@@ -45,7 +45,8 @@ OpenCanary is the Open Source version of our commercial [Thinkst Canary](https:/
 
 ## Prerequisites
 
-* Python 3.7 (Recommended Python 3.7+)
+* AMD64: Python 3.7 (Recommended Python 3.7+)
+* ARM64: Python 3.9+
 * _Optional_ SNMP requires the Python library Scapy
 * _Optional_ Samba module needs a working installation of Samba
 * _Optional_ Portscan uses iptables (not nftables) and is only supported on Linux-based operating systems
