@@ -124,6 +124,15 @@ $ cd dist
 $ pip install opencanary-<version>.tar.gz
 ```
 
+### Use via pkgx
+
+OpenCanary is packaged via [pkgx](https://pkgx.sh/), so no installation is needed if pkgx is installed, simply preface the `opencanaryd` command with
+`pkgx`. Due to environment variable protections in modern `sudo` implementations, the entire command must be run as root, or via `sudo -E`.
+
+```
+$ pkgx opencanaryd --version
+```
+
 ### Installation for Docker
 
 OpenCanary Docker images are hosted on Docker Hub. These are only useful on Linux Docker hosts, as the `host` network engine is required for accurate network information.
@@ -179,6 +188,14 @@ Start OpenCanary by running:
 ```
 $ . env/bin/activate
 $ opencanaryd --start
+```
+
+### With pkgx
+
+Start OpenCanary by running:
+
+```
+$ sudo -E pkgx opencanaryd --start
 ```
 
 ### With docker-compose
