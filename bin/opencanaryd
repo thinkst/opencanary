@@ -1,0 +1,38 @@
+#!/bin/bash
+DIR=$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )
+PIDFILE="${DIR}/opencanaryd.pid"
+
+cmd=$1
+
+function usage() {
+    echo -e "\n  OpenCanary v1.0\n"
+    echo -e "\topencanaryd [ --start | --stop | --copyconfig | --help ]\n\n"
+    echo -e "\t\t--start\tStarts the opencanaryd process"
+    echo -e "\t\t--stop\tStops the opencanaryd process"
+    echo -e "\t\t--copyconfig\tCreates a default config file at ${HOME}/.opencanary.conf"
+    echo -e "\t\t--help\tThis help\n"
+
+}
+
+if [ "${cmd}" == "--start" ]; then
+    if [ ! -f ~/.opencanary.conf -a ! -f opencanary.conf -a ! -f /etc/opencanaryd/opencanary.conf ]; then
+        echo "[e] No config file found, please create one with \"opencanaryd --copyconfig\""
+        exit 1
+    fi
+
+    sudo "${DIR}/twistd" -y "${DIR}/opencanary.tac" --pidfile "${PIDFILE}" --syslog --prefix=opencanaryd
+elif [ "${cmd}" == "--stop" ]; then
+    pid=`sudo cat "${PIDFILE}"`
+    sudo kill "$pid"
+elif [ "${cmd}" == "--copyconfig" ]; then
+    if [ -f ~/.opencanary.conf ]; then
+        echo "[e] A config file already exists at ${HOME}/.opencanary.conf, please move it first"
+        exit 1
+    fi
+    cp "${DIR}/../lib/python2.7/site-packages/opencanary/data/settings.json" ~/.opencanary.conf
+    echo -e "[*] A sample config file is ready (${HOME}/.opencanary.conf)\n"
+    echo    "[*] Edit your configuration, then launch with \"opencanaryd --start\""
+else
+    usage
+    exit 1
+fi
