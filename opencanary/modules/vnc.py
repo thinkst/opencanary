@@ -6,6 +6,8 @@ from twisted.application import internet
 
 from des import des
 
+import os
+
 RFB_33  = '003.003'
 RFB_37  = '003.007'
 RFB_38  = '003.008'
@@ -66,7 +68,7 @@ class VNCProtocol(Protocol):
 
     def _send_auth(self,):
         print 'send auth'
-        self.challenge = 'A' * 16
+        self.challenge = os.urandom(16)
         self.transport.write(self.challenge)
         self.state = AUTH_SEND
 
