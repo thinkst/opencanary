@@ -196,4 +196,3 @@ class HpfeedsHandler(logging.Handler):
             self.hpc.publish(self.channels,msg)
         except:
             print "Error on publishing to server"
-a
