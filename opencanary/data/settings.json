@@ -55,6 +55,15 @@
 		    "class": "opencanary.logger.SocketJSONHandler",
 		    "host": "127.0.0.1",
 		    "port": 1514
+		},
+
+    "hpfeeds": {
+		    "class": "opencanary.logger.HpfeedsHandler",
+		    "host": "127.0.0.1",
+		    "port": 10000,
+        "ident": "test",
+        "secret":"12345",
+        "channels":["test.events"]
 		}
 	    }
 	}
