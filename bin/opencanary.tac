@@ -81,7 +81,7 @@ for module in MODULES:
 
     # start modules
     try:
-        if module in [CanarySamba, CanaryPortscan]:
+        if hasattr(loadmod, 'startYourEngines'):
             loadmod.startYourEngines()
             logMsg("Start module %s" % (module.NAME))
             continue
