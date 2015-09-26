@@ -1,9 +1,25 @@
 import sys
 import warnings
-import os.path
+import os
 from pkg_resources import resource_filename
 
 from opencanary.honeycred import *
+
+__all__ = ['CanaryServices', 'CanaryService']
+
+# attempt to import all modules in the directory
+modpath=os.path.dirname(__file__)
+modules = [ f[:-3] for f in os.listdir(modpath) if f[-3:]=='.py' and f[0]!='_'
+                 and os.path.isfile(os.path.join(modpath, f))]
+for module in modules:
+    try:
+        __import__(module, globals(), locals())
+    except ImportError:
+        continue
+
+# list of canary services
+CanaryServices = []
+
 
 class CanaryService(object):
     NAME = 'baseservice'
@@ -17,6 +33,8 @@ class CanaryService(object):
         self.creds = config.getVal("%s.honeycreds" % self.NAME, [])
         if self.creds:
             self.honeyCredHook = buildHoneyCredHook(self.creds)
+
+        CanaryServices.append(self)
 
     @classmethod
     def resource_dir(klass):
@@ -77,6 +95,8 @@ if sys.platform.startswith("linux"):
     import datetime
     import os
 
+    __all__.append('FileSystemWatcher')
+    
     class FileSystemWatcher(object):
 
         def __init__(self, fileName=None):
