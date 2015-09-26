@@ -7,46 +7,7 @@ from twisted.internet.protocol import Factory
 
 from opencanary.config import config
 from opencanary.logger import getLogger
-from opencanary.modules.http import CanaryHTTP
-from opencanary.modules.ftp import CanaryFTP
-from opencanary.modules.ssh import CanarySSH
-from opencanary.modules.telnet import Telnet
-from opencanary.modules.httpproxy import HTTPProxy
-from opencanary.modules.mysql import CanaryMySQL
-from opencanary.modules.mssql import MSSQL
-from opencanary.modules.ntp import CanaryNtp
-from opencanary.modules.tftp import CanaryTftp
-from opencanary.modules.vnc import CanaryVNC
-from opencanary.modules.sip import CanarySIP
-
-#from opencanary.modules.example0 import CanaryExample0
-#from opencanary.modules.example1 import CanaryExample1
-
-MODULES = [Telnet, CanaryHTTP, CanaryFTP, CanarySSH, HTTPProxy, CanaryMySQL,
-           MSSQL, CanaryVNC, CanaryTftp, CanaryNtp, CanarySIP]
-           #CanaryExample0, CanaryExample1]
-try:
-    #Module needs RDP, but the rest of OpenCanary doesn't
-    from opencanary.modules.rdp import CanaryRDP
-    MODULES.append(CanaryRDP)
-except ImportError:
-    pass
-
-
-try:
-    #Module need Scapy, but the rest of OpenCanary doesn't
-    from opencanary.modules.snmp import CanarySNMP
-    MODULES.append(CanarySNMP)
-except ImportError:
-    pass
-
-# NB: imports below depend on inotify, only available on linux
-import sys
-if sys.platform.startswith("linux"):
-    from opencanary.modules.samba import CanarySamba
-    from opencanary.modules.portscan import CanaryPortscan
-    MODULES.append(CanarySamba)
-    MODULES.append(CanaryPortscan)
+from opencanary.modules import CanaryServices
 
 logger = getLogger(config)
 
@@ -59,7 +20,7 @@ def logMsg(msg):
 
 application = service.Application("opencanaryd")
 
-for module in MODULES:
+for module in CanaryServices:
     # skip if not enabled
     if not config.moduleEnabled(module.NAME):
         continue
