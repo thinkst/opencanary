@@ -176,3 +176,23 @@ class SocketJSONHandler(SocketHandler):
 
     def makePickle(self, record):
         return record.getMessage() + "\n"
+
+
+class HpfeedsHandler(logging.Handler):
+    def __init__(self,host,port,ident, secret,channels):
+        logging.Handler.__init__(self)
+        self.host=str(host)
+        self.port=int(port)
+        self.ident=str(ident)
+        self.secret=str(secret)
+        self.channels=map(str,channels)
+        hpc=hpfeeds.new(self.host, self.port, self.ident, self.secret)
+        hpc.subscribe(channels)
+        self.hpc=hpc
+
+    def emit(self, record):
+        try:
+            msg = self.format(record)
+            self.hpc.publish(self.channels,msg)
+        except:
+            print "Error on publishing to server"
