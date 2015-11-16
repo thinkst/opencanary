@@ -56,6 +56,7 @@ class Telnet(CanaryService):
         self.port = int(config.getVal('telnet.port', default=8023))
         self.banner = config.getVal('telnet.banner', '').encode('utf8')
         self.logtype = logger.LOG_TELNET_LOGIN_ATTEMPT
+        self.listen_addr = config.getVal('device.listen_addr', default='')
 
         if self.banner:
             self.banner += "\n"
@@ -68,4 +69,4 @@ class Telnet(CanaryService):
         f.logger = self.logger
         f.banner = self.banner
         f.protocol = lambda: TelnetTransport(AlertAuthTelnetProtocol, p)
-        return internet.TCPServer(self.port, f)
+        return internet.TCPServer(self.port, f, interface=self.listen_addr)

@@ -27,7 +27,7 @@ class Config:
                 print "[-] An error occured loading %s (%s)" % (fname, e)
 
     def moduleEnabled(self, module_name):
-        k = "%s.enabled" % module_name
+        k = "%s.enabled" % module_name.lower()
         if k in self.__config:
             return bool(self.__config[k])
         return False

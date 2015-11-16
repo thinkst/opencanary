@@ -134,6 +134,7 @@ class HTTPProxy(CanaryService):
         self.skindir = os.path.join(
             HTTPProxy.resource_dir(), 'skin', self.skin)
         self.logtype = logger.LOG_HTTPPROXY_LOGIN_ATTEMPT
+        self.listen_addr = config.getVal('device.listen_addr', default='')
 
         authfilename = os.path.join(self.skindir, 'auth.html')
         try:
@@ -146,4 +147,4 @@ class HTTPProxy(CanaryService):
     def getService(self):
         AlertProxyRequest.FACTORY = self
         f = HTTPProxyFactory()
-        return internet.TCPServer(self.port, f)
+        return internet.TCPServer(self.port, f, interface=self.listen_addr)

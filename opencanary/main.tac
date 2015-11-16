@@ -62,12 +62,13 @@ application = service.Application("opencanaryd")
 for module in MODULES:
     # skip if not enabled
     if not config.moduleEnabled(module.NAME):
+        logMsg("Skipped module %s" % (module.NAME))
         continue
 
     # newer type modules
     if issubclass(module, Factory):
         csf = sys.modules[module.__module__].CanaryServiceFactory(config, logger)
-        internet.TCPServer(csf.port, csf).setServiceParent(application)
+        internet.TCPServer(csf.port, csf, interface=config.getVal('device.listen_addr', default='')).setServiceParent(application)
         continue
 
     # check if module is enabled

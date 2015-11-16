@@ -154,6 +154,7 @@ class CanaryMySQL(CanaryService):
         self.port = int(config.getVal("mysql.port", default=3306))
         self.banner = config.getVal("mysql.banner", default="5.5.43-0ubuntu0.14.04.1").encode()
         self.logtype = logger.LOG_MYSQL_LOGIN_ATTEMPT
+        self.listen_addr = config.getVal('device.listen_addr', default='')
         if re.search('^[3456]\.[-_~.+\w]+$', self.banner) is None:
             raise ConfigException("sql.banner", "Invalid MySQL Banner")
 
@@ -161,4 +162,4 @@ class CanaryMySQL(CanaryService):
     def getService(self):
         factory = SQLFactory()
         factory.canaryservice = self
-        return internet.TCPServer(self.port, factory)
+        return internet.TCPServer(self.port, factory, interface=self.listen_addr)

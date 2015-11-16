@@ -373,10 +373,11 @@ class MSSQL(CanaryService):
         CanaryService.__init__(self, config=config, logger=logger)
         self.port = int(config.getVal("mssql.port", default=1433))
         self.version = config.getVal("mssql.version", default="2012")
+        self.listen_addr = config.getVal('device.listen_addr', default='')
         if self.version not in MSSQLProtocol.NMAP_PROBE_1_RESP:
             raise ConfigException("mssql.version", "Invalid MSSQL Version")
 
     def getService(self):
         factory = SQLFactory()
         factory.canaryservice = self
-        return internet.TCPServer(self.port, factory)
+        return internet.TCPServer(self.port, factory, interface=self.listen_addr)

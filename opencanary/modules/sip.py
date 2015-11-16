@@ -31,9 +31,10 @@ class CanarySIP(CanaryService):
         CanaryService.__init__(self, config=config, logger=logger)
         self.port = int(config.getVal('sip.port', default=5060))
         self.logtype=self.logger.LOG_SIP_REQUEST
+        self.listen_addr = config.getVal('device.listen_addr', default='')
 
 
     def getService(self):
         f = SIPServer()
         f.factory = self
-        return internet.UDPServer(self.port, f)
+        return internet.UDPServer(self.port, f, interface=self.listen_addr)

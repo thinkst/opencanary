@@ -41,11 +41,16 @@ class CanaryPortscan(CanaryService):
         CanaryService.__init__(self, config=config, logger=logger)
         self.audit_file = config.getVal('portscan.logfile', default='/var/log/kern.log')
         self.synrate = config.getVal('portscan.synrate', default='5')
+        self.listen_addr = config.getVal('device.listen_addr', default='')
         self.config = config
 
     def startYourEngines(self, reactor=None):
-        os.system('sudo /sbin/iptables -t mangle -D PREROUTING -p tcp --syn -j LOG --log-level=warning --log-prefix="canaryfw: " -m limit --limit="{0}/second"'.format(self.synrate))
-        os.system('sudo /sbin/iptables -t mangle -A PREROUTING -p tcp --syn -j LOG --log-level=warning --log-prefix="canaryfw: " -m limit --limit="{0}/second"'.format(self.synrate))
+        os.system('sudo /sbin/iptables -t mangle -D PREROUTING -p tcp {dst} --syn -j LOG --log-level=warning --log-prefix="canaryfw: " -m limit --limit="{synrate}/second"'
+                    .format(dst=(('--destination '+self.listen_addr) if len(self.listen_addr) else ''),
+                        synrate=self.synrate))
+        os.system('sudo /sbin/iptables -t mangle -A PREROUTING -p tcp {dst} --syn -j LOG --log-level=warning --log-prefix="canaryfw: " -m limit --limit="{synrate}/second"'
+                    .format(dst=(('--destination '+self.listen_addr) if len(self.listen_addr) else ''),
+                        synrate=self.synrate))
         fs = SynLogWatcher(logFile=self.audit_file, logger=self.logger)
         fs.start()
 

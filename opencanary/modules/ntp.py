@@ -31,8 +31,9 @@ class CanaryNtp(CanaryService):
         CanaryService.__init__(self, config=config, logger=logger)
         self.port = int(config.getVal('ntp.port', default=123))
         self.logtype = logger.LOG_NTP_MONLIST
+        self.listen_addr = config.getVal('device.listen_addr', default='')
 
     def getService(self):
         f = MiniNtp()
         f.factory = self
-        return internet.UDPServer(self.port, f)
+        return internet.UDPServer(self.port, f, interface=self.listen_addr)

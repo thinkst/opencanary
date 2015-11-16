@@ -44,9 +44,10 @@ class CanaryTftp(CanaryService):
         CanaryService.__init__(self, config=config, logger=logger)
         self.port = int(config.getVal('tftp.port', default=69))
         self.logtype=self.logger.LOG_TFTP
+        self.listen_addr = config.getVal('device.listen_addr', default='')
 
 
     def getService(self):
         f = Tftp()
         f.factory = self
-        return internet.UDPServer(self.port, f)
+        return internet.UDPServer(self.port, f, interface=self.listen_addr)

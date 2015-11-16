@@ -69,6 +69,7 @@ class CanaryFTP(CanaryService):
         # find a place to check that logtype is initialised
         # find a place to check that factory has service attached
         self.logtype = logger.LOG_FTP_LOGIN_ATTEMPT
+        self.listen_addr = config.getVal('device.listen_addr', default='')
 
     def getService(self):
         p = Portal(FTPRealm(FTP_PATH), [DenyAllAccess()])
@@ -76,4 +77,4 @@ class CanaryFTP(CanaryService):
         f.protocol = LoggingFTP
         f.welcomeMessage = self.banner
         f.canaryservice = self
-        return internet.TCPServer(self.port, f)
+        return internet.TCPServer(self.port, f, interface=self.listen_addr)

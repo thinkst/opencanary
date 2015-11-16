@@ -36,8 +36,9 @@ class CanarySNMP(CanaryService):
         CanaryService.__init__(self, config=config, logger=logger)
         self.port = int(config.getVal('snmp.port', default=161))
         self.logtype = logger.LOG_SNMP_CMD
+        self.listen_addr = config.getVal('device.listen_addr', default='')
 
     def getService(self):
         f = MiniSNMP()
         f.factory = self
-        return internet.UDPServer(self.port, f)
+        return internet.UDPServer(self.port, f, interface=self.listen_addr)
