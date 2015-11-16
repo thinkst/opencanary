@@ -10,6 +10,7 @@ from twisted. application import internet
 
 from zope.interface import implements
 import sys, os, time
+import base64
 
 SSH_PATH="/var/tmp"
 
@@ -67,6 +68,34 @@ class HoneyPotSSHUserAuthServer(userauth.SSHUserAuthServer):
             src_port=peer.address.port,
             dst_host=us.address.host,
             dst_port=us.address.port)
+
+        return self.portal.login(c, None, conchinterfaces.IConchUser).addErrback(
+                                                        self._ebPassword)
+
+    def auth_publickey(self, packet):
+
+        try:
+            #extract the public key blob from the SSH packet
+            key_blob = getNS(getNS(packet[1:])[1])[0]
+        except:
+            key_blob = "No public key found."
+
+        try:
+            #convert blob into openssh key format
+            key = keys.Key.fromString(key_blob).toString('openssh')
+        except:
+            key = "Invalid SSH Public Key Submitted: {key_blob}".format(key_blob=key_blob.encode('hex'))
+            for keytype in ['ecdsa-sha2-nistp256','ecdsa-sha2-nistp384','ecdsa-sha2-nistp521','ssh-ed25519']:
+                if keytype in key_blob:
+                    key = '{keytype} {keydata}'.format(
+                            keytype=keytype,
+                            keydata=base64.b64encode(key_blob))
+
+            print 'Key was {key}'.format(key=key)
+
+        c = credentials.SSHPrivateKey(None,None,None,None,None)
+
+        #self.log(key=key)
 
         return self.portal.login(c, None, conchinterfaces.IConchUser).addErrback(
                                                         self._ebPassword)
@@ -323,6 +352,18 @@ class HoneypotPasswordChecker:
     def requestAvatarId(self, credentials):
         return defer.fail(error.UnauthorizedLogin())
 
+class CanaryPublicKeyChecker:
+    implements(checkers.ICredentialsChecker)
+
+    credentialInterfaces = (credentials.ISSHPrivateKey,)
+
+    def __init__(self, logger=None):
+        self.logger = logger
+        self.auth_attempt = 0
+
+    def requestAvatarId(self, credentials):
+        return defer.fail(error.UnauthorizedLogin())
+
 class CanarySSH(CanaryService):
     NAME = 'ssh'
 
@@ -330,6 +371,7 @@ class CanarySSH(CanaryService):
         CanaryService.__init__(self, config=config, logger=logger)
         self.port = int(config.getVal("ssh.port", default=22))
         self.version = config.getVal("ssh.version", default="SSH-2.0-OpenSSH_5.1p1 Debian-5").encode('utf8')
+        self.listen_addr = config.getVal('device.listen_addr', default='')
 
     def getService(self):
         factory = HoneyPotSSHFactory(version=self.version, logger=self.logger)
@@ -339,8 +381,9 @@ class CanarySSH(CanaryService):
         rsa_pubKeyString, rsa_privKeyString = getRSAKeys()
         dsa_pubKeyString, dsa_privKeyString = getDSAKeys()
         factory.portal.registerChecker(HoneypotPasswordChecker(logger=factory.logger))
+        factory.portal.registerChecker(CanaryPublicKeyChecker(logger=factory.logger))
         factory.publicKeys = {'ssh-rsa': keys.Key.fromString(data=rsa_pubKeyString),
                               'ssh-dss': keys.Key.fromString(data=dsa_pubKeyString)}
         factory.privateKeys = {'ssh-rsa': keys.Key.fromString(data=rsa_privKeyString),
                                'ssh-dss': keys.Key.fromString(data=dsa_privKeyString)}
-        return internet.TCPServer(self.port, factory)
+        return internet.TCPServer(self.port, factory, interface=self.listen_addr)
