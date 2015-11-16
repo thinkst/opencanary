@@ -115,5 +115,7 @@
 	    "username" : "admin",
 	    "password" : "admin1"
 	}
-    ]
+    ],
+    "mssql.enabled": false,
+    "vnc.enabled": false
 }
