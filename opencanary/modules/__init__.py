@@ -2,8 +2,28 @@ import sys
 import warnings
 import os.path
 from pkg_resources import resource_filename
+from twisted.application import internet
+from twisted.internet.protocol import Factory
+from twisted.internet.protocol import DatagramProtocol
 
 from opencanary.honeycred import *
+
+# Monkey-patch-replace Twisted Protocol with CanaryProtocol class
+from twisted.internet import protocol
+
+class CanaryProtocol(protocol.Protocol):
+    """TCP protocols (ie. descedents of this class) gain a log method that be
+    can be called with just the event data, as transport data is added here"""
+
+    def log(self, *args, **kwargs):
+        if hasattr(self, 'factory') and hasattr(self.factory, 'log'):
+            kwargs['transport'] = self.transport
+            return self.factory.log(*args, **kwargs)
+
+        raise AttributeError("""Instance of %s does not have 'factory' attribute
+        or factory does not have a log function.""" % self.__class__.__name__ )
+
+protocol.Protocol = CanaryProtocol
 
 class CanaryService(object):
     NAME = 'baseservice'
@@ -67,6 +87,23 @@ class CanaryService(object):
                 data["honeycred"] = self.honeyCredHook(username, password)
 
         self.logger.log(data)
+
+    def getService(self):
+        """Return service to be run
+
+        This handles the easy case where the CanaryService class is
+        also the Factory/Datagram class. Subclasses should override
+        this if more intricracy is needed.
+        """
+        if isinstance(self, Factory):
+            return internet.TCPServer(self.port, self)
+        elif isinstance(self, DatagramProtocol):
+            return internet.UDPServer(self.port, self)
+
+        err = 'The class %s does not inherit from either Factory or DatagramProtocol.' % (
+            self.__class__.__name__
+            )
+        raise Exception(err)
 
 
 if sys.platform.startswith("linux"):

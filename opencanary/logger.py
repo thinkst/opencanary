@@ -72,6 +72,16 @@ class LoggerBase(object):
     LOG_SNMP_CMD                                = 13001
     LOG_RDP                                     = 14001
     LOG_SIP_REQUEST                             = 15001
+    LOG_USER_0                                  = 99000
+    LOG_USER_1                                  = 99001
+    LOG_USER_2                                  = 99002
+    LOG_USER_3                                  = 99003
+    LOG_USER_4                                  = 99004
+    LOG_USER_5                                  = 99005
+    LOG_USER_6                                  = 99006
+    LOG_USER_7                                  = 99007
+    LOG_USER_8                                  = 99008
+    LOG_USER_9                                  = 99009
 
     def sanitizeLog(self, logdata):
         logdata['node_id'] = self.node_id
