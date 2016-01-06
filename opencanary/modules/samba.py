@@ -15,7 +15,7 @@ if sys.platform.startswith("linux"):
 
         def handleLines(self, lines=None):
             #samba4 re
-            audit_re = re.compile(r'.*smbd_audit: (.*)')
+            audit_re = re.compile(r'.*smbd_audit: ([^|]+?)[|]([^|]+?)[|]([^|]+?)[|]([^|]+?)[|]([^|]+?)[|]([^|]+?)[|]([^|]+?)[|]([^|]+?)[|]([^|]+?)[|]([^|]+?)[|]([^|]+?)[|]([^|]+?)[|](.*)')
 
             #samba 3 re
             #audit_re = re.compile(r'.*smbd\[[0-9]+\]: (.*)')
@@ -23,7 +23,7 @@ if sys.platform.startswith("linux"):
                     matches = audit_re.match(line)
                     (user,remoteIP,localIP,remoteName,shareName,
                     localName,smbVer,smbArch,timeStamp,domainName,
-                    auditAction,auditStatus,fileName) = matches.group(1).split('|')
+                    auditAction,auditStatus,fileName) = matches.groups()
 
                     data = {}
                     data['src_host'] = remoteIP
