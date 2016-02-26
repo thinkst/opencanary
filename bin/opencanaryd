@@ -8,6 +8,7 @@ function usage() {
     echo -e "\n  OpenCanary v1.0\n"
     echo -e "\topencanaryd [ --start | --dev | --stop | --copyconfig | --help ]\n\n"
     echo -e "\t\t--start\tStarts the opencanaryd process"
+    echo -e "\t\t--dev\tRun the opencanaryd process in the foreground"
     echo -e "\t\t--stop\tStops the opencanaryd process"
     echo -e "\t\t--copyconfig\tCreates a default config file at ${HOME}/.opencanary.conf"
     echo -e "\t\t--help\tThis help\n"
@@ -27,7 +28,7 @@ elif [ "${cmd}" == "--dev" ]; then
       exit 1
   fi
 
-  sudo "${DIR}/twistd" -noy "${DIR}/opencanary.tac" --syslog --prefix=opencanaryd
+  sudo "${DIR}/twistd" -noy "${DIR}/opencanary.tac"
 elif [ "${cmd}" == "--stop" ]; then
     pid=`sudo cat "${PIDFILE}"`
     sudo kill "$pid"
