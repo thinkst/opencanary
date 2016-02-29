@@ -6,10 +6,11 @@ cmd=$1
 
 function usage() {
     echo -e "\n  OpenCanary v1.0\n"
-    echo -e "\topencanaryd [ --start | --dev | --stop | --copyconfig | --help ]\n\n"
+    echo -e "\topencanaryd [ --start | --dev | --stop | --copyconfig | --usermodule | --help ]\n\n"
     echo -e "\t\t--start\tStarts the opencanaryd process"
     echo -e "\t\t--dev\tRun the opencanaryd process in the foreground"
     echo -e "\t\t--stop\tStops the opencanaryd process"
+    echo -e "\t\t--usermodule\tRun opencanaryd in foreground with only usermodules enabled"
     echo -e "\t\t--copyconfig\tCreates a default config file at ${HOME}/.opencanary.conf"
     echo -e "\t\t--help\tThis help\n"
 
@@ -29,6 +30,19 @@ elif [ "${cmd}" == "--dev" ]; then
   fi
 
   sudo "${DIR}/twistd" -noy "${DIR}/opencanary.tac"
+elif [ "${cmd}" == "--usermodule" ]; then
+  usermodconf=$(python -c "from pkg_resources import resource_filename; print resource_filename('opencanary', 'data/settings-usermodule.json')")
+
+  if [ -f opencanary.conf ]; then
+    if ! diff -q opencanary.conf "${usermodconf}" 2>&1 >/dev/null; then
+      echo "Backing up old config to ./opencanary.conf.old"
+      cp opencanary.conf{,.old}
+    fi
+  fi
+
+  cp "${usermodconf}" opencanary.conf
+  sudo "${DIR}/twistd" -noy "${DIR}/opencanary.tac"
+
 elif [ "${cmd}" == "--stop" ]; then
     pid=`sudo cat "${PIDFILE}"`
     sudo kill "$pid"
