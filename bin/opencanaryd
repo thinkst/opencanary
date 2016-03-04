@@ -51,7 +51,7 @@ elif [ "${cmd}" == "--copyconfig" ]; then
         echo "[e] A config file already exists at ${HOME}/.opencanary.conf, please move it first"
         exit 1
     fi
-    cp "${DIR}/../lib/python2.7/site-packages/opencanary/data/settings.json" ~/.opencanary.conf
+    cp "/usr/local/lib/python2.7/dist-packages/opencanary/data/settings.json" ~/.opencanary.conf
     echo -e "[*] A sample config file is ready (${HOME}/.opencanary.conf)\n"
     echo    "[*] Edit your configuration, then launch with \"opencanaryd --start\""
 else
