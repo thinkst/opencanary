@@ -49,6 +49,7 @@ Alerting
    :maxdepth: 2
 
    alerts/email
+   alerts/hpfeeds
 
 Indices and tables
 ------------------
