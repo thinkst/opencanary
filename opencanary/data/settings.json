@@ -62,7 +62,7 @@
             }
         }
     },
-    "portscan.synrate": "5",
+    "portscan.synrate": 5,
     "smb.auditfile": "/var/log/samba-audit.log",
     "smb.configfile": "/briar/config/smb.conf",
     "smb.domain": "corp.thinkst.com",

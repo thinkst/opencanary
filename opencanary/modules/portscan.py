@@ -40,7 +40,7 @@ class CanaryPortscan(CanaryService):
     def __init__(self,config=None, logger=None):
         CanaryService.__init__(self, config=config, logger=logger)
         self.audit_file = config.getVal('portscan.logfile', default='/var/log/kern.log')
-        self.synrate = config.getVal('portscan.synrate', default='5')
+        self.synrate = int(config.getVal('portscan.synrate', default=5))
         self.listen_addr = config.getVal('device.listen_addr', default='')
         self.config = config
 
@@ -56,4 +56,3 @@ class CanaryPortscan(CanaryService):
 
     def configUpdated(self,):
         pass
-
