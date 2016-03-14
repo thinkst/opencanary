@@ -28,6 +28,13 @@ $ pip install opencanary
 $ pip install scapy pcapy # optional
 ```
 
+Ubuntu users installing rdpy should run the following before installing OpenCanary:
+
+```
+$ sudo apt-get install -y build-essential libssl-dev libffi-dev python-dev
+$ pip install rdpy
+```
+
 Installation OS X needs an extra step, as multiple OpenSSL versions
 may exist which confounds the python libraries using to it.
 
