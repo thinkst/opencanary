@@ -22,17 +22,17 @@ Installation on Ubuntu:
 
 ```
 $ sudo apt-get install python-dev python-pip python-virtualenv
-$ virtualenv venv/
+$ sudo virtualenv venv/
 $ . venv/bin/activate
-$ pip install opencanary
-$ pip install scapy pcapy # optional
+$ sudo pip install opencanary
+$ sudo pip install scapy pcapy # optional
 ```
 
 Ubuntu users installing rdpy should run the following before installing OpenCanary:
 
 ```
 $ sudo apt-get install -y build-essential libssl-dev libffi-dev python-dev
-$ pip install rdpy
+$ sudo pip install rdpy
 ```
 
 Installation OS X needs an extra step, as multiple OpenSSL versions
@@ -57,25 +57,31 @@ $ env ARCHFLAGS="-arch x86_64" LDFLAGS="-L/usr/local/opt/openssl/lib" CFLAGS="-I
 
 Now installation can run as usual:
 ```
-$ pip install opencanary
-$ pip install scapy pcapy # optional
+$ sudo pip install opencanary
+$ sudo pip install scapy pcapy # optional
 ```
 
 To install from source, instead of running pip do the following:
 
 ```
-$ git clone https://github.com/thinkst/opencanary
+$ sudo git clone https://github.com/thinkst/opencanary
 $ cd opencanary
-$ python setup.py install
+$ sudo python setup.py install
 ```
 
 Run
 ----
 
+To create a working config, run:
+
+```
+$ sudo opencanaryd --copyconfig
+```
+
 OpenCanary is started by running:
 
 ```
-$ sudo /path/to/venv/bin/opencanary --start
+$ sudo opencanaryd --start
 ```
 
 On the first run, instructions are printed that will get to a working config.
