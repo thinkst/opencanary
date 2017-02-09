@@ -22,7 +22,8 @@ if [ "${cmd}" == "--start" ]; then
         exit 1
     fi
 
-    sudo "${DIR}/twistd" -y "${DIR}/opencanary.tac" --pidfile "${PIDFILE}" --syslog --prefix=opencanaryd
+    # Do not log to syslog to avoid flood
+    sudo "${DIR}/twistd" -y "${DIR}/opencanary.tac" --pidfile "${PIDFILE}" --prefix=opencanaryd
 elif [ "${cmd}" == "--dev" ]; then
   if [ ! -f ~/.opencanary.conf -a ! -f opencanary.conf -a ! -f /etc/opencanaryd/opencanary.conf ]; then
       echo "[e] No config file found, please create one with \"opencanaryd --copyconfig\""
