@@ -43,9 +43,27 @@ class Error(Resource):
         return Resource.render(self, request)
 
     def render_GET(self, request):
+        # Log requested page
+        logdata = {
+            'SKIN': self.skin,
+            'HOSTNAME': request.getRequestHostname(),
+            'PATH': request.path,
+            'USERAGENT': request.getHeader('user-agent')
+        }
+        logtype = self.factory.logger.LOG_HTTP_GET
+        self.factory.log(logdata, transport=request.transport, logtype=logtype)
         return self.err_page(request)
 
     def render_POST(self, request):
+        # Log requested page
+        logdata = {
+            'SKIN': self.skin,
+            'HOSTNAME': request.getRequestHostname(),
+            'PATH': request.path,
+            'USERAGENT': request.getHeader('user-agent')
+        }
+        logtype = self.factory.logger.LOG_HTTP_GET
+        self.factory.log(logdata, transport=request.transport, logtype=logtype)
         return self.err_page(request)
 
 class BasicLogin(Resource):
