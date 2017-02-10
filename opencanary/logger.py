@@ -2,6 +2,11 @@ import simplejson as json
 import logging.config
 import socket
 import sys
+import base64
+import requests
+import time
+import dateutil.parser
+import re
 
 from datetime import datetime
 from logging.handlers import SocketHandler
@@ -206,3 +211,90 @@ class HpfeedsHandler(logging.Handler):
             self.hpc.publish(self.channels,msg)
         except:
             print "Error on publishing to server"
+
+
+class DShieldHandler(logging.Handler):
+    def __init__(self, dshield_userid, dshield_authkey, allowed_ports):
+        logging.Handler.__init__(self)
+        self.dshield_userid = str(dshield_userid)
+        self.dshield_authkey = str(dshield_authkey)
+        try:
+                # Extract the list of allowed ports
+                self.allowed_ports = map(int, str(allowed_ports).split(','))
+
+        except:
+                # By default, report only port 22
+                self.allowed_ports = [ 22 ]
+
+    def emit(self, record):
+        self.format(record)
+        jsonData = json.loads(record.message)
+
+        if 'USERNAME' not in jsonData['logdata']  or 'PASSWORD' not  in jsonData['logdata']:
+            return
+
+        if jsonData['dst_port'] not in self.allowed_ports:
+            return
+
+        # Extract fields from the log entry
+        timestamp = dateutil.parser.parse(jsonData['local_time'])
+        d = timestamp.date().__str__()
+        t = timestamp.time().strftime("%H:%M:%S")
+        tz = time.strftime("%z")
+        data = '{0}\t{1}\t{2}\t{3}\t{4}\t{5}\n'.format(
+            d,
+            t,
+            tz,
+            jsonData['src_host'],
+            jsonData['logdata']['USERNAME'],
+            jsonData['logdata']['PASSWORD']
+            )
+
+        # The nonce is predefined as explained in the original script :
+        # trying to avoid sending the authentication key in the "clear" but not wanting to
+        # deal with a full digest like exchange. Using a fixed nonce to mix up the limited
+        # userid.
+        nonce = base64.b64decode('ElWO1arph+Jifqme6eXD8Uj+QTAmijAWxX1msbJzXDM=')
+        digest = base64.b64encode(hmac.new('{0}{1}'.format(nonce,self.dshield_userid),
+            base64.b64decode(self.dshield_authkey),
+            hashlib.sha256).digest())
+        auth_header = 'credentials={0} nonce=ElWO1arph+Jifqme6eXD8Uj+QTAmijAWxX1msbJzXDM= userid={1}'.format(digest, self.dshield_userid)
+        headers = {'X-ISC-Authorization': auth_header,
+            'Content-Type':'text/plain'}
+        req = requests.request(method ='PUT',
+                           url = 'https://secure.dshield.org/api/file/sshlog',
+                           headers = headers,
+                           timeout = 10,
+                           verify = True,
+                           data = data)
+
+        if req.status_code == requests.codes.ok:
+            response = req.text
+            sha1_regex = re.compile(ur'<sha1checksum>([^<]+)<\/sha1checksum>')
+            sha1_match = sha1_regex.search(response)
+            if sha1_match is None:
+                print 'Could not find sha1checksum in response'
+                print 'Response was {0}'.format(response)
+                return (1, 'Could not find sha1checksum in response')
+            sha1_local = hashlib.sha1()
+            sha1_local.update(data)
+            if sha1_match.group(1) != sha1_local.hexdigest():
+                print '\nERROR: SHA1 Mismatch {0} {1} .\n'.format(sha1_match.group(1), sha1_local.hexdigest())
+                return(1,'\nERROR: SHA1 Mismatch {0} {1} .\n'.format(sha1_match.group(1), sha1_local.hexdigest()))
+            md5_regex = re.compile(ur'<md5checksum>([^<]+)<\/md5checksum>')
+            md5_match = md5_regex.search(response)
+            if md5_match is None:
+                print 'Could not find md5checksum in response'
+                print 'Response was {0}'.format(response)
+                return (1, 'Could not find md5checksum in response')
+            md5_local = hashlib.md5()
+            md5_local.update(data)
+            if md5_match.group(1) != md5_local.hexdigest():
+                print '\nERROR: MD5 Mismatch {0} {1} .\n'.format(md5_match.group(1), md5_local.hexdigest())
+                return(1,'\nERROR: MD5 Mismatch {0} {1} .\n'.format(md5_match.group(1), md5_local.hexdigest()))
+            print '\nSUCCESS: Sent {0} bytes worth of data to secure.dshield.org\n'.format(len(data))
+            return(0,'\nSUCCESS: Sent {0} bytes worth of data to secure.dshield.org\n'.format(len(data)))
+        else:
+            print '\nERROR: error {0} .\n'.format(req.status_code)
+            print 'Response was {0}'.format(response)
+            return(1,'\nERROR: error {0} .\n'.format(req.status_code))
