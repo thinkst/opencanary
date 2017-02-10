@@ -58,7 +58,13 @@
                     "class": "opencanary.logger.SocketJSONHandler",
                     "host": "127.0.0.1",
                     "port": 1514
-                }
+                },
+                 "dshield": {
+                    "class": "opencanary.logger.DShieldHandler",
+                    "dshield_userid": "xxxxxx",
+                    "dshield_authkey": "xxxxxx",
+                    "allowed_ports": "22,23"
+                }               
             }
         }
     },
