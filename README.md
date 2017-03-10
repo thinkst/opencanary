@@ -22,8 +22,8 @@ Installation on Ubuntu:
 
 ```
 $ sudo apt-get install python-dev python-pip python-virtualenv
-$ virtualenv venv/
-$ . venv/bin/activate
+$ virtualenv env/
+$ . env/bin/activate
 $ pip install opencanary
 $ pip install scapy pcapy # optional
 ```
@@ -39,8 +39,8 @@ Installation OS X needs an extra step, as multiple OpenSSL versions
 may exist which confounds the python libraries using to it.
 
 ```
-$ virtualenv venv/
-$ . venv/bin/activate
+$ virtualenv env/
+$ . env/bin/activate
 ```
 
 Macports users should then run:
@@ -75,7 +75,8 @@ Run
 OpenCanary is started by running:
 
 ```
-$ sudo /path/to/venv/bin/opencanary --start
+$ . env/bin/activate
+$ opencanaryd --start
 ```
 
 On the first run, instructions are printed that will get to a working config.
