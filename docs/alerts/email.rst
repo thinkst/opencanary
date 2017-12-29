@@ -34,6 +34,29 @@ Send to a GMail address
         }
     }
 
+Depending on your ISP and their outbound spam protection mechanisms, you may need to send to TCP port 587, set up an `app password <https://support.google.com/accounts/answer/185833?hl=en>`_ and use credentials, as well as setting an empty tuple for the **secure** parameter. Your configuration would then look like:
+
+
+.. code-block:: json
+
+   [..] # Services configuration
+       "logger": {
+       "class" : "PyLogger",
+       "kwargs" : {
+           "handlers": {
+               "SMTP": {
+                   "class": "logging.handlers.SMTPHandler",
+                   "mailhost": ["smtp.gmail.com", 587],
+                   "fromaddr": "noreply@yourdomain.com",
+                   "toaddrs" : ["youraddress@gmail.com"],
+                   "subject" : "OpenCanary Alert",
+                   "credentials" : ["youraddress", "abcdefghijklmnop"],
+                   "secure" : []
+                }
+            }
+        }
+    }
+
 Send with SMTP authentication
 -----------------------------
 
