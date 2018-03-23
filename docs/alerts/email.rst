@@ -10,7 +10,8 @@ In the configurations below, set these configuration variables:
 * **toaddres** - An array of addresses that will receive the alert. Keep it short.
 * **subject** - The email's subject.
 * **credentials** - Optional parameter, if the SMTP server requires authentication.
-
+* **secure** - Optional parameter if TLS support is mandatory or wanted.
+  
 More information can be found on the `PyLogger page <https://docs.python.org/2/library/logging.handlers.html#logging.handlers.SMTPHandler>`_.
 
 Send to a GMail address
@@ -50,7 +51,8 @@ Send with SMTP authentication
                    "fromaddr": "canary@yourdomain.com",
                    "toaddrs" : ["youraddress@yourdomain.com"],
                    "subject" : "OpenCanary Alert",
-                   "credentials" : ["myusername", "password1"]
+                   "credentials" : ["myusername", "password1"],
+		   "secure" : []
                 }
             }
         }
