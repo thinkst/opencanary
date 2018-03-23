@@ -5,6 +5,17 @@ from pkg_resources import resource_filename
 SAMPLE_SETTINGS = resource_filename(__name__, 'data/settings.json')
 SETTINGS = 'opencanary.conf'
 
+def byteify(input):
+    if isinstance(input, dict):
+        return {byteify(key): byteify(value)
+                for key, value in input.iteritems()}
+    elif isinstance(input, list):
+        return [byteify(element) for element in input]
+    elif isinstance(input, unicode):
+        return input.encode('utf-8')
+    else:
+        return input
+
 class Config:
     def __init__(self, configfile=SETTINGS):
         self.__config = None
@@ -17,6 +28,7 @@ class Config:
                 with open(fname, "r") as f:
                     print "[-] Using config file: %s" % fname
                     self.__config = json.load(f)
+                    self.__config = byteify(self.__config)
                 return
             except IOError as e:
                 print "[-] Failed to open %s for reading (%s)" % (fname, e)
