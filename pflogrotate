@@ -1,0 +1,29 @@
+#!/bin/sh
+
+PFLOG=/var/log/pflog
+FILE=/var/log/pflog2min.txt
+
+
+#if file is readable and size > 24 bytes; then
+if [ -r $PFLOG ] && [ $(stat -f %z $PFLOG) -gt 24 ]; then
+mv $PFLOG $FILE
+touch $PFLOG
+
+
+#start pflog-daemon
+pflogd
+
+#convert binary into readable file and send to syslog
+tcpdump -s 160 -n -ttt -e -v -r $FILE > /var/log/pflog.txt
+
+rm $FILE
+
+#execute python-script to convert into opencanary format
+/usr/local/bin/python /etc/pflogformat.py &
+wait $!
+
+rm /var/log/pflog.txt
+touch /var/log/pflog.txt
+
+
+fi
