@@ -69,6 +69,8 @@ $ cd opencanary
 $ python setup.py install
 ```
 
+If you are looking to get OpenCanary working on OpenBSD, see take a look at https://github.com/8com/opencanar. 
+
 Run
 ----
 
