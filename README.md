@@ -66,10 +66,12 @@ To install from source, instead of running pip do the following:
 ```
 $ git clone https://github.com/thinkst/opencanary
 $ cd opencanary
-$ python setup.py install
+$ python setup.py sdist
+$ cd dist
+$ pip install opencanary-<version>.tar.gz
 ```
 
-If you are looking to get OpenCanary working on OpenBSD, see take a look at https://github.com/8com/opencanar. 
+If you are looking to get OpenCanary working on OpenBSD, take a look at https://github.com/8com/opencanary. 
 
 Run
 ----
