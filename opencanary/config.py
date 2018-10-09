@@ -22,7 +22,7 @@ class Config:
         self.__configfile = configfile
 
         files = [configfile, "%s/.%s" % (expanduser("~"), configfile), "/etc/opencanaryd/%s"%configfile]
-
+        print "** We hope you enjoy using OpenCanary. For more open source Canary goodness, head over to canarytokens.org. **"
         for fname in files:
             try:
                 with open(fname, "r") as f:

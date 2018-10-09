@@ -70,5 +70,11 @@ Run opencanaryd in the foreground to see more error messages.
 
 .. code-block:: sh
 
-   $ sudo env/bin/twistd -noy env/bin/opencanary.tac
+   $ opencanaryd --dev
+
+You may also easily restart the service using,
+
+.. code-block:: sh
+
+   $ opencanaryd --restart
 

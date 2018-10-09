@@ -42,7 +42,6 @@ if sys.platform.startswith("linux"):
         def __init__(self,config=None, logger=None):
             CanaryService.__init__(self, config=config, logger=logger)
             self.audit_file = config.getVal('smb.auditfile', default='/var/log/samba-audit.log')
-            self.sharepath = config.getVal('smb.sharepath', default='/briar/smb/openshare')
             self.config = config
 
         def startYourEngines(self, reactor=None):

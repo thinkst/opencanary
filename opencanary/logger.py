@@ -61,6 +61,10 @@ class LoggerBase(object):
     LOG_SSH_LOGIN_ATTEMPT                       = 4002
     LOG_SMB_FILE_OPEN                           = 5000
     LOG_PORT_SYN                                = 5001
+    LOG_PORT_NMAPOS                             = 5002
+    LOG_PORT_NMAPNULL                           = 5003
+    LOG_PORT_NMAPXMAS                           = 5004
+    LOG_PORT_NMAPFIN                            = 5005
     LOG_TELNET_LOGIN_ATTEMPT                    = 6001
     LOG_HTTPPROXY_LOGIN_ATTEMPT                 = 7001
     LOG_MYSQL_LOGIN_ATTEMPT                     = 8001
@@ -72,6 +76,13 @@ class LoggerBase(object):
     LOG_SNMP_CMD                                = 13001
     LOG_RDP                                     = 14001
     LOG_SIP_REQUEST                             = 15001
+    LOG_GIT_CLONE_REQUEST                       = 16001
+    LOG_REDIS_COMMAND                           = 17001
+    LOG_TCP_BANNER_CONNECTION_MADE              = 18001
+    LOG_TCP_BANNER_KEEP_ALIVE_CONNECTION_MADE   = 18002
+    LOG_TCP_BANNER_KEEP_ALIVE_SECRET_RECEIVED   = 18003
+    LOG_TCP_BANNER_KEEP_ALIVE_DATA_RECEIVED     = 18004
+    LOG_TCP_BANNER_DATA_RECEIVED                = 18005
     LOG_USER_0                                  = 99000
     LOG_USER_1                                  = 99001
     LOG_USER_2                                  = 99002

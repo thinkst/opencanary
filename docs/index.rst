@@ -24,6 +24,7 @@ services sending alerts.
    :maxdepth: 1
 
    starting/opencanary
+   starting/configuration
    starting/correlator
 
 Services

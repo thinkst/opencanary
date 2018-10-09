@@ -5,12 +5,14 @@ from twisted.cred import portal, checkers, credentials, error
 from twisted.conch import error, avatar, interfaces as conchinterfaces
 from twisted.conch.checkers import SSHPublicKeyDatabase
 from twisted.conch.ssh import factory, userauth, connection, keys, session, transport
+from twisted.conch.openssh_compat import primes
+from twisted.conch.ssh.common import MP
 from twisted.internet import reactor, protocol, defer
 from twisted. application import internet
 
 from zope.interface import implements
 import sys, os, time
-import base64
+import base64, struct
 
 SSH_PATH="/var/tmp"
 
@@ -128,6 +130,7 @@ class HoneyPotSSHFactory(factory.SSHFactory):
     def buildProtocol(self, addr):
         # FIXME: try to mimic something real 100%
         t = HoneyPotTransport()
+        _modulis = '/etc/ssh/moduli', '/private/etc/moduli'
 
         if self.version:
             t.ourVersionString = self.version
@@ -135,6 +138,12 @@ class HoneyPotSSHFactory(factory.SSHFactory):
             t.ourVersionString = 'empty'
 
         t.supportedPublicKeys = self.privateKeys.keys()
+        for _moduli in _modulis:
+            try:
+                self.primes = primes.parseModuliFile(_moduli)
+                break
+            except IOError:
+                pass
 
         if not self.primes:
             ske = t.supportedKeyExchanges[:]
@@ -192,6 +201,20 @@ class HoneyPotTransport(transport.SSHServerTransport):
         #print 'Remote SSH version: %s' % (self.otherVersionString,)
         return transport.SSHServerTransport.ssh_KEXINIT(self, packet)
 
+    def ssh_KEX_DH_GEX_REQUEST(self, packet):
+        MSG_KEX_DH_GEX_GROUP = 31
+        #We have to override this method since the original will
+        #pick the client's ideal DH group size. For some SSH clients, this is
+        #8192 bits, which takes minutes to compute. Instead, we pick the minimum,
+        #which on our test client was 1024.
+        if self.ignoreNextPacket:
+            self.ignoreNextPacket = 0
+            return
+        self.dhGexRequest = packet
+        min, ideal, max = struct.unpack('>3L', packet)
+        self.g, self.p = self.factory.getDHPrime(min)
+        self.sendPacket(MSG_KEX_DH_GEX_GROUP, MP(self.p) + MP(self.g))
+
     def lastlogExit(self):
         starttime = time.strftime('%a %b %d %H:%M',
             time.localtime(self.logintime))
@@ -247,43 +270,13 @@ class HoneyPotAvatar(avatar.ConchUser):
         self.env = env
         self.channelLookup.update({'session': HoneyPotSSHSession})
 
-        #userdb = core.auth.UserDB()
-        #self.uid = self.gid = userdb.getUID(self.username)
-
-        #if not self.uid:
-        #    self.home = '/root'
-        #else:
-        #    self.home = '/home/' + username
-
     def openShell(self, protocol):
-        #serverProtocol = core.protocol.LoggingServerProtocol(
-        #    core.protocol.HoneyPotInteractiveProtocol, self, self.env)
-        #serverProtocol.makeConnection(protocol)
-        #protocol.makeConnection(session.wrapProtocol(serverProtocol))
         return
 
     def getPty(self, terminal, windowSize, attrs):
-        #print 'Terminal size: %s %s' % windowSize[0:2]
-        #self.windowSize = windowSize
         return None
 
     def execCommand(self, protocol, cmd):
-        #cfg = config()
-        #if not cfg.has_option('honeypot', 'exec_enabled') or \
-        #        cfg.get('honeypot', 'exec_enabled').lower() not in \
-        #            ('yes', 'true', 'on'):
-        #    print 'Exec disabled. Not executing command: "%s"' % cmd
-        #    raise core.exceptions.NotEnabledException, \
-        #        'exec_enabled not enabled in configuration file!'
-#            return
-
-
-        #print 'exec command: "%s"' % cmd
-        #serverProtocol = kippo.core.protocol.LoggingServerProtocol(
-        #    kippo.core.protocol.HoneyPotExecProtocol, self, self.env, cmd)
-        #serverProtocol.makeConnection(protocol)
-        #protocol.makeConnection(session.wrapProtocol(serverProtocol))
-
         return
 
     def closed(self):

@@ -2,6 +2,8 @@ OpenCanary
 =================
 Thinkst Applied Research
 
+![opencanary logo](logo.png)
+
 Overview
 ----------
 
@@ -17,6 +19,8 @@ Prerequisites
 
 Install
 ----------
+
+For updated and cleaner documentation, please head over to http://opencanary.org
 
 Installation on Ubuntu:
 
