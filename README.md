@@ -2,7 +2,7 @@ OpenCanary
 =================
 Thinkst Applied Research
 
-![opencanary logo](logo.png)
+![opencanary logo](docs/logo.png)
 
 Overview
 ----------
