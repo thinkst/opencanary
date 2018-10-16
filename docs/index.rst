@@ -52,6 +52,33 @@ Alerting
    alerts/email
    alerts/hpfeeds
 
+
+Upgrading
+---------
+
+If you have a previous version of OpenCanary installed already, you can upgrade it easily.
+
+Start by activating your virtual evnironment (`env` in the below example) that has your installed version of OpenCanary,
+
+.. code-block:: sh
+
+   $ . env/bin/activate
+
+
+Inside the virtualenv, you can upgrape your OpenCanary by,
+
+.. code-block:: sh
+
+  $ pip install opencanary --upgrade
+
+Please note that this will not wipe your existing OpenCanary config file. If you would like a new one (with the new settings), please regenerate the config file using,
+
+.. code-block:: sh
+
+  $ opencanaryd --copyconfig
+
+
+
 Indices and tables
 ------------------
 * :ref:`genindex`
