@@ -120,8 +120,6 @@ want to change are:
        dns proxy = no
        log file = /var/log/samba/log.all
        log level = 0
-       syslog only = yes
-       syslog = 0
        vfs object = full_audit
        full_audit:prefix = %U|%I|%i|%m|%S|%L|%R|%a|%T|%D
        full_audit:success = pread
