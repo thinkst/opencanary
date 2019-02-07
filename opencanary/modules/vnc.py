@@ -39,12 +39,12 @@ class VNCProtocol(Protocol):
         self.state = PRE_INIT
 
     def _send_handshake(self,):
-        print 'send handshake'
+        print('send handshake')
         self.transport.write('RFB {version}\n'.format(version=self.serv_version))
         self.state = HANDSHAKE_SEND
 
     def _recv_handshake(self,data=None):
-        print 'got handshake'
+        print('got handshake')
         if len(data) != 12 or data[:3] != 'RFB':
             raise ProtocolError()
         client_ver = data[4:-1]
@@ -56,24 +56,24 @@ class VNCProtocol(Protocol):
         self._send_security()
 
     def _send_security(self,):
-        print 'send security'
+        print('send security')
         self.transport.write('\x01\x02')#VNC authentication
         self.state = SECURITY_SEND
 
     def _recv_security(self,data=None):
-        print 'got security'
+        print('got security')
         if len(data) != 1 and data != '\x02':
             raise ProtocolError()
         self._send_auth()
 
     def _send_auth(self,):
-        print 'send auth'
+        print('send auth')
         self.challenge = os.urandom(16)
         self.transport.write(self.challenge)
         self.state = AUTH_SEND
 
     def _recv_auth(self,data=None):
-        print 'got auth'
+        print('got auth')
         if len(data) != 16:
             raise ProtocolError()
         logdata = {"VNC Server Challenge" : self.challenge.encode('hex'),

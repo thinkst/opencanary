@@ -22,21 +22,21 @@ class Config:
         self.__configfile = configfile
 
         files = [configfile, "%s/.%s" % (expanduser("~"), configfile), "/etc/opencanaryd/%s"%configfile]
-        print "** We hope you enjoy using OpenCanary. For more open source Canary goodness, head over to canarytokens.org. **"
+        print("** We hope you enjoy using OpenCanary. For more open source Canary goodness, head over to canarytokens.org. **")
         for fname in files:
             try:
                 with open(fname, "r") as f:
-                    print "[-] Using config file: %s" % fname
+                    print("[-] Using config file: %s" % fname)
                     self.__config = json.load(f)
                     self.__config = byteify(self.__config)
                 return
             except IOError as e:
-                print "[-] Failed to open %s for reading (%s)" % (fname, e)
+                print("[-] Failed to open %s for reading (%s)" % (fname, e))
             except ValueError as e:
-                print "[-] Failed to decode json from %s (%s)" % (fname, e)
+                print("[-] Failed to decode json from %s (%s)" % (fname, e))
                 subprocess.call("cp -r %s /var/tmp/config-err-$(date +%%s)" % fname, shell=True)
             except Exception as e:
-                print "[-] An error occured loading %s (%s)" % (fname, e)
+                print("[-] An error occured loading %s (%s)" % (fname, e))
 
     def moduleEnabled(self, module_name):
         k = "%s.enabled" % module_name.lower()
@@ -187,8 +187,8 @@ class Config:
             with open(cfg, "w") as f:
                 json.dump(self.__config, f, sort_keys=True, indent=4, separators=(',', ': '))
 
-        except Exception, e:
-            print "[-] Failed to save config file %s" % e
+        except Exception as e:
+            print("[-] Failed to save config file %s" % e)
             raise ConfigException("config", "%s" % e)
 
 

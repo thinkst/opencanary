@@ -76,9 +76,9 @@ class AlertProxyRequest(Request):
             except:
                 pass
         elif atype == "NTLM":
-            print b64decode(token).split(":")
+            print(b64decode(token).split(":"))
             exit(1)
-            print "something NTLM"
+            print("something NTLM")
             return
 
         logdata = {'USERNAME': username, 'PASSWORD': password}

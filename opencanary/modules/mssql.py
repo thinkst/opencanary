@@ -100,7 +100,7 @@ class MSSQLProtocol(Protocol, TimeoutMixin):
         try:
             return map(getOption, range(0, len(options), 5))
         except Exception as e:
-            print e
+            print(e)
 
         return None
 
@@ -207,7 +207,7 @@ class MSSQLProtocol(Protocol, TimeoutMixin):
                 # buffer but return copy of header anyway
                 return TDSPacket._make(header + [None])
         except Exception as e:
-            print e
+            print(e)
 
         return None
 

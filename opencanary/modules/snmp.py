@@ -25,7 +25,7 @@ class MiniSNMP(DatagramProtocol):
             self.transport.getPeer = lambda: IPv4Address('UDP', host, port)
             self.factory.log(logdata=logdata, transport=self.transport)
         except Exception as e:
-            print e
+            print(e)
             pass
 
 
