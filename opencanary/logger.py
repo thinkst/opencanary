@@ -99,17 +99,17 @@ class LoggerBase(object):
     def sanitizeLog(self, logdata):
         logdata['node_id'] = self.node_id
         logdata['local_time'] = datetime.utcnow().strftime("%Y-%m-%d %H:%M:%S.%f")
-        if not logdata.has_key('src_host'):
+        if 'src_host' not in logdata:
             logdata['src_host'] = ''
-        if not logdata.has_key('src_port'):
+        if 'src_port' not in logdata:
             logdata['src_port'] = -1
-        if not logdata.has_key('dst_host'):
+        if 'dst_host' not in logdata:
             logdata['dst_host'] = ''
-        if not logdata.has_key('dst_port'):
+        if 'dst_port' not in logdata:
             logdata['dst_port'] = -1
-        if not logdata.has_key('logtype'):
+        if 'logtype' not in logdata:
             logdata['logtype'] = self.LOG_BASE_MSG
-        if not logdata.has_key('logdata'):
+        if 'logdata' not in logdata:
             logdata['logdata'] = {}
         return logdata
 
