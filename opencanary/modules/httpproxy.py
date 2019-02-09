@@ -4,8 +4,13 @@ import datetime
 from opencanary.modules import CanaryService
 
 from base64 import b64decode
-import urlparse
-from urllib import quote as urlquote
+# The urlparse module is renamed to urllib.parse in Python 3.
+try:
+    import urlparse
+    from urllib import quote as urlquote
+except ImportError:
+    from urllib.parse import urlparse
+    from urllib.parse import quote as urlquote
 from twisted.application import internet
 from twisted.internet.protocol import ServerFactory
 from twisted.application.internet import TCPServer
