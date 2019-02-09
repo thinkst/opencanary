@@ -155,7 +155,7 @@ class CanaryMySQL(CanaryService):
         self.banner = config.getVal("mysql.banner", default="5.5.43-0ubuntu0.14.04.1").encode()
         self.logtype = logger.LOG_MYSQL_LOGIN_ATTEMPT
         self.listen_addr = config.getVal('device.listen_addr', default='')
-        if re.search('^[3456]\.[-_~.+\w]+$', self.banner) is None:
+        if re.search('^[3456]\.[-_~.+\w]+$', self.banner.decode()) is None:
             raise ConfigException("sql.banner", "Invalid MySQL Banner")
 
 

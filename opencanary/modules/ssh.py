@@ -147,7 +147,8 @@ class HoneyPotSSHFactory(factory.SSHFactory):
 
         if not self.primes:
             ske = t.supportedKeyExchanges[:]
-            ske.remove('diffie-hellman-group-exchange-sha1')
+            if 'diffie-hellman-group-exchange-sha1' in ske:
+                ske.remove('diffie-hellman-group-exchange-sha1')
             t.supportedKeyExchanges = ske
 
         t.factory = self
@@ -190,7 +191,7 @@ class HoneyPotTransport(transport.SSHServerTransport):
     def dataReceived(self, data):
         transport.SSHServerTransport.dataReceived(self, data)
         # later versions seem to call sendKexInit again on their own
-        isLibssh = data.find('libssh', data.find('SSH-')) != -1
+        isLibssh = data.find(b'libssh', data.find('SSH-')) != -1
 
         if (twisted.version.major < 11 or isLibssh) and \
                 not self.hadVersion and self.gotVersion:
@@ -247,7 +248,7 @@ class HoneyPotTransport(transport.SSHServerTransport):
         @param desc: a descrption of the reason for the disconnection.
         @type desc: C{str}
         """
-        if not 'bad packet length' in desc:
+        if not 'bad packet length' in desc.decode():
             # With python >= 3 we can use super?
             transport.SSHServerTransport.sendDisconnect(self, reason, desc)
         else:
