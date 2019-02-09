@@ -15,12 +15,12 @@ from twisted.internet import protocol
 """
 
 class MiniNtp(DatagramProtocol):
-    def datagramReceived(self, data, (host, port)):
+    def datagramReceived(self, data, host_and_port):
         if len(data) < 4 or data[3]!= '\x2a': #monlist command:
             #bogus packet, discard
             return
         logdata={'NTP CMD': 'monlist'}
-        self.transport.getPeer = lambda: IPv4Address('UDP', host, port)
+        self.transport.getPeer = lambda: IPv4Address('UDP', host_and_port[0], host_and_port[1])
         self.factory.log(logdata=logdata, transport=self.transport)
 
 class CanaryNtp(CanaryService):

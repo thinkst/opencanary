@@ -11,14 +11,14 @@ from scapy.all import SNMP
 """
 
 class MiniSNMP(DatagramProtocol):
-    def datagramReceived(self, data, (host, port)):
+    def datagramReceived(self, data, host_and_port):
         try:
             snmp = SNMP(data)
             community = snmp.community.val
             requests = [x.oid.val for x in snmp.PDU.varbindlist]
 
             logdata={'REQUESTS': requests, 'COMMUNITY_STRING': community}
-            self.transport.getPeer = lambda: IPv4Address('UDP', host, port)
+            self.transport.getPeer = lambda: IPv4Address('UDP', host_and_port[0], host_and_port[1])
             self.factory.log(logdata=logdata, transport=self.transport)
         except Exception as e:
             print(e)
