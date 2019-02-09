@@ -4,7 +4,7 @@ from twisted.internet.protocol import Protocol
 from twisted.internet.protocol import Factory
 from twisted.application import internet
 
-from des import des
+from opencanary.modules.des import des
 
 import os
 
