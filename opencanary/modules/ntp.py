@@ -1,6 +1,5 @@
 from opencanary.modules import CanaryService
 
-from zope.interface import implements
 from twisted.application import internet
 from twisted.internet.protocol import DatagramProtocol
 

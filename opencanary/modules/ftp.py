@@ -5,16 +5,15 @@ from twisted.protocols.ftp import FTPFactory, FTPRealm, FTP, \
                             USR_LOGGED_IN_PROCEED, GUEST_LOGGED_IN_PROCEED, IFTPShell, \
                             AuthorizationError
 from twisted.cred.portal import Portal
-from zope.interface import implements
+from zope.interface import implementer
 from twisted.cred.checkers import ICredentialsChecker
 from twisted.python import failure
 from twisted.cred import error as cred_error, credentials
 
 FTP_PATH = "/briar/data/ftp"
 
+@implementer(ICredentialsChecker)
 class DenyAllAccess:
-    implements(ICredentialsChecker)
-
     credentialInterfaces = (credentials.IAnonymous, credentials.IUsernamePassword)
 
     def requestAvatarId(self, credentials):

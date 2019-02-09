@@ -1,13 +1,9 @@
 from opencanary.modules import CanaryService
 
-from zope.interface import implements
 from twisted.application import internet
 from twisted.internet.protocol import DatagramProtocol
 
-from twisted.application.internet import UDPServer
 from twisted.internet.address import IPv4Address
-
-from twisted.internet import protocol
 
 from scapy.all import SNMP
 """

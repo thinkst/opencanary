@@ -10,7 +10,7 @@ from twisted.conch.ssh.common import MP
 from twisted.internet import reactor, protocol, defer
 from twisted. application import internet
 
-from zope.interface import implements
+from zope.interface import implementer
 import sys, os, time
 import base64, struct
 
@@ -153,9 +153,9 @@ class HoneyPotSSHFactory(factory.SSHFactory):
         t.factory = self
         return t
 
-class HoneyPotRealm:
-    implements(portal.IRealm)
 
+@implementer(portal.IRealm)
+class HoneyPotRealm:
     def __init__(self):
         pass
 
@@ -261,9 +261,9 @@ class HoneyPotSSHSession(session.SSHSession):
         #print 'request_env: %s' % (repr(data))
         pass
 
-class HoneyPotAvatar(avatar.ConchUser):
-    implements(conchinterfaces.ISession)
 
+@implementer(conchinterfaces.ISession)
+class HoneyPotAvatar(avatar.ConchUser):
     def __init__(self, username, env):
         avatar.ConchUser.__init__(self)
         self.username = username
@@ -332,9 +332,9 @@ def getDSAKeys():
             privateKeyString = f.read()
     return publicKeyString, privateKeyString
 
-class HoneypotPasswordChecker:
-    implements(checkers.ICredentialsChecker)
 
+@implementer(checkers.ICredentialsChecker)
+class HoneypotPasswordChecker:
     credentialInterfaces = (credentials.IUsernamePassword,)
 
     def __init__(self, logger=None):
@@ -345,9 +345,9 @@ class HoneypotPasswordChecker:
     def requestAvatarId(self, credentials):
         return defer.fail(error.UnauthorizedLogin())
 
-class CanaryPublicKeyChecker:
-    implements(checkers.ICredentialsChecker)
 
+@implementer(checkers.ICredentialsChecker)
+class CanaryPublicKeyChecker:
     credentialInterfaces = (credentials.ISSHPrivateKey,)
 
     def __init__(self, logger=None):
