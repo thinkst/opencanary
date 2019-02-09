@@ -299,14 +299,14 @@ def getRSAKeys():
         rsaKey = RSA.generate(KEY_LENGTH, randbytes.secureRandom)
         publicKeyString = keys.Key(rsaKey).public().toString('openssh')
         privateKeyString = keys.Key(rsaKey).toString('openssh')
-        with file(public_key, 'w+b') as f:
+        with open(public_key, 'w+b') as f:
             f.write(publicKeyString)
-        with file(private_key, 'w+b') as f:
+        with open(private_key, 'w+b') as f:
             f.write(privateKeyString)
     else:
-        with file(public_key) as f:
+        with open(public_key) as f:
             publicKeyString = f.read()
-        with file(private_key) as f:
+        with open(private_key) as f:
             privateKeyString = f.read()
     return publicKeyString, privateKeyString
 
@@ -321,14 +321,14 @@ def getDSAKeys():
         dsaKey = DSA.generate(KEY_LENGTH, randbytes.secureRandom)
         publicKeyString = keys.Key(dsaKey).public().toString('openssh')
         privateKeyString = keys.Key(dsaKey).toString('openssh')
-        with file(public_key, 'w+b') as f:
+        with open(public_key, 'w+b') as f:
             f.write(publicKeyString)
-        with file(private_key, 'w+b') as f:
+        with open(private_key, 'w+b') as f:
             f.write(privateKeyString)
     else:
-        with file(public_key) as f:
+        with open(public_key) as f:
             publicKeyString = f.read()
-        with file(private_key) as f:
+        with open(private_key) as f:
             privateKeyString = f.read()
     return publicKeyString, privateKeyString
 
