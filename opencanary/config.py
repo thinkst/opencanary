@@ -8,11 +8,13 @@ SETTINGS = 'opencanary.conf'
 def byteify(input):
     if isinstance(input, dict):
         return {byteify(key): byteify(value)
-                for key, value in input.iteritems()}
+                for key, value in input.items()}
     elif isinstance(input, list):
         return [byteify(element) for element in input]
-    elif isinstance(input, unicode):
-        return input.encode('utf-8')
+    # Only check unicode on Python 2, In Python 3 unicode is the default and we can just return the input.
+    if sys.version_info[0] < 3:
+        if isinstance(input, unicode):
+            return input.encode('utf-8')
     else:
         return input
 
@@ -79,17 +81,17 @@ class Config:
 
         # test options indpenedently for validity
         errors = []
-        for key,value in params.iteritems():
+        for key,value in params.items():
             try:
                 self.valid(key,value)
             except ConfigException as e:
                 errors.append(e)
 
         # Test that no ports overlap
-        ports = {k: v for k, v in self.__config.iteritems() if k.endswith(".port")}
-        newports = {k: v for k, v in params.iteritems() if k.endswith(".port")}
+        ports = {k: v for k, v in self.__config.items() if k.endswith(".port")}
+        newports = {k: v for k, v in params.items() if k.endswith(".port")}
         ports.update(newports)
-        ports = [(port,setting) for setting, port in ports.iteritems()]
+        ports = [(port,setting) for setting, port in ports.items()]
         ports.sort()
 
         for port, settings in itertools.groupby(ports, lambda x: x[0]):
@@ -152,9 +154,9 @@ class Config:
                 if not f["name"]:
                     raise ConfigException(key, "Filename cannot be empty")
                 if not f["type"]:
-                    raise Configexception(key, "File type cannot be empty")
+                    raise ConfigException(key, "File type cannot be empty")
                 if f["type"] not in extensions:
-                    raise Configexception(key, "Extension %s is not supported" % f["type"])
+                    raise ConfigException(key, "Extension %s is not supported" % f["type"])
 
         if key == "device.name":
             allowed_chars = string.ascii_letters + string.digits + "+-#_"
