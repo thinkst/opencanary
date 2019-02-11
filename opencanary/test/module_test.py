@@ -119,7 +119,7 @@ class TestHTTPModule(unittest.TestCase):
             'isIframeLogin': 'yes'}
         request = requests.post('http://localhost/index.html', data=login_data)
         # Currently the web server returns 200, but in future it should return
-        # a 403 statuse code.
+        # a 403 status code.
         self.assertEqual(request.status_code, 200)
         self.assertIn('Synology RackStation', request.text)
         last_log = get_last_log()
@@ -129,6 +129,32 @@ class TestHTTPModule(unittest.TestCase):
         self.assertIn('python-requests', last_log['logdata']['USERAGENT'])
         self.assertEqual(last_log['logdata']['USERNAME'], "test_user")
         self.assertEqual(last_log['logdata']['PASSWORD'], "test_pass")
+
+    def test_get_directory_listing(self):
+        """
+        Try to get a directory listing should result in a 403 Forbidden message.
+        """
+        request = requests.get('http://localhost/css/')
+        self.assertEqual(request.status_code, 403)
+        self.assertIn('Forbidden', request.text)
+        # These request are not logged at the moment. Maybe we should.
+
+    def test_get_non_existent_file(self):
+        """
+        Try to get a file that doesn't exist should give a 404 error message.
+        """
+        request = requests.get('http://localhost/this/file/doesnt_exist.txt')
+        self.assertEqual(request.status_code, 404)
+        self.assertIn('Not Found', request.text)
+        # These request are not logged at the moment. Maybe we should.
+
+    def test_get_supporting_image_file(self):
+        """
+        Try to download a supporting image file
+        """
+        request = requests.get('http://localhost/img/synohdpack/images/Components/checkbox.png')
+        # Just an arbitrary image
+        self.assertEqual(request.status_code, 200)
 
 
 class TestSSHModule(unittest.TestCase):

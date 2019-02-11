@@ -31,22 +31,22 @@ class Error(Resource):
 
     def err_page(self, request):
         path = request.path\
-                .replace('<', '&lt;')\
-                .replace('>', '&gt;')
+                .replace(b'<', b'&lt;')\
+                .replace(b'>', b'&gt;')
         return self.error_contents\
-                .replace('[[URL]]', path)\
-                .replace('[[BANNER]]', self.factory.banner)
+                .replace('[[URL]]', str(path))\
+                .replace('[[BANNER]]', str(self.factory.banner))
 
     def render(self, request):
-        request.setHeader('Server', self.factory.banner)
+        request.setHeader(b'Server', self.factory.banner)
         request.setResponseCode(int(self.error_code))
         return Resource.render(self, request)
 
     def render_GET(self, request):
-        return self.err_page(request)
+        return self.err_page(request).encode()
 
     def render_POST(self, request):
-        return self.err_page(request)
+        return self.err_page(request).encode()
 
 class BasicLogin(Resource):
     isLeaf = True
@@ -91,18 +91,18 @@ class BasicLogin(Resource):
             logtype = self.factory.logger.LOG_HTTP_GET
             self.factory.log(logdata, transport=request.transport, logtype=logtype)
 
-        return self.login
+        return self.login.encode()
 
     def render_POST(self, request):
         try:
-            username = request.args['username'][0]
+            username = request.args[b'username'][0]
         except (KeyError, IndexError):
             username = '<not supplied>'
         try:
-            password = request.args['password'][0]
+            password = request.args[b'password'][0]
         except (KeyError, IndexError):
             password = '<not supplied>'
-        useragent = request.getHeader('user-agent')
+        useragent = request.getHeader(b'user-agent')
         if not useragent:
             useragent = '<not supplied>'
 
@@ -117,7 +117,7 @@ class BasicLogin(Resource):
         logtype = self.factory.logger.LOG_HTTP_POST_LOGIN_ATTEMPT
         self.factory.log(logdata, transport=request.transport, logtype=logtype)
 
-        return self.err
+        return self.err.encode()
 
 
 class RedirectCustomHeaders(Redirect):
@@ -127,7 +127,7 @@ class RedirectCustomHeaders(Redirect):
         self.factory = factory
 
     def render(self, request):
-        request.setHeader('Server', self.factory.banner)
+        request.setHeader(b'Server', self.factory.banner)
         return Redirect.render(self, request)
 
 
@@ -175,8 +175,8 @@ class CanaryHTTP(CanaryService):
         page = BasicLogin(factory=self)
         root = StaticNoDirListing(self.staticdir)
         root.createErrorPages(self)
-        root.putChild("", RedirectCustomHeaders("/index.html", factory=self))
-        root.putChild("index.html", page)
+        root.putChild(b"", RedirectCustomHeaders(b"/index.html", factory=self))
+        root.putChild(b"index.html", page)
         wrapped = EncodingResourceWrapper(root, [GzipEncoderFactory()])
         site = Site(wrapped)
         return internet.TCPServer(self.port, site, interface=self.listen_addr)
