@@ -152,9 +152,9 @@ class Config:
                 if not f["name"]:
                     raise ConfigException(key, "Filename cannot be empty")
                 if not f["type"]:
-                    raise Configexception(key, "File type cannot be empty")
+                    raise ConfigException(key, "File type cannot be empty")
                 if f["type"] not in extensions:
-                    raise Configexception(key, "Extension %s is not supported" % f["type"])
+                    raise ConfigException(key, "Extension %s is not supported" % f["type"])
 
         if key == "device.name":
             allowed_chars = string.ascii_letters + string.digits + "+-#_"
