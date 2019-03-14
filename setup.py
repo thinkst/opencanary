@@ -22,7 +22,8 @@ setup(
         'fpdf==1.7',
         'passlib==1.6.2',
         'Jinja2>=2.4',
-        'ntlmlib==0.67'
+        'ntlmlib==0.67',
+        'requests==2.7.0'
     ],
     setup_requires=[
         'setuptools_git'
@@ -33,4 +34,3 @@ setup(
     platforms='any',
     include_package_data=True
 )
-
