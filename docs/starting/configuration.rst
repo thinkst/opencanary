@@ -91,7 +91,11 @@ add to the `logger` section in your config file,
                     "fromaddr": "noreply@yourdomain.com",
                     "toaddrs" : ["youraddress@gmail.com"],
                     "subject" : "OpenCanary Alert"
-                 }
+                 },
+                "slack":{
+                    "class":"opencanary.logger.SlackHandler",
+                    "webhook_url":"https://hooks.slack.com/services/..."
+                }
             }
         }
     }
