@@ -23,7 +23,8 @@ setup(
         'PyPDF2==1.26.0',
         'fpdf==1.7.2',
         'passlib==1.7.1',
-        'ntlmlib==0.71'
+        'ntlmlib==0.71',
+        'hpfeeds==1.0'
     ],
     setup_requires=[
         'setuptools_git'
