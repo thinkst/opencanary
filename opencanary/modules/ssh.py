@@ -293,10 +293,10 @@ def getRSAKeys():
     private_key = os.path.join(SSH_PATH, 'id_rsa')
 
     if not (os.path.exists(public_key) and os.path.exists(private_key)):
-        from Crypto.PublicKey import RSA
-        from twisted.python import randbytes
+        from cryptography.hazmat.primitives.asymmetric import rsa
+        from cryptography.hazmat.backends import default_backend
         KEY_LENGTH = 2048
-        rsaKey = RSA.generate(KEY_LENGTH, randbytes.secureRandom)
+        rsaKey = rsa.generate_private_key(public_exponent=65537,key_size=KEY_LENGTH,backend=default_backend())
         publicKeyString = keys.Key(rsaKey).public().toString('openssh')
         privateKeyString = keys.Key(rsaKey).toString('openssh')
         with file(public_key, 'w+b') as f:
@@ -315,10 +315,10 @@ def getDSAKeys():
     private_key = os.path.join(SSH_PATH, 'id_dsa')
 
     if not (os.path.exists(public_key) and os.path.exists(private_key)):
-        from Crypto.PublicKey import DSA
-        from twisted.python import randbytes
+        from cryptography.hazmat.primitives.asymmetric import dsa
+        from cryptography.hazmat.backends import default_backend
         KEY_LENGTH = 1024
-        dsaKey = DSA.generate(KEY_LENGTH, randbytes.secureRandom)
+        dsaKey = dsa.generate_private_key(key_size=KEY_LENGTH,backend=default_backend())
         publicKeyString = keys.Key(dsaKey).public().toString('openssh')
         privateKeyString = keys.Key(dsaKey).toString('openssh')
         with file(public_key, 'w+b') as f:
