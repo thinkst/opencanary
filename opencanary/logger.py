@@ -1,6 +1,7 @@
 import simplejson as json
 import logging.config
 import socket
+import hpfeeds
 import sys
 
 from datetime import datetime
