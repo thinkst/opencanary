@@ -50,15 +50,27 @@ class VNCProtocol(Protocol):
         client_ver = data[4:-1]
 
         #support single version for now
-        if client_ver != RFB_38:
+        if client_ver not in [RFB_33, RFB_37, RFB_38]:
             raise UnsupportedVersion()
 
-        self._send_security()
+        self._send_security(client_ver)
+
 
     def _send_security(self,):
         print('send security')
         self.transport.write('\x01\x02')#VNC authentication
         self.state = SECURITY_SEND
+
+
+    def _send_security(self,client_ver):
+        print 'send security'
+        if client_ver == RFB_33:
+            self.transport.write('\x00\x00\x00\x02')#specify VNC auth using 4 bytes
+            self._send_auth()
+        else:
+            self.transport.write('\x01\x02')#VNC authentication
+            self.state = SECURITY_SEND
+
 
     def _recv_security(self,data=None):
         print('got security')

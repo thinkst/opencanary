@@ -3,11 +3,13 @@ from __future__ import print_function
 import simplejson as json
 import logging.config
 import socket
+import hpfeeds
 import sys
 
 from datetime import datetime
 from logging.handlers import SocketHandler
 from twisted.internet import reactor
+import requests
 
 class Singleton(type):
     _instances = {}
@@ -219,3 +221,25 @@ class HpfeedsHandler(logging.Handler):
             self.hpc.publish(self.channels,msg)
         except:
             print("Error on publishing to server")
+
+class SlackHandler(logging.Handler):
+    def __init__(self,webhook_url):
+        logging.Handler.__init__(self)
+        self.webhook_url=webhook_url
+
+    def generate_msg(self, alert):
+        msg = {}
+        msg['pretext'] = "OpenCanary Alert"
+        data=json.loads(alert.msg)
+        msg['fields']=[]
+        for k,v in data.items():
+            msg['fields'].append({'title':k, 'value':json.dumps(v) if type(v) is dict else v})
+        return {'attachments':[msg]}
+
+    def emit(self, record):
+        data = self.generate_msg(record)
+        response = requests.post(
+            self.webhook_url, json=data
+            )
+        if response.status_code != 200:
+            print("Error %s sending Slack message, the response was:\n%s" % (response.status_code, response.text))

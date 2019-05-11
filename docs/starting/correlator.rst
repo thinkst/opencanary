@@ -31,6 +31,8 @@ In the config file, fill the twilio or mandrill details (or both), and the notif
      "console.sms_notification_numbers": ["+336522334455"],
      "console.email_notification_enable": true,
      "console.email_notification_address": ["notifications@opencanary.org"],
+     "console.slack_notification_enable": true,
+     "console.slack_notification_webhook": ["https://hooks.slack.com/services/example/webhookdata"]
      "twilio.auth_token": "fae9206628714fb2ce00f72e94f2258f",
      "twilio.from_number": ""+1201253234"",
      "twilio.sid": "BD742385c0810b431fe2ddb9fc327c85ad",

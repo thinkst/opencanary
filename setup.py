@@ -8,12 +8,14 @@ requirements = [
     'pyasn1==0.4.5',
     'cryptography==2.5.0',
     'simplejson==3.16.0',
+    'requests==2.7.0',
     'zope.interface==4.6.0',
     'PyPDF2==1.26.0',
     'fpdf==1.7.2',
     'passlib==1.7.1',
     'Jinja2==2.10.0',
-    'ntlmlib==0.72']
+    'ntlmlib==0.72',
+    'hpfeeds==1.0']
 
 # Python 2 requires wsgiref but with python 3 wsgiref is a standard library.
 if sys.version_info[0] < 3:

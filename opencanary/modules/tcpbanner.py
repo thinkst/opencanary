@@ -76,8 +76,11 @@ class TCPBannerProtocol(Protocol):
             data = data[:255]
 
             logdata = {'FUNCTION':'DATA_RECEIVED',
-                       'DATA':str(data).rstrip(),
                        'BANNER_ID':str(self.banner_id)}
+            try:
+                logdata['DATA'] = str(data).rstrip().decode('utf-8').encode('utf-8')
+            except UnicodeDecodeError:
+                logdata['DATA'] = str(data).rstrip().decode('unicode_escape').encode('utf-8')
 
             send_log = True
 
