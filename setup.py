@@ -15,7 +15,7 @@ requirements = [
     'passlib==1.7.1',
     'Jinja2==2.10.0',
     'ntlmlib==0.72',
-    'hpfeeds==1.0']
+    'hpfeeds3==0.9.8']
 
 # Python 2 requires wsgiref but with python 3 wsgiref is a standard library.
 if sys.version_info[0] < 3:
