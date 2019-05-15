@@ -8,7 +8,7 @@ requirements = [
     'pyasn1==0.4.5',
     'cryptography==2.5.0',
     'simplejson==3.16.0',
-    'requests==2.7.0',
+    'requests==2.21.0',
     'zope.interface==4.6.0',
     'PyPDF2==1.26.0',
     'fpdf==1.7.2',
