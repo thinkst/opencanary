@@ -24,6 +24,7 @@ import socket
 import requests
 import paramiko
 import pymysql
+import git
 
 
 def get_last_log():
@@ -68,6 +69,31 @@ class TestFTPModule(unittest.TestCase):
 
     def tearDown(self):
         self.ftp.close()
+
+
+class TestGitModule(unittest.TestCase):
+    """
+    Tests the Git Module by trying to clone a repository from localhost.
+    """
+
+    def setUp(self):
+        self.repository = git.Repo
+
+    def test_clone_a_repository(self):
+        self.assertRaises(git.exc.GitCommandError,
+                          self.repository.clone_from,
+                          'git://localhost/test.git',
+                          '/tmp/git_test')
+
+    def test_log_git_clone(self):
+        """
+        Check that the git clone attempt was logged
+        """
+        # This test must be run after the test_clone_a_repository.
+        # Unless we add an attempt to clone into this test, or the setup.
+        last_log = get_last_log()
+        self.assertEqual(last_log['logdata']['HOST'], "localhost")
+        self.assertEqual(last_log['logdata']['REPO'], "test.git")
 
 
 class TestHTTPModule(unittest.TestCase):
@@ -240,8 +266,7 @@ class TestMySQLModule(unittest.TestCase):
                           cursorclass=pymysql.cursors.DictCursor)
         last_log = get_last_log()
         self.assertEqual(last_log['logdata']['USERNAME'], "test_user")
-        self.assertEqual(last_log['logdata']['PASSWORD'],
-                         "b2e5ed6a0e59f99327399ced2009338d5c0fe237")
+        self.assertEqual(last_log['logdata']['PASSWORD'], "b2e5ed6a0e59f99327399ced2009338d5c0fe237")
         self.assertEqual(last_log['dst_port'], 3306)
 
 
