@@ -17,6 +17,7 @@ import json
 from ftplib import FTP, error_perm
 import unittest
 import socket
+import warnings  # Used in the TestSSHModule (see comment there)
 
 # These libraries are only needed by the test suite and so aren't in the
 # OpenCanary requirements, there is a requirements.txt file in the tests folder
@@ -195,12 +196,19 @@ class TestSSHModule(unittest.TestCase):
         """
         Try to log into the SSH server
         """
-        self.assertRaises(paramiko.ssh_exception.AuthenticationException,
-                          self.connection.connect,
-                          hostname="localhost",
-                          port=22,
-                          username="test_user",
-                          password="test_pass")
+        # FIXME: At the time of this writing, paramiko calls cryptography
+        # which throws a depreciation warning. It looks like this has been
+        # fixed https://github.com/paramiko/paramiko/issues/1369 but the fix
+        # hasn't been pushed to pypi. When the fix is pushed we can update
+        # and remove the import warnings and the warnings.catch.
+        with warnings.catch_warnings():
+            warnings.simplefilter("ignore")
+            self.assertRaises(paramiko.ssh_exception.AuthenticationException,
+                              self.connection.connect,
+                              hostname="localhost",
+                              port=22,
+                              username="test_user",
+                              password="test_pass")
         last_log = get_last_log()
         self.assertEqual(last_log['dst_port'], 22)
         self.assertIn('paramiko', last_log['logdata']['REMOTEVERSION'])
