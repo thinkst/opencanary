@@ -15,7 +15,7 @@ if sys.platform.startswith("linux"):
 
         def handleLines(self, lines=None):
             #samba4 re
-            audit_re = re.compile(r'.*smbd_audit: (?:[^|]*\|){12}[^|]*$')
+            audit_re = re.compile(r'.*smbd_audit: ((?:[^|]*\|){12}[^|]*)$')
 
             #samba 3 re
             #audit_re = re.compile(r'.*smbd\[[0-9]+\]: (.*)')
