@@ -15,12 +15,16 @@ if sys.platform.startswith("linux"):
 
         def handleLines(self, lines=None):
             #samba4 re
-            audit_re = re.compile(r'.*smbd_audit: (.*)')
+            audit_re = re.compile(r'.*smbd_audit: (?:[^|]*\|){12}[^|]*$')
 
             #samba 3 re
             #audit_re = re.compile(r'.*smbd\[[0-9]+\]: (.*)')
             for line in lines:
                     matches = audit_re.match(line)
+                    
+                    #Skip lines that do not match the correct RegEx pattern
+                    if matches is None:
+                           continue
                     (user,remoteIP,localIP,remoteName,shareName,
                     localName,smbVer,smbArch,timeStamp,domainName,
                     auditAction,auditStatus,fileName) = matches.group(1).split('|')
