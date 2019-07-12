@@ -15,7 +15,7 @@ from twisted.internet import protocol
 """
 
 class Tftp(DatagramProtocol):
-    def datagramReceived(self, data, (host, port)):
+    def datagramReceived(self, data, *host, port):
         if len(data) < 5:
             #bogus packet, discard
             return

@@ -96,11 +96,11 @@ class BasicLogin(Resource):
     def render_POST(self, request):
         try:
             username = request.args['username'][0]
-        except KeyError, IndexError:
+        except KeyError as IndexError:
             username = '<not supplied>'
         try:
             password = request.args['password'][0]
-        except KeyError, IndexError:
+        except KeyError as IndexError:
             password = '<not supplied>'
         useragent = request.getHeader('user-agent')
         if not useragent:

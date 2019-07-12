@@ -1,3 +1,5 @@
+from __future__ import print_function
+from six import iteritems
 import os, sys, json, copy, socket, itertools, string, subprocess
 from os.path import expanduser
 from pkg_resources import resource_filename
@@ -8,10 +10,10 @@ SETTINGS = 'opencanary.conf'
 def byteify(input):
     if isinstance(input, dict):
         return {byteify(key): byteify(value)
-                for key, value in input.iteritems()}
+                for key, value in iteritems(input)}
     elif isinstance(input, list):
         return [byteify(element) for element in input]
-    elif isinstance(input, unicode):
+    elif isinstance(input, str):
         return input.encode('utf-8')
     else:
         return input
@@ -22,21 +24,21 @@ class Config:
         self.__configfile = configfile
 
         files = [configfile, "%s/.%s" % (expanduser("~"), configfile), "/etc/opencanaryd/%s"%configfile]
-        print "** We hope you enjoy using OpenCanary. For more open source Canary goodness, head over to canarytokens.org. **"
+        print("** We hope you enjoy using OpenCanary. For more open source Canary goodness, head over to canarytokens.org. **")
         for fname in files:
             try:
                 with open(fname, "r") as f:
-                    print "[-] Using config file: %s" % fname
+                    print("[-] Using config file: %s" % fname)
                     self.__config = json.load(f)
                     self.__config = byteify(self.__config)
                 return
             except IOError as e:
-                print "[-] Failed to open %s for reading (%s)" % (fname, e)
+                print("[-] Failed to open %s for reading (%s)" % (fname, e))
             except ValueError as e:
-                print "[-] Failed to decode json from %s (%s)" % (fname, e)
+                print("[-] Failed to decode json from %s (%s)" % (fname, e))
                 subprocess.call("cp -r %s /var/tmp/config-err-$(date +%%s)" % fname, shell=True)
             except Exception as e:
-                print "[-] An error occured loading %s (%s)" % (fname, e)
+                print("[-] An error occured loading %s (%s)" % (fname, e))
 
     def moduleEnabled(self, module_name):
         k = "%s.enabled" % module_name.lower()
@@ -79,17 +81,17 @@ class Config:
 
         # test options indpenedently for validity
         errors = []
-        for key,value in params.iteritems():
+        for key,value in iteritems(params):
             try:
                 self.valid(key,value)
             except ConfigException as e:
                 errors.append(e)
 
         # Test that no ports overlap
-        ports = {k: v for k, v in self.__config.iteritems() if k.endswith(".port")}
-        newports = {k: v for k, v in params.iteritems() if k.endswith(".port")}
+        ports = {k: v for k, v in iteritems(self.__config) if k.endswith(".port")}
+        newports = {k: v for k, v in iteritems(params) if k.endswith(".port")}
         ports.update(newports)
-        ports = [(port,setting) for setting, port in ports.iteritems()]
+        ports = [(port,setting) for setting, port in iteritems(ports)]
         ports.sort()
 
         for port, settings in itertools.groupby(ports, lambda x: x[0]):
@@ -187,8 +189,8 @@ class Config:
             with open(cfg, "w") as f:
                 json.dump(self.__config, f, sort_keys=True, indent=4, separators=(',', ': '))
 
-        except Exception, e:
-            print "[-] Failed to save config file %s" % e
+        except Exception as e:
+            print("[-] Failed to save config file %s" % e)
             raise ConfigException("config", "%s" % e)
 
 

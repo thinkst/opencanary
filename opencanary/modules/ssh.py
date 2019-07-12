@@ -1,3 +1,4 @@
+from __future__ import print_function
 from opencanary.modules import CanaryService
 
 import twisted
@@ -10,7 +11,7 @@ from twisted.conch.ssh.common import MP
 from twisted.internet import reactor, protocol, defer
 from twisted. application import internet
 
-from zope.interface import implements
+from zope.interface import implementer
 import sys, os, time
 import base64, struct
 
@@ -93,7 +94,7 @@ class HoneyPotSSHUserAuthServer(userauth.SSHUserAuthServer):
                             keytype=keytype,
                             keydata=base64.b64encode(key_blob))
 
-            print 'Key was {key}'.format(key=key)
+            print('Key was {key}'.format(key=key))
 
         c = credentials.SSHPrivateKey(None,None,None,None,None)
 
@@ -153,8 +154,9 @@ class HoneyPotSSHFactory(factory.SSHFactory):
         t.factory = self
         return t
 
+
+@implementer(portal.IRealm)
 class HoneyPotRealm:
-    implements(portal.IRealm)
 
     def __init__(self):
         pass
@@ -164,7 +166,7 @@ class HoneyPotRealm:
             return interfaces[0], \
                 HoneyPotAvatar(avatarId, self.env), lambda: None
         else:
-            raise Exception, "No supported interfaces found."
+            raise Exception("No supported interfaces found.")
 
 class HoneyPotTransport(transport.SSHServerTransport):
 
@@ -198,7 +200,7 @@ class HoneyPotTransport(transport.SSHServerTransport):
             self.hadVersion = True
 
     def ssh_KEXINIT(self, packet):
-        #print 'Remote SSH version: %s' % (self.otherVersionString,)
+        #print('Remote SSH version: %s' % (self.otherVersionString,))
         return transport.SSHServerTransport.ssh_KEXINIT(self, packet)
 
     def ssh_KEX_DH_GEX_REQUEST(self, packet):
@@ -258,11 +260,12 @@ class HoneyPotTransport(transport.SSHServerTransport):
 
 class HoneyPotSSHSession(session.SSHSession):
     def request_env(self, data):
-        #print 'request_env: %s' % (repr(data))
+        #print('request_env: %s' % (repr(data)))
         pass
 
+
+@implementer(conchinterfaces.ISession)
 class HoneyPotAvatar(avatar.ConchUser):
-    implements(conchinterfaces.ISession)
 
     def __init__(self, username, env):
         avatar.ConchUser.__init__(self)
@@ -332,8 +335,9 @@ def getDSAKeys():
             privateKeyString = f.read()
     return publicKeyString, privateKeyString
 
+
+@implementer(checkers.ICredentialsChecker)
 class HoneypotPasswordChecker:
-    implements(checkers.ICredentialsChecker)
 
     credentialInterfaces = (credentials.IUsernamePassword,)
 
@@ -345,8 +349,9 @@ class HoneypotPasswordChecker:
     def requestAvatarId(self, credentials):
         return defer.fail(error.UnauthorizedLogin())
 
+
+@implementer(checkers.ICredentialsChecker)
 class CanaryPublicKeyChecker:
-    implements(checkers.ICredentialsChecker)
 
     credentialInterfaces = (credentials.ISSHPrivateKey,)
 

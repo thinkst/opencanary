@@ -1,11 +1,19 @@
+from __future__ import print_function
 import os
 import datetime
 
 from opencanary.modules import CanaryService
 
 from base64 import b64decode
-import urlparse
-from urllib import quote as urlquote
+try:
+    import urlparse
+except ImportError:
+    import urllib.parse as urlparse
+
+try:
+    from urllib import quote  # Python 2.X
+except ImportError:
+    from urllib.parse import quote  # Python 3+
 from twisted.application import internet
 from twisted.internet.protocol import ServerFactory
 from twisted.application.internet import TCPServer
@@ -76,9 +84,9 @@ class AlertProxyRequest(Request):
             except:
                 pass
         elif atype == "NTLM":
-            print b64decode(token).split(":")
+            print(b64decode(token).split(":"))
             exit(1)
-            print "something NTLM"
+            print("something NTLM")
             return
 
         logdata = {'USERNAME': username, 'PASSWORD': password}

@@ -1,3 +1,4 @@
+from __future__ import print_function
 import simplejson as json
 import logging.config
 import socket
@@ -20,29 +21,29 @@ def getLogger(config):
     try:
         d = config.getVal('logger')
     except Exception as e:
-        print >> sys.stderr, "Error: config does not have 'logger' section"
+        print("Error: config does not have 'logger' section", file=sys.stderr)
         exit(1)
 
     classname = d.get('class', None)
     if classname is None:
-        print >> sys.stderr, "Logger section is missing the class key."
+        print("Logger section is missing the class key.", file=sys.stderr)
         exit(1)
 
     LoggerClass = globals().get(classname, None)
     if LoggerClass is None:
-        print >> sys.stderr, "Logger class (%s) is not defined." % classname
+        print("Logger class (%s) is not defined." % classname, file=sys.stderr)
         exit(1)
 
     kwargs = d.get('kwargs', None)
     if kwargs is None:
-        print >> sys.stderr, "Logger section is missing the kwargs key."
+        print("Logger section is missing the kwargs key.", file=sys.stderr)
         exit(1)
 
     try:
         logger = LoggerClass(config, **kwargs)
     except Exception as e:
-        print >> sys.stderr, "An error occured initialising the logger class"
-        print e
+        print("An error occured initialising the logger class", file=sys.stderr)
+        print(e)
         exit(1)
 
     return logger
@@ -142,9 +143,9 @@ class PyLogger(LoggerBase):
         try:
             logging.config.dictConfig(logconfig)
         except Exception as e:
-            print >> sys.stderr, "Invalid logging config"
-            print type(e)
-            print e
+            print("Invalid logging config", file=sys.stderr)
+            print(type(e))
+            print(e)
             exit(1)
 
         self.logger = logging.getLogger(self.node_id)
@@ -152,7 +153,7 @@ class PyLogger(LoggerBase):
     def error(self, data):
         data['local_time'] = datetime.utcnow().strftime("%Y-%m-%d %H:%M:%S.%f")
         msg = '[ERR] %r' % json.dumps(data, sort_keys=True)
-        print >> sys.stderr, msg
+        print(msg, file=sys.stderr)
         self.logger.warn(msg)
 
     def log(self, logdata, retry=True):
@@ -176,7 +177,7 @@ class SocketJSONHandler(SocketHandler):
 
     def send(self, s, attempt=0):
         if attempt >= 10:
-            print "Dropping log message due to too many failed sends"
+            print("Dropping log message due to too many failed sends")
             return
 
         if self.sock is None:
@@ -218,7 +219,7 @@ class HpfeedsHandler(logging.Handler):
             msg = self.format(record)
             self.hpc.publish(self.channels,msg)
         except:
-            print "Error on publishing to server"
+            print("Error on publishing to server")
 
 class SlackHandler(logging.Handler):
     def __init__(self,webhook_url):
@@ -240,4 +241,4 @@ class SlackHandler(logging.Handler):
             self.webhook_url, json=data
             )
         if response.status_code != 200:
-            print ("Error %s sending Slack message, the response was:\n%s" % (response.status_code, response.text))
+            print("Error %s sending Slack message, the response was:\n%s" % (response.status_code, response.text))

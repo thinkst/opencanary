@@ -3,6 +3,7 @@ from opencanary.modules import CanaryService
 from twisted.internet.protocol import Protocol
 from twisted.internet.protocol import Factory
 from twisted.application import internet
+from __future__ import print_function
 
 class Example1Protocol(Protocol):
     """
@@ -41,7 +42,7 @@ class Example1Protocol(Protocol):
         Recieved data is unbuffered so we buffer it for telnet.
         """
         self.buffer += data
-        print "Recieved data: ", repr(data)
+        print("Recieved data: ", repr(data))
 
         # Discard inital telnet client control chars
         i = self.buffer.find("\x01")

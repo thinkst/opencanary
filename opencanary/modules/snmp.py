@@ -1,3 +1,4 @@
+from __future__ import print_function
 from opencanary.modules import CanaryService
 
 from zope.interface import implements
@@ -15,7 +16,7 @@ from scapy.all import SNMP
 """
 
 class MiniSNMP(DatagramProtocol):
-    def datagramReceived(self, data, (host, port)):
+    def datagramReceived(self, data, *host, port):
         try:
             snmp = SNMP(data)
             community = snmp.community.val
@@ -25,7 +26,7 @@ class MiniSNMP(DatagramProtocol):
             self.transport.getPeer = lambda: IPv4Address('UDP', host, port)
             self.factory.log(logdata=logdata, transport=self.transport)
         except Exception as e:
-            print e
+            print(e)
             pass
 
 

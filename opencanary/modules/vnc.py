@@ -1,10 +1,14 @@
+from __future__ import print_function
 from opencanary.modules import CanaryService
 
 from twisted.internet.protocol import Protocol
 from twisted.internet.protocol import Factory
 from twisted.application import internet
 
-from des import des
+try:
+    from des import des
+except ImportError:
+    from .des import des
 
 import os
 
@@ -39,12 +43,12 @@ class VNCProtocol(Protocol):
         self.state = PRE_INIT
 
     def _send_handshake(self,):
-        print 'send handshake'
+        print('send handshake')
         self.transport.write('RFB {version}\n'.format(version=self.serv_version))
         self.state = HANDSHAKE_SEND
 
     def _recv_handshake(self,data=None):
-        print 'got handshake'
+        print('got handshake')
         if len(data) != 12 or data[:3] != 'RFB':
             raise ProtocolError()
         client_ver = data[4:-1]
@@ -56,7 +60,7 @@ class VNCProtocol(Protocol):
         self._send_security(client_ver)
 
     def _send_security(self,client_ver):
-        print 'send security'
+        print('send security')
         if client_ver == RFB_33:
             self.transport.write('\x00\x00\x00\x02')#specify VNC auth using 4 bytes
             self._send_auth()
@@ -65,19 +69,19 @@ class VNCProtocol(Protocol):
             self.state = SECURITY_SEND
 
     def _recv_security(self,data=None):
-        print 'got security'
+        print('got security')
         if len(data) != 1 and data != '\x02':
             raise ProtocolError()
         self._send_auth()
 
     def _send_auth(self,):
-        print 'send auth'
+        print('send auth')
         self.challenge = os.urandom(16)
         self.transport.write(self.challenge)
         self.state = AUTH_SEND
 
     def _recv_auth(self,data=None):
-        print 'got auth'
+        print('got auth')
         if len(data) != 16:
             raise ProtocolError()
         logdata = {"VNC Server Challenge" : self.challenge.encode('hex'),
