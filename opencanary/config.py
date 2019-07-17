@@ -14,7 +14,8 @@ def byteify(input):
     elif isinstance(input, list):
         return [byteify(element) for element in input]
     elif isinstance(input, str):
-        return input.encode('utf-8')
+        # return input.encode('utf-8')
+        return input.encode()
     else:
         return input
 
@@ -49,6 +50,10 @@ class Config:
     def getVal(self, key, default=None):
         # throw exception to caller
         try:
+            print(self.__config)
+            print(type(self.__config))
+            print(self.__config.keys())
+            print(self.__config.get(key))
             return self.__config[key]
         except KeyError as e:
             if default is not None:
