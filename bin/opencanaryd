@@ -32,7 +32,7 @@ elif [ "${cmd}" == "--dev" ]; then
 
   sudo "${DIR}/twistd" -noy "${DIR}/opencanary.tac"
 elif [ "${cmd}" == "--usermodule" ]; then
-  usermodconf=$(python -c "from pkg_resources import resource_filename; print resource_filename('opencanary', 'data/settings-usermodule.json')")
+  usermodconf=$(python -c "from __future__ import print_function; from pkg_resources import resource_filename; print(resource_filename('opencanary', 'data/settings-usermodule.json'))")
 
   if [ -f opencanary.conf ]; then
     if ! diff -q opencanary.conf "${usermodconf}" 2>&1 >/dev/null; then
@@ -61,7 +61,7 @@ elif [ "${cmd}" == "--copyconfig" ]; then
         echo "[e] A config file already exists at ${HOME}/.opencanary.conf, please move it first"
         exit 1
     fi
-    defaultconf=$(python -c "from pkg_resources import resource_filename; print resource_filename('opencanary', 'data/settings.json')")
+    defaultconf=$(python -c "from __future__ import print_function; from pkg_resources import resource_filename; print(resource_filename('opencanary', 'data/settings.json'))")
     cp "${defaultconf}" ~/.opencanary.conf
     echo -e "[*] A sample config file is ready (${HOME}/.opencanary.conf)\n"
     echo    "[*] Edit your configuration, then launch with \"opencanaryd --start\""

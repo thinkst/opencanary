@@ -4,13 +4,15 @@ import datetime
 from opencanary.modules import CanaryService
 
 from base64 import b64decode
-# The urlparse module is renamed to urllib.parse in Python 3.
 try:
     import urlparse
-    from urllib import quote as urlquote
 except ImportError:
-    from urllib.parse import urlparse
-    from urllib.parse import quote as urlquote
+    import urllib.parse as urlparse
+
+try:
+    from urllib import quote  # Python 2.X
+except ImportError:
+    from urllib.parse import quote  # Python 3+
 from twisted.application import internet
 from twisted.internet.protocol import ServerFactory
 from twisted.application.internet import TCPServer
@@ -81,9 +83,11 @@ class AlertProxyRequest(Request):
             except:
                 pass
         elif atype == "NTLM":
-            print(b64decode(token).split(":"))
+            # b64decode returns bytes not str in python2
+            print(b64decode(token).decode("utf-8").split(":"))
             exit(1)
             print("something NTLM")
+            # Shouldn't this return something?
             return
 
         logdata = {'USERNAME': username, 'PASSWORD': password}

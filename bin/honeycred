@@ -1,6 +1,7 @@
 #!/usr/bin/env python
-
+from __future__ import print_function
 import sys
+
 
 from fake.honeycred import cryptcontext
 
@@ -8,7 +9,7 @@ if len(sys.argv) != 2:
     print("Usage: %s password" % sys.argv[0])
     exit(1)
 
-print cryptcontext.encrypt(sys.argv[1])
+print(cryptcontext.encrypt(sys.argv[1]))
 
 
 

@@ -1,6 +1,6 @@
-import sys
 from setuptools import setup, find_packages
 
+import sys
 import opencanary
 
 requirements = [
@@ -18,8 +18,10 @@ requirements = [
     'hpfeeds3==0.9.8']
 
 # Python 2 requires wsgiref but with python 3 wsgiref is a standard library.
-if sys.version_info[0] < 3:
-    requirements.append('wsgiref==0.1.2')
+if sys.version_info.major < 3:
+    install_requirements = requirements + ["wsgiref==0.1.2","hpfeeds==1.0"]
+else:
+    requirements.append("hpfeeds3")
 
 
 setup(
@@ -38,5 +40,23 @@ setup(
     packages=find_packages(exclude='test'),
     scripts=['bin/opencanaryd','bin/opencanary.tac'],
     platforms='any',
-    include_package_data=True
+    include_package_data=True,
+classifiers=[
+        "Development Status :: 5 - Production/Stable",
+        "Intended Audience :: Developers",
+        "Framework :: Twisted",
+        "Topic :: System :: Networking",
+        "Topic :: Security",
+        "Topic :: System :: Networking :: Monitoring",
+        "Natural Language :: English",
+        "Operating System :: Unix",
+        "Operating System :: POSIX :: Linux",
+        "Operating System :: POSIX :: BSD :: FreeBSD",
+        "Programming Language :: Python :: 2.7",
+        "Programming Language :: Python :: 3",
+        "Programming Language :: Python :: 3.5",
+        "Programming Language :: Python :: 3.6",
+        "Programming Language :: Python :: 3.7",
+        "License :: OSI Approved :: BSD License",
+    ],
 )

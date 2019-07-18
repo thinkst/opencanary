@@ -1,3 +1,4 @@
+from __future__ import print_function
 from opencanary.modules import CanaryService
 from opencanary.config import ConfigException
 
@@ -10,6 +11,7 @@ from ntlmlib.messages import ChallengeResponse, TargetInfo
 import struct
 import re
 import collections
+
 
 # Monkeypatch bug in ntmllib
 if getattr(TargetInfo, 'getData', None) is None:

@@ -17,6 +17,7 @@ from twisted.conch.telnet import ECHO
 
 @implementer(portal.IRealm)
 class Realm:
+
     def requestAvatar(self, avatarId, mind, *interfaces):
         if ITelnetProtocol in interfaces:
             av = MyTelnet()

@@ -1,10 +1,14 @@
+from __future__ import print_function
 from opencanary.modules import CanaryService
 
 from twisted.internet.protocol import Protocol
 from twisted.internet.protocol import Factory
 from twisted.application import internet
 
-from opencanary.modules.des import des
+try:
+    from des import des
+except ImportError:
+    from .des import des
 
 import os
 

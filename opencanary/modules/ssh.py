@@ -1,3 +1,4 @@
+from __future__ import print_function
 from opencanary.modules import CanaryService
 
 import twisted
@@ -160,6 +161,7 @@ class HoneyPotSSHFactory(factory.SSHFactory):
 
 @implementer(portal.IRealm)
 class HoneyPotRealm:
+
     def __init__(self):
         pass
 
@@ -202,7 +204,7 @@ class HoneyPotTransport(transport.SSHServerTransport):
             self.hadVersion = True
 
     def ssh_KEXINIT(self, packet):
-        #print 'Remote SSH version: %s' % (self.otherVersionString,)
+        #print('Remote SSH version: %s' % (self.otherVersionString,))
         return transport.SSHServerTransport.ssh_KEXINIT(self, packet)
 
     def ssh_KEX_DH_GEX_REQUEST(self, packet):
@@ -262,12 +264,13 @@ class HoneyPotTransport(transport.SSHServerTransport):
 
 class HoneyPotSSHSession(session.SSHSession):
     def request_env(self, data):
-        #print 'request_env: %s' % (repr(data))
+        #print('request_env: %s' % (repr(data)))
         pass
 
 
 @implementer(conchinterfaces.ISession)
 class HoneyPotAvatar(avatar.ConchUser):
+
     def __init__(self, username, env):
         avatar.ConchUser.__init__(self)
         self.username = username
@@ -363,6 +366,7 @@ def getDSAKeys():
 
 @implementer(checkers.ICredentialsChecker)
 class HoneypotPasswordChecker:
+
     credentialInterfaces = (credentials.IUsernamePassword,)
 
     def __init__(self, logger=None):
@@ -376,6 +380,7 @@ class HoneypotPasswordChecker:
 
 @implementer(checkers.ICredentialsChecker)
 class CanaryPublicKeyChecker:
+
     credentialInterfaces = (credentials.ISSHPrivateKey,)
 
     def __init__(self, logger=None):

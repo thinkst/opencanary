@@ -114,7 +114,7 @@ def logMsg(msg):
 #    data['src_host'] = device_name
 #    data['dst_host'] = node_id
     data['logdata'] = {'msg': msg}
-    logger.log(data, retry=False)
+    logger.log.info(msg=data, retry=False)
 
 application = service.Application("opencanaryd")
 

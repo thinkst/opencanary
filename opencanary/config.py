@@ -1,3 +1,5 @@
+from __future__ import print_function
+from six import iteritems
 import os, sys, json, copy, socket, itertools, string, subprocess
 from os.path import expanduser
 from pkg_resources import resource_filename
@@ -10,7 +12,7 @@ if sys.version_info[0] < 3:
     def byteify(input):
         if isinstance(input, dict):
             return {byteify(key): byteify(value)
-                    for key, value in input.items()}
+                    for key, value in iteritems(input)}
         elif isinstance(input, list):
             return [byteify(element) for element in input]
         elif isinstance(input, unicode):
@@ -90,17 +92,17 @@ class Config:
 
         # test options indpenedently for validity
         errors = []
-        for key,value in params.items():
+        for key,value in iteritems(params):
             try:
                 self.valid(key,value)
             except ConfigException as e:
                 errors.append(e)
 
         # Test that no ports overlap
-        ports = {k: v for k, v in self.__config.items() if k.endswith(".port")}
-        newports = {k: v for k, v in params.items() if k.endswith(".port")}
+        ports = {k: v for k, v in iteritems(self.__config) if k.endswith(".port")}
+        newports = {k: v for k, v in iteritems(params) if k.endswith(".port")}
         ports.update(newports)
-        ports = [(port,setting) for setting, port in ports.items()]
+        ports = [(port,setting) for setting, port in iteritems(ports)]
         ports.sort()
 
         for port, settings in itertools.groupby(ports, lambda x: x[0]):
