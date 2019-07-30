@@ -19,32 +19,28 @@ class Singleton(type):
 
 def getLogger(config):
     try:
-        d = config.getVal('logger'.encode('utf-8'))
+        d = config.getVal('logger')
     except Exception as e:
         print("Error: config does not have 'logger' section", file=sys.stderr)
-        print(e)
         exit(1)
 
-    classname = d.get('class'.encode('utf-8'), None)
+    classname = d.get('class', None)
     if classname is None:
         print("Logger section is missing the class key.", file=sys.stderr)
         exit(1)
 
-    print(globals())
-    LoggerClass = globals().get('logging', None)
-    # LoggerClass = classname
+    LoggerClass = globals().get(classname, None)
     if LoggerClass is None:
         print("Logger class (%s) is not defined." % classname, file=sys.stderr)
         exit(1)
 
-    kwargs = d.get('kwargs'.encode('utf-8'), None)
+    kwargs = d.get('kwargs', None)
     if kwargs is None:
         print("Logger section is missing the kwargs key.", file=sys.stderr)
         exit(1)
-
     try:
-        # logger = LoggerClass(config, **kwargs)
-        logger = logging.getLogger()
+        logger = LoggerClass(config, **kwargs)
+        # logger = logging.getLogger()
     except Exception as e:
         print("An error occured initialising the logger class", file=sys.stderr)
         print(e)
