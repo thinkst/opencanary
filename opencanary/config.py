@@ -21,13 +21,7 @@ if sys.version_info[0] < 3:
             return input
 else:
     def byteify(input):
-        if isinstance(input, dict):
-            return {byteify(key): byteify(value)
-                    for key, value in input.items()}
-        elif isinstance(input, list):
-            return [byteify(element) for element in input]
-        else:
-            return input
+        return input
 
 class Config:
     def __init__(self, configfile=SETTINGS):
