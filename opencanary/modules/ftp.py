@@ -1,4 +1,4 @@
-from opencanary.modules import CanaryService, ensureStringType
+from opencanary.modules import CanaryService
 
 from twisted.application import internet
 from twisted.protocols.ftp import FTPFactory, FTPRealm, FTP, \
