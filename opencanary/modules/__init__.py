@@ -105,6 +105,11 @@ class CanaryService(object):
             )
         raise Exception(err)
 
+def ensureStringType(input):
+    if type(input) != str:
+        return input.decode()
+    return input
+
 
 if sys.platform.startswith("linux"):
     from twisted.python import filepath

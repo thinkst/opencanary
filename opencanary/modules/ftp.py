@@ -1,4 +1,4 @@
-from opencanary.modules import CanaryService
+from opencanary.modules import CanaryService, ensureStringType
 
 from twisted.application import internet
 from twisted.protocols.ftp import FTPFactory, FTPRealm, FTP, \
@@ -75,6 +75,6 @@ class CanaryFTP(CanaryService):
         p = Portal(FTPRealm(FTP_PATH), [DenyAllAccess()])
         f = FTPFactory(p)
         f.protocol = LoggingFTP
-        f.welcomeMessage = self.banner
+        f.welcomeMessage = self.banner.decode()
         f.canaryservice = self
         return internet.TCPServer(self.port, f, interface=self.listen_addr)
