@@ -1,5 +1,5 @@
 from opencanary.modules import CanaryService
-from opencanary.config import ConfigException
+from opencanary.config import ConfigException, PY3
 
 from twisted.protocols.policies import TimeoutMixin
 from twisted.internet.protocol import Protocol
@@ -16,13 +16,13 @@ class MySQL(Protocol, TimeoutMixin):
     HEADER_LEN              = 4
     ERR_CODE_ACCESS_DENIED  = 1045
     ERR_CODE_PKT_ORDER      = 1156
-    SQL_STATE_ACCESS_DENIED = "2800"
-    SQL_STATE_PKT_ORDER     = "08S01"
+    SQL_STATE_ACCESS_DENIED = b"2800"
+    SQL_STATE_PKT_ORDER     = b"08S01"
 
     # https://dev.mysql.com/doc/internals/en/connection-phase-packets.html#packet-Protocol::Handshake
     def __init__(self, factory):
         self._busyReceiving = False
-        self._buffer = ""
+        self._buffer = b""
         self.factory = factory
         self.threadid = factory.next_threadid()
         self.setTimeout(10)
@@ -46,13 +46,16 @@ class MySQL(Protocol, TimeoutMixin):
     def parse_auth(data):
         # https://dev.mysql.com/doc/internals/en/connection-phase-packets.html#packet-Protocol::HandshakeResponse
         offset = 4 + 4 + 1 + 23
-        i = data.find("\x00", offset)
+        i = data.find(b"\x00", offset)
         if i < 0:
             return None, None
 
         username = data[offset:i]
         i += 1
-        plen = struct.unpack('B', data[i])[0]
+        if PY3:
+            plen = data[i]
+        else:
+            plen = struct.unpack('B', data[i])[0]
         i+=1
         if plen == 0:
             return username, None
@@ -63,9 +66,11 @@ class MySQL(Protocol, TimeoutMixin):
     def consume_packet(self):
         if len(self._buffer) < MySQL.HEADER_LEN:
             return None, None
-
-        length = struct.unpack('<I', self._buffer[:3] + '\x00')[0]
-        seq_id = struct.unpack('<B', self._buffer[3])[0]
+        length = struct.unpack('<I', self._buffer[:3] + b'\x00')[0]
+        if PY3:
+            seq_id = self._buffer[3]
+        else:
+            seq_id = struct.unpack('<B', self._buffer[3])[0]
 
         # enough buffer data to consume packet?
         if len(self._buffer) < MySQL.HEADER_LEN + length:
@@ -78,25 +83,26 @@ class MySQL(Protocol, TimeoutMixin):
         return seq_id, payload
 
     def server_greeting(self):
+        # struct.pack returns a byte string for py2 and py3
         _threadid = struct.pack('<I', self.threadid)
         # TODO: randomize salts embedded here
-        data = '\x0a' + self.factory.canaryservice.banner +'\x00' + _threadid + '\x25\x73\x36\x51\x74\x77\x75\x69\x00\xff\xf7\x08\x02\x00\x0f\x80\x15\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x2e\x47\x5c\x78\x67\x7a\x4f\x5b\x5c\x3e\x5c\x39\x00\x6d\x79\x73\x71\x6c\x5f\x6e\x61\x74\x69\x76\x65\x5f\x70\x61\x73\x73\x77\x6f\x72\x64\x00'
+        data = b'\x0a' + self.factory.canaryservice.banner + b'\x00' + _threadid + b'\x25\x73\x36\x51\x74\x77\x75\x69\x00\xff\xf7\x08\x02\x00\x0f\x80\x15\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x2e\x47\x5c\x78\x67\x7a\x4f\x5b\x5c\x3e\x5c\x39\x00\x6d\x79\x73\x71\x6c\x5f\x6e\x61\x74\x69\x76\x65\x5f\x70\x61\x73\x73\x77\x6f\x72\x64\x00'
         return self.build_packet(0x00, data)
 
     def access_denied(self, seq_id, user, password=None):
-        Y = "YES" if password else "NO"
+        Y = b"YES" if password else b"NO"
         ip = self.transport.getPeer().host
         msg = "Access denied for user '%s'@'%s' (using password: %s)" % (user, ip, Y)
         return self.error_pkt(seq_id, MySQL.ERR_CODE_ACCESS_DENIED,
-                              MySQL.SQL_STATE_ACCESS_DENIED, msg)
+                              MySQL.SQL_STATE_ACCESS_DENIED, msg.encode())
 
     def unordered_pkt(self, seq_id):
-        msg = "Got packets out of order"
+        msg = "Got packets out of order".encode()
         return self.error_pkt(seq_id, MySQL.ERR_CODE_PKT_ORDER,
                               MySQL.SQL_STATE_PKT_ORDER, msg)
 
     def error_pkt(self, seq_id, err_code, sql_state, msg):
-        data = "\xff" + struct.pack("<H", err_code) + "\x23#" + sql_state + msg
+        data = b"\xff" + struct.pack("<H", err_code) + b"\x23#" + sql_state + msg
         return self.build_packet(0x02, data)
 
     def connectionMade(self):
@@ -125,7 +131,6 @@ class MySQL(Protocol, TimeoutMixin):
                 if username:
                     logdata = {'USERNAME': username, 'PASSWORD': password}
                     self.factory.canaryservice.log(logdata, transport=self.transport)
-                    
                     self.transport.write(self.access_denied(0x02, username, password))
                     self.transport.loseConnection()
         finally:

@@ -7,6 +7,8 @@ from pkg_resources import resource_filename
 SAMPLE_SETTINGS = resource_filename(__name__, 'data/settings.json')
 SETTINGS = 'opencanary.conf'
 
+PY3 = sys.version_info > (3,)
+
 # Only check unicode on Python 2, In Python 3 unicode is the default and we can just return the input.
 if sys.version_info[0] < 3:
     def byteify(input):
