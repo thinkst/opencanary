@@ -8,24 +8,24 @@ import shlex
 
 class ProtocolError(Exception):
     def __init__(self, reason):
-        self.message = '-ERR Protocol error: {reason}\r\n'.format(reason=reason)
+        self.message = b'-ERR Protocol error: {reason}\r\n'.format(reason=reason)
 
 class ArgumentCountError(Exception):
     def __init__(self, cmd):
-        self.message = "-ERR wrong number of arguments for '{cmd}' command\r\n".format(cmd=cmd.lower())
+        self.message = b"-ERR wrong number of arguments for '{cmd}' command\r\n".format(cmd=cmd.lower())
 
 class AuthenticationRequiredError(Exception):
     def __init__(self):
-        self.message = "-NOAUTH Authentication required.\r\n"
+        self.message = b"-NOAUTH Authentication required.\r\n"
 
 class AuthenticationError(Exception):
     def __init__(self):
-        self.message = "-ERR invalid password\r\n"
+        self.message = b"-ERR invalid password\r\n"
 
 class UnknownCommandError(Exception):
     def __init__(self, cmd):
         cmd.replace('\r',' ').replace('\n', ' ')
-        self.message = "-ERR unknown command '{cmd}'\r\n".format(cmd=cmd.lower())
+        self.message = b"-ERR unknown command '{cmd}'\r\n".format(cmd=cmd.lower())
 
 class RedisCommandAgain(Exception):
     pass
@@ -390,9 +390,9 @@ class RedisProtocol(Protocol):
                 #are in a single packet and missing some data, run again
 
                 if not hasattr(self, '_data'):
-                    self._data = data
+                    self._data = data.decode()
                 else:
-                    self._data += data
+                    self._data += data.decode()
 
                 cmds = self._processRedisCommand()
 
