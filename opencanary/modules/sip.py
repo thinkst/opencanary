@@ -12,7 +12,7 @@ from twisted.internet.address import IPv4Address
 class SIPServer(Base):
     def handle_request(self, request, addr):
         try:
-            logdata={'HEADERS': request.headers.data}
+            logdata={'HEADERS': request.headers}
             self.transport.getPeer = lambda: IPv4Address('UDP', addr[0], addr[1])
             self.factory.log(logdata=logdata, transport=self.transport)
         except Exception as e:
