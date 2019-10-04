@@ -61,7 +61,7 @@ class Telnet(CanaryService):
         self.listen_addr = config.getVal('device.listen_addr', default='')
 
         if self.banner:
-            self.banner += "\n"
+            self.banner += b"\n"
 
     def getService(self):
         r = Realm()
