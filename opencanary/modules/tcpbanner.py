@@ -78,9 +78,9 @@ class TCPBannerProtocol(Protocol):
             logdata = {'FUNCTION':'DATA_RECEIVED',
                        'BANNER_ID':str(self.banner_id)}
             try:
-                logdata['DATA'] = str(data).rstrip().decode('utf-8').encode('utf-8')
+                logdata['DATA'] = data.rstrip().decode().encode('utf-8')
             except UnicodeDecodeError:
-                logdata['DATA'] = str(data).rstrip().decode('unicode_escape').encode('utf-8')
+                logdata['DATA'] = data.rstrip().decode('unicode_escape').encode('utf-8')
 
             send_log = True
 
@@ -88,14 +88,14 @@ class TCPBannerProtocol(Protocol):
                 if self.keep_alive_secret != '' and self.keep_alive_secret in data:
                     self.keep_alive_disable_alerting = True
                     self.factory.canaryservice.logtype = self.factory.canaryservice.logger.LOG_TCP_BANNER_KEEP_ALIVE_SECRET_RECEIVED
-                    logdata['SECRET_STRING'] = str(self.keep_alive_secret)
+                    logdata['SECRET_STRING'] = (self.keep_alive_secret).decode().encode('utf-8')
                 else:
                     self.factory.canaryservice.logtype = self.factory.canaryservice.logger.LOG_TCP_BANNER_KEEP_ALIVE_DATA_RECEIVED
             else:
                 self.factory.canaryservice.logtype = self.factory.canaryservice.logger.LOG_TCP_BANNER_DATA_RECEIVED
                 if self.alert_string_enabled:
                     if self.alert_string in data:
-                        logdata['ALERT_STRING'] = str(self.alert_string)
+                        logdata['ALERT_STRING'] = (self.alert_string).decode().encode('utf-8')
                     else:
                         send_log = False
 
@@ -111,15 +111,15 @@ class TCPBannerFactory(Factory):
     def __init__(self, config=None, banner_id=1):
         self.banner_id = str(banner_id)
         self.accept_banner = config.getVal('tcpbanner_' + self.banner_id + '.initbanner','')\
-            .encode('utf8').replace('\\n','\n').replace('\\r','\r')
+            .encode('utf8').replace(b'\\n',b'\n').replace(b'\\r',b'\r')
         self.send_banner = config.getVal('tcpbanner_' + self.banner_id + '.datareceivedbanner','')\
-            .encode('utf8').replace('\\n','\n').replace('\\r','\r')
+            .encode('utf8').replace(b'\\n',b'\n').replace(b'\\r',b'\r')
         self.alert_string_enabled = config.getVal('tcpbanner_' + self.banner_id + '.alertstring.enabled', False)
         self.alert_string = config.getVal('tcpbanner_' + self.banner_id + '.alertstring','')\
-            .encode('utf8').replace('\\n','\n').replace('\\r','\r')
+            .encode('utf8').replace(b'\\n',b'\n').replace(b'\\r',b'\r')
         self.keep_alive_enabled = config.getVal('tcpbanner_' + self.banner_id + '.keep_alive.enabled', False)
         self.keep_alive_secret = config.getVal('tcpbanner_' + self.banner_id + '.keep_alive_secret', '')\
-            .encode('utf8').replace('\\n','\n').replace('\\r','\r')
+            .encode('utf8').replace(b'\\n',b'\n').replace(b'\\r',b'\r')
         # the defaults for the tcp keep alive values add up to 1 hour keep alive
         # 300 for the first probe + 300 * 11 for the interval probes = 3600
         self.keep_alive_idle = config.getVal('tcpbanner_' + self.banner_id + '.keep_alive_idle', 300)
