@@ -16,16 +16,16 @@ class Tftp(DatagramProtocol):
             #bogus packet, discard
             return
 
-        if data[:2] == "\x00\x01":
+        if data[:2] == b"\x00\x01":
             opcode="READ"
-        elif data[:2] == "\x00\x02":
+        elif data[:2] == b"\x00\x02":
             opcode="WRITE"
         else:
             #don't log other opcodes
             return
 
         try:
-            (filename, mode, ignore) = data[2:].split("\x00")
+            (filename, mode, ignore) = data[2:].split(b"\x00")
         except ValueError:
             return
 
