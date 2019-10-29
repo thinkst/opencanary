@@ -13,7 +13,7 @@ setup(
     long_description='A low interaction honeypot intended to be run on internal networks.',
     install_requires=[
         'Jinja2>=2.4',
-        'Twisted==18.4.0',
+        'Twisted==19.7.0',
         'pyasn1==0.4.5',
         # 'pycrypto==2.6.1',
         'cryptography==2.6.1',
