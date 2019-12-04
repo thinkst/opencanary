@@ -4,7 +4,7 @@ import sys
 import opencanary
 
 requirements = [
-    'Twisted==18.9.0',
+    'Twisted==19.10.0',
     'pyasn1==0.4.5',
     'cryptography==2.5.0',
     'simplejson==3.16.0',
@@ -15,7 +15,8 @@ requirements = [
     'passlib==1.7.1',
     'Jinja2==2.10.0',
     'ntlmlib==0.72',
-    'hpfeeds3==0.9.8']
+    'hpfeeds3==0.9.8',
+    'bcrypt==3.1.7']
 
 # Python 2 requires wsgiref but with python 3 wsgiref is a standard library.
 if sys.version_info.major < 3:

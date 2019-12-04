@@ -5,16 +5,15 @@ from twisted.internet.protocol import Protocol
 from twisted.internet.protocol import Factory
 from twisted.application import internet
 
-try:
-    from des import des
-except ImportError:
-    from .des import des
+from opencanary.modules.des import des
+from opencanary.config import PY3
+import sys
 
 import os
 
-RFB_33  = '003.003'
-RFB_37  = '003.007'
-RFB_38  = '003.008'
+RFB_33  = b'003.003'
+RFB_37  = b'003.007'
+RFB_38  = b'003.008'
 
 #states
 PRE_INIT = 1
@@ -23,7 +22,7 @@ SECURITY_SEND = 3
 AUTH_SEND = 4
 AUTH_OVER = 5
 
-#if one of these is used in the VNC authentication attempt, alert that 
+#if one of these is used in the VNC authentication attempt, alert that
 #a common password was tried
 COMMON_PASSWORDS=['111111', 'password', '123456', '111111','1234',
                   'administrator','root','passw0rd']
@@ -44,12 +43,13 @@ class VNCProtocol(Protocol):
 
     def _send_handshake(self,):
         print('send handshake')
-        self.transport.write('RFB {version}\n'.format(version=self.serv_version))
+        version_string = 'RFB {version}\n'.format(version=self.serv_version)
+        self.transport.write(version_string.encode('utf-8'))
         self.state = HANDSHAKE_SEND
 
     def _recv_handshake(self,data=None):
         print('got handshake')
-        if len(data) != 12 or data[:3] != 'RFB':
+        if len(data) != 12 or data[:3] != b'RFB':
             raise ProtocolError()
         client_ver = data[4:-1]
 
@@ -59,20 +59,13 @@ class VNCProtocol(Protocol):
 
         self._send_security(client_ver)
 
-
-    def _send_security(self,):
-        print('send security')
-        self.transport.write('\x01\x02')#VNC authentication
-        self.state = SECURITY_SEND
-
-
     def _send_security(self,client_ver):
         print('send security')
         if client_ver == RFB_33:
-            self.transport.write('\x00\x00\x00\x02')#specify VNC auth using 4 bytes
+            self.transport.write(b'\x00\x00\x00\x02')#specify VNC auth using 4 bytes
             self._send_auth()
         else:
-            self.transport.write('\x01\x02')#VNC authentication
+            self.transport.write(b'\x01\x02')#VNC authentication
             self.state = SECURITY_SEND
 
 
@@ -92,8 +85,15 @@ class VNCProtocol(Protocol):
         print('got auth')
         if len(data) != 16:
             raise ProtocolError()
-        logdata = {"VNC Server Challenge" : self.challenge.encode('hex'),
-                   "VNC Client Response": data.encode('hex')}
+
+        if PY3:
+            logdata = {"VNC Server Challenge" : self.challenge.hex(),
+                       "VNC Client Response": data.hex()
+                    }
+        else:
+            logdata = {"VNC Server Challenge" : self.challenge.encode('hex'),
+                       "VNC Client Response": data.encode('hex')
+                    }
 
         used_password = self._try_decrypt_response(response=data)
         if used_password:
@@ -109,9 +109,9 @@ class VNCProtocol(Protocol):
         self._send_handshake()
 
     def _send_auth_failed(self,):
-        self.transport.write('\x00\x00\x00\x01'+#response code
-                             '\x00\x00\x00\x16'+#message length
-                             'Authentication failure')#Message
+        self.transport.write(b'\x00\x00\x00\x01'+#response code
+                             b'\x00\x00\x00\x16'+#message length
+                             b'Authentication failure')#Message
         self.state = AUTH_OVER
         raise ProtocolError()
 
@@ -124,10 +124,19 @@ class VNCProtocol(Protocol):
             if len(pw) < 8:
                 pw+= '\x00'*(8-len(pw))
 
-            #VNC use of DES requires password bits to be mirrored
-            pw = ''.join([chr(int('{:08b}'.format(ord(x))[::-1], 2))
-                                                       for x in pw])
-            desbox = des(pw)
+            if not PY3:
+                #VNC use of DES requires password bits to be mirrored
+                pw = ''.join([chr(int('{:08b}'.format(ord(x))[::-1], 2))
+                                                           for x in pw])
+                desbox = des(pw)
+            else:
+                pw = pw.encode('ascii')
+                # VNC use of DES requires password bits to be mirrored
+                values = bytearray()
+                for x in pw:
+                    values.append(int('{:08b}'.format(x)[::-1], 2))
+                desbox = des(values)
+
             decrypted_challenge = desbox.decrypt(response)
             if decrypted_challenge == self.challenge:
                 return password
