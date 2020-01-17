@@ -19,7 +19,8 @@ requirements = [
     ]
 # Python 2 requires wsgiref but with python 3 wsgiref is a standard library.
 if sys.version_info.major < 3:
-    install_requirements = requirements + ["wsgiref==0.1.2","hpfeeds==1.0"]
+    requirements.append("wsgiref==0.1.2")
+    requirements.append("hpfeeds==1.0")
 else:
     requirements.append("hpfeeds3==0.9.8")
 
