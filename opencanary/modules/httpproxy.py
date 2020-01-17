@@ -40,7 +40,7 @@ PROFILES = {
             ("Pragma", "no-cache"),
             ("Cache-Control", "no-cache"),
         ],
-        "status_reason": "Proxy Authentication Required ( The ISA Server requires authorization to fulfill the request. Access to the Web Proxy service is denied.  )"
+        "status_reason": b"Proxy Authentication Required ( The ISA Server requires authorization to fulfill the request. Access to the Web Proxy service is denied.  )"
     },
     "squid" : {
         # p/Squid http proxy/ v/$1/ cpe:/a:squid-cache:squid:$1/
@@ -54,7 +54,7 @@ PROFILES = {
             ("X-Cache-Lookup", "NONE from localhost"), # actually hostname:port
             ("X-Squid-Error", "ERR_CACHE_ACCESS_DENIED 0")
         ],
-        "status_reason": "Proxy Authentication Required"
+        "status_reason": b"Proxy Authentication Required"
     }
 }
 

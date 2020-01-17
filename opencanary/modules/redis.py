@@ -25,7 +25,7 @@ class AuthenticationError(Exception):
 class UnknownCommandError(Exception):
     def __init__(self, cmd):
         cmd.replace('\r',' ').replace('\n', ' ')
-        self.message = b"-ERR unknown command '{cmd}'\r\n".format(cmd=cmd.lower())
+        self.message = ("-ERR unknown command '{cmd}'\r\n".format(cmd=cmd.lower())).encode('utf-8')
 
 class RedisCommandAgain(Exception):
     pass
