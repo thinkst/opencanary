@@ -35,6 +35,7 @@ try:
     from opencanary.modules.rdp import CanaryRDP
     MODULES.append(CanaryRDP)
 except ImportError:
+    print("Can't import RDP. Please ensure you have RDP installed.")
     pass
 
 
@@ -43,6 +44,7 @@ try:
     from opencanary.modules.snmp import CanarySNMP
     MODULES.append(CanarySNMP)
 except ImportError:
+    print("Can't import SNMP. Please ensure you have Scapy installed.")
     pass
 
 # NB: imports below depend on inotify, only available on linux

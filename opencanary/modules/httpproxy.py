@@ -120,7 +120,7 @@ class AlertProxyRequest(Request):
         self.responseHeaders.addRawHeader("Content-Type", "text/html")
         self.responseHeaders.addRawHeader("Proxy-Authenticate",
                                            'Basic realm="%s"' % prompt)
-        self.responseHeaders.addRawHeader("Content-Length", len(content))
+        self.responseHeaders.addRawHeader("Content-Length", "{}".format(len(content)))
 
         self.write(content.encode("utf-8"))
         self.finish()
