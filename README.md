@@ -12,7 +12,7 @@ OpenCanary is a daemon that runs several canary versions of services that alerts
 Prerequisites
 ----------------
 
-* Python 2.7
+* Python 2.7, 3.6 
 * [Optional] SNMP requires the python library scapy
 * [Optional] RDP requires the python library rdpy
 * [Optional] Samba module needs a working installation of samba
@@ -75,7 +75,7 @@ $ cd dist
 $ pip install opencanary-<version>.tar.gz
 ```
 
-If you are looking to get OpenCanary working on OpenBSD, take a look at https://github.com/8com/opencanary. 
+If you are looking to get OpenCanary working on OpenBSD, take a look at https://github.com/8com/opencanary.
 
 Run
 ----
