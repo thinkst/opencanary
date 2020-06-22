@@ -9,29 +9,9 @@
     "http.enabled": false,
     "http.port": 80,
     "http.skin": "nasLogin",
-    "http.skin.list": [
-        {
-            "desc": "Plain HTML Login",
-            "name": "basicLogin"
-        },
-        {
-            "desc": "Synology NAS Login",
-            "name": "nasLogin"
-        }
-    ],
     "httpproxy.enabled" : false,
     "httpproxy.port": 8080,
     "httpproxy.skin": "squid",
-    "httproxy.skin.list": [
-        {
-            "desc": "Squid",
-            "name": "squid"
-        },
-        {
-            "desc": "Microsoft ISA Server Web Proxy",
-            "name": "ms-isa"
-        }
-    ],
     "logger": {
         "class": "PyLogger",
         "kwargs": {

@@ -162,8 +162,10 @@ class CanaryHTTP(CanaryService):
     def __init__(self, config=None, logger=None):
         CanaryService.__init__(self, config=config, logger=logger)
         self.skin = config.getVal('http.skin', default='basicLogin')
-        self.skindir = os.path.join(
-            CanaryHTTP.resource_dir(), "skin", self.skin)
+        self.skindir = config.getVal('http.skindir', default='')
+        if not os.path.isdir(self.skindir):
+            self.skindir = os.path.join(
+              CanaryHTTP.resource_dir(), "skin", self.skin)
         self.staticdir = os.path.join(self.skindir, "static")
         self.port = int(config.getVal('http.port', default=80))
         ubanner = config.getVal('http.banner', default="Apache/2.2.22 (Ubuntu)")
