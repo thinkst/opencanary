@@ -1,13 +1,14 @@
 FROM python:3.6-buster
 
-RUN apt update &&\
-	 apt-get install -y sudo vim build-essential libssl-dev libffi-dev python-dev &&\
-	 apt-get install -y libpcap-dev && apt-get install -y build-essential libssl-dev libffi-dev python-dev
+WORKDIR /root/
 
+RUN apt update &&\
+	 apt-get install -y sudo vim build-essential libssl-dev libffi-dev python-dev libpcap-dev
 RUN pip install rdpy
 RUN pip install opencanary
 RUN pip install scapy pcapy 
+COPY run.sh /bin/run
+RUN chmod +x /bin/run
 
-CMD opencanaryd --start && tail -f /var/tmp/opencanary.log
-
+CMD /bin/run
 
