@@ -4,6 +4,7 @@ import logging.config
 import socket
 import hpfeeds
 import sys
+from os import getpid
 
 from datetime import datetime
 from logging.handlers import SocketHandler
@@ -152,13 +153,15 @@ class PyLogger(LoggerBase):
 
     def error(self, data):
         data['local_time'] = datetime.utcnow().strftime("%Y-%m-%d %H:%M:%S.%f")
-        msg = '[ERR] %r' % json.dumps(data, sort_keys=True)
+        pid = str(getpid()
+        msg = 'opencanaryd['+pid+']: '+'[ERR] %r' % json.dumps(data, sort_keys=True)
         print(msg, file=sys.stderr)
         self.logger.warn(msg)
 
     def log(self, logdata, retry=True):
         logdata = self.sanitizeLog(logdata)
-        self.logger.warn(json.dumps(logdata, sort_keys=True))
+        pid = str(getpid()
+        self.logger.warn('opencanaryd['+pid+']: '+json.dumps(logdata, sort_keys=True))
 
 
 class SocketJSONHandler(SocketHandler):
