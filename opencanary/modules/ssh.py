@@ -342,7 +342,7 @@ def getDSAKeys():
 
     if not (os.path.exists(public_key) and os.path.exists(private_key)):
         ssh_key = dsa.generate_private_key(
-            key_size=2048,
+            key_size=1024,
             backend=default_backend())
         public_key_string = ssh_key.public_key().public_bytes(
             serialization.Encoding.OpenSSH,
