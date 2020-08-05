@@ -60,7 +60,11 @@ class MySQL(Protocol, TimeoutMixin):
         if plen == 0:
             return username, None
 
-        password="".join("{:02x}".format(ord(c)) for c in data[i:i+plen])
+        if PY3:
+            password="".join("{:02x}".format(c) for c in data[i:i+plen])
+        else:
+            password="".join("{:02x}".format(ord(c)) for c in data[i:i+plen])
+            
         return username, password
 
     def consume_packet(self):
