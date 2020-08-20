@@ -54,7 +54,7 @@
     "snmp.enabled": false,
     "snmp.port": 161,
     "ntp.enabled": false,
-    "ntp.port": "123",
+    "ntp.port": 123,
     "tftp.enabled": false,
     "tftp.port": 69,
     "tcpbanner.maxnum":10,
@@ -71,7 +71,7 @@
     "tcpbanner_1.keep_alive_interval":300,
     "tcpbanner_1.keep_alive_idle": 300,
     "telnet.enabled": false,
-    "telnet.port": "23",
+    "telnet.port": 23,
     "telnet.banner": "",
     "telnet.honeycreds": [
         {
