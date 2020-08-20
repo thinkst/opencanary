@@ -18,6 +18,9 @@
             "formatters": {
                 "plain": {
                     "format": "%(message)s"
+                },
+                "syslog_rfc": {
+                    "format": "opencanaryd[%(process)-5s:%(thread)d]: %(name)s %(levelname)-5s %(message)s"
                 }
             },
             "handlers": {

@@ -15,7 +15,7 @@ Currently OpenCanary supports faking the following services natively:
 * `ftp` - a File Transfer Protocol server which on login attempts
 * `git` - a Git protocol which alerts on repo cloning
 * `http` - an HTTP web server that alerts on login attempts
-* `httpproxy` - an HTTP web proxy that alerts when there is an attempt to proxy to another page 
+* `httpproxy` - an HTTP web proxy that alerts when there is an attempt to proxy to another page
 * `mssql` - an MS SQL server that alerts on login attempts
 * `mysql` - a MYSQL server that alerts on login attempts
 * `telnet` - a Telnet server that alerts on login attempts
@@ -25,16 +25,16 @@ Currently OpenCanary supports faking the following services natively:
 * `redis` - a Redis server which alerts on actions
 * `tftp` - a tftp server which alerts on requests
 * `ntp` - an NTP server which alerts on ntp requests.
-* `tcpbanner` - a TCPbanner service which alerts on connection and subsequent data recieved events. 
+* `tcpbanner` - a TCPbanner service which alerts on connection and subsequent data recieved events.
 
 Please note that each service may have other configurations such as `port`. For example, the `tcpbanner` service has a bunch
-of extra settings that drastically change the way the service would interact with an attacker. 
+of extra settings that drastically change the way the service would interact with an attacker.
 
 The default generated config will include all options, with all services set to `false` (except for `ftp`).
 
 You may also want to fiddle with some of our other services which require a bit more setup;
 
-`smb` - a log watcher for Samba logging files which allows Opencanary to alert on files being opened in a Windows File Share. 
+`smb` - a log watcher for Samba logging files which allows Opencanary to alert on files being opened in a Windows File Share.
 
 For this configuration, you will need to setup your own Windows File Share, and point Opencanary at it using the following configuration,
 
@@ -44,8 +44,8 @@ For this configuration, you will need to setup your own Windows File Share, and 
 
 which is where your Windows File Share will be logging any activity happening on that share.
 
-`portscan` - a log watcher that works with iptables to monitor when your Opencanary is being scanned. 
-At this stage the portscan module supports detection of nmap OS, nmap FIN, nmap OS, nmap NULL and normal port scans. 
+`portscan` - a log watcher that works with iptables to monitor when your Opencanary is being scanned.
+At this stage the portscan module supports detection of nmap OS, nmap FIN, nmap OS, nmap NULL and normal port scans.
 
 Logger Configuration
 --------------------
@@ -61,6 +61,9 @@ add to the `logger` section in your config file,
             "formatters": {
                 "plain": {
                     "format": "%(message)s"
+                },
+                "syslog_rfc": {
+                    "format": "opencanaryd[%(process)-5s:%(thread)d]: %(name)s %(levelname)-5s %(message)s"
                 }
             },
             "handlers": {
@@ -74,6 +77,7 @@ add to the `logger` section in your config file,
                 },
                 "syslog-unix": {
                     "class": "logging.handlers.SysLogHandler",
+                    "formatter":"syslog_rfc",
                     "address": [
                         "localhost",
                         514
@@ -101,11 +105,14 @@ add to the `logger` section in your config file,
     }
 
 Please note that the above are not the only logging options. You can use any Python logging class. The above are the most popular.
-You can also head over to Email Alerts for more **SMTP** options that require authentication. 
+You can also head over to Email Alerts for more **SMTP** options that require authentication.
 
 You may want to look through some other python logging options over at `PyLogger page <https://docs.python.org/2/library/logging.handlers.html>`_.
 
-Default Configuration 
+We have provided you with two different formatters. One is the plain message with incident information; the other is the syslog rfc format. We have
+already added it to the `syslog-unix` handler for your convenience.
+
+Default Configuration
 ---------------------
 
 When you generate the default OpenCanary config file using,
