@@ -11,26 +11,16 @@ function usage() {
     echo -e "\t\t--dev\tRun the opencanaryd process in the foreground"
     echo -e "\t\t--stop\tStops the opencanaryd process"
     echo -e "\t\t--usermodule\tRun opencanaryd in foreground with only usermodules enabled"
-    echo -e "\t\t--copyconfig\tCreates a default config file at ${HOME}/.opencanary.conf"
+    echo -e "\t\t--copyconfig\tCreates a default config file at /etc/opencanaryd/opencanary.conf"
     echo -e "\t\t--"
     echo -e "\t\t--help\tThis help\n"
 
 }
 
 if [ "${cmd}" == "--start" ]; then
-    if [ ! -f ~/.opencanary.conf -a ! -f opencanary.conf -a ! -f /etc/opencanaryd/opencanary.conf ]; then
-        echo "[e] No config file found, please create one with \"opencanaryd --copyconfig\""
-        exit 1
-    fi
-
     sudo "${DIR}/twistd" -y "${DIR}/opencanary.tac" --pidfile "${PIDFILE}" --syslog --prefix=opencanaryd
 elif [ "${cmd}" == "--dev" ]; then
-  if [ ! -f ~/.opencanary.conf -a ! -f opencanary.conf -a ! -f /etc/opencanaryd/opencanary.conf ]; then
-      echo "[e] No config file found, please create one with \"opencanaryd --copyconfig\""
-      exit 1
-  fi
-
-  sudo "${DIR}/twistd" -noy "${DIR}/opencanary.tac"
+    sudo "${DIR}/twistd" -noy "${DIR}/opencanary.tac"
 elif [ "${cmd}" == "--usermodule" ]; then
   usermodconf=$(python -c "from __future__ import print_function; from pkg_resources import resource_filename; print(resource_filename('opencanary', 'data/settings-usermodule.json'))")
 
@@ -47,23 +37,18 @@ elif [ "${cmd}" == "--usermodule" ]; then
 elif [ "${cmd}" == "--restart" ]; then
     pid=`sudo cat "${PIDFILE}"`
     sudo kill "$pid"
-    if [ ! -f ~/.opencanary.conf -a ! -f opencanary.conf -a ! -f /etc/opencanaryd/opencanary.conf ]; then
-        echo "[e] No config file found, please create one with \"opencanaryd --copyconfig\""
-        exit 1
-    fi
     sudo "${DIR}/twistd" -y "${DIR}/opencanary.tac" --pidfile "${PIDFILE}" --syslog --prefix=opencanaryd
-
 elif [ "${cmd}" == "--stop" ]; then
     pid=`sudo cat "${PIDFILE}"`
     sudo kill "$pid"
 elif [ "${cmd}" == "--copyconfig" ]; then
-    if [ -f ~/.opencanary.conf ]; then
-        echo "[e] A config file already exists at ${HOME}/.opencanary.conf, please move it first"
+    if [ -f /etc/opencanaryd/opencanary.conf ]; then
+        echo "A config file already exists at /etc/opencanaryd/opencanary.conf, please move it first"
         exit 1
     fi
     defaultconf=$(python -c "from __future__ import print_function; from pkg_resources import resource_filename; print(resource_filename('opencanary', 'data/settings.json'))")
-    cp "${defaultconf}" ~/.opencanary.conf
-    echo -e "[*] A sample config file is ready (${HOME}/.opencanary.conf)\n"
+    sudo cp "${defaultconf}" /etc/opencanaryd/opencanary.conf
+    echo -e "[*] A sample config file is ready /etc/opencanaryd/opencanary.conf\n"
     echo    "[*] Edit your configuration, then launch with \"opencanaryd --start\""
 else
     usage

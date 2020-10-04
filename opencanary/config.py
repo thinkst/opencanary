@@ -46,6 +46,9 @@ class Config:
                 subprocess.call("cp -r %s /var/tmp/config-err-$(date +%%s)" % fname, shell=True)
             except Exception as e:
                 print("[-] An error occured loading %s (%s)" % (fname, e))
+        if self.__config is None:
+            print('No config file found. Please create one with "opencanaryd --copyconfig"')
+            sys.exit(1)
 
     def moduleEnabled(self, module_name):
         k = "%s.enabled" % module_name.lower()
