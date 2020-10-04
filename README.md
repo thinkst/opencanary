@@ -7,7 +7,12 @@ Thinkst Applied Research
 Overview
 ----------
 
-OpenCanary is a daemon that runs several canary versions of services that alerts when a service is (ab)used.
+In essence, OpenCanary creates a network honeypot allowing you to catch hackers before they fully compromise your systems. As a technical definition, OpenCanary is a daemon that runs several canary versions of services that alerts when a service is (ab)used. 
+
+Features
+----------
+
+* Recieve email alerts as soon as potential threats are detected, highlighting the threat source IP address and where the breach may have taken place. 
 
 Prerequisites
 ----------------
@@ -17,7 +22,7 @@ Prerequisites
 * [Optional] RDP requires the python library rdpy
 * [Optional] Samba module needs a working installation of samba
 
-Install
+Installation
 ----------
 
 For updated and cleaner documentation, please head over to http://opencanary.org
