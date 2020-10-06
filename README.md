@@ -12,7 +12,7 @@ In essence, OpenCanary creates a network honeypot allowing you to catch hackers 
 Features
 ----------
 
-* Recieve email alerts as soon as potential threats are detected, highlighting the threat source IP address and where the breach may have taken place. 
+* Receive email alerts as soon as potential threats are detected, highlighting the threat source IP address and where the breach may have taken place. 
 
 Prerequisites
 ----------------
