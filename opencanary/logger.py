@@ -99,6 +99,7 @@ class LoggerBase(object):
 
     def sanitizeLog(self, logdata):
         logdata['node_id'] = self.node_id
+        logdata['local_time'] = datetime.utcnow().strftime("%Y-%m-%d %H:%M:%S.%f")
         logdata['utc_time'] = datetime.utcnow().strftime("%Y-%m-%d %H:%M:%S.%f")
         logdata['local_time_adjusted'] = datetime.now().strftime("%Y-%m-%d %H:%M:%S.%f")
         if 'src_host' not in logdata:
