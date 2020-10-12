@@ -34,8 +34,8 @@ class Error(Resource):
                 .replace(b'<', b'&lt;')\
                 .replace(b'>', b'&gt;')
         return self.error_contents\
-                .replace('[[URL]]', str(path))\
-                .replace('[[BANNER]]', str(self.factory.banner))
+                .replace('[[URL]]', path.decode("utf-8"))\
+                .replace('[[BANNER]]', self.factory.banner.decode("utf-8"))
 
     def render(self, request):
         request.setHeader(b'Server', self.factory.banner)
