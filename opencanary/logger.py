@@ -191,7 +191,7 @@ class SocketJSONHandler(SocketHandler):
                 # connection for the next msg, sendall still reports
                 # successful write on a disconnected socket but then
                 # on subsequent writes it fails correctly.
-                self.sock.sendall(s)
+                self.sock.sendall(s.encode("utf-8"))
                 return
             except socket.error:
                 self.sock.close()
