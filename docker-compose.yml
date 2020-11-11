@@ -1,0 +1,15 @@
+version: "3"
+
+services:
+ canary:
+      container_name: opencanary
+      restart: always
+      volumes:
+          - ./data/:/root 
+      ports:
+              - '21:21'
+              - '888:80'
+      image: 'opencanary'
+      build: 
+        context: .
+        dockerfile: Dockerfile.latest
