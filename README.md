@@ -164,3 +164,21 @@ local7.*            /var/log/samba-audit.log
 ```
 
 For other syslog implementations similar lines might work.
+
+Docker
+----------------
+
+To build the latest Docker image (based on the code on a given branch) run:
+
+```bash
+docker build -t opencanary -f Dockerfile.latest .
+```
+
+To build a Docker image based on what has been released in Pypi, run:
+
+```bash
+docker build -t opencanary -f Dockerfile.stable .
+```
+
+### Docker Compose 
+
