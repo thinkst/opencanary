@@ -142,4 +142,5 @@ start_modules.extend(filter(lambda m: config.moduleEnabled(m.NAME), MODULES))
 for klass in start_modules:
     start_mod(application, klass)
 
-logMsg("Canary running!!!")
+msg = 'Canary running!!!'
+logMsg({'logdata': msg})
