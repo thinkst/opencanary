@@ -15,17 +15,11 @@ requirements = [
     'passlib==1.7.1',
     'Jinja2==2.10.0',
     'ntlmlib==0.72',
-    'bcrypt==3.1.7']
+    'bcrypt==3.1.7',
+    'hpfeeds==3.0.0']
 
-py_env = None
-# Python 2 requires wsgiref but with python 3 wsgiref is a standard library.
 if sys.version_info.major < 3:
     requirements.append('wsgiref==0.1.2')
-    requirements.append('hpfeeds==1.0')
-    py_env = '==2.7.*'
-else:
-    requirements.append('hpfeeds3==0.9.8')
-    py_env = '>=3.5'
 
 setup(
     name='opencanary',
@@ -44,7 +38,6 @@ setup(
     scripts=['bin/opencanaryd','bin/opencanary.tac'],
     platforms='any',
     include_package_data=True,
-    python_requires=py_env,
     classifiers=[
         "Development Status :: 5 - Production/Stable",
         "Intended Audience :: Developers",
