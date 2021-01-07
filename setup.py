@@ -9,7 +9,7 @@ requirements = [
     'cryptography==3.0',
     'simplejson==3.16.0',
     'requests==2.21.0',
-    'zope.interface==4.6.0',
+    'zope.interface==5.0.0',
     'PyPDF2==1.26.0',
     'fpdf==1.7.2',
     'passlib==1.7.1',
