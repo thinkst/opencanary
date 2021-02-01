@@ -38,8 +38,8 @@ class CanaryService(object):
         self.creds = config.getVal("%s.honeycreds" % self.NAME, [])
         if self.creds:
             self.honeyCredHook = buildHoneyCredHook(self.creds)
-        # Check if whitelist is populated
-        self.whitelist = config.getVal('ip.whitelist', default='')
+        # Check if ignorelist is populated
+        self.ignorelist = config.getVal('ip.ignorelist', default='')
 
     @classmethod
     def resource_dir(klass):
@@ -89,9 +89,9 @@ class CanaryService(object):
             if username or password:
                 data["honeycred"] = self.honeyCredHook(username, password)
         
-        # Log only if not in whitelist
+        # Log only if not in ignorelist
         notify = True
-        for ip in self.whitelist:
+        for ip in self.ignorelist:
             if check_ip(peer.host,ip) == True:
                 notify = False
                 break
