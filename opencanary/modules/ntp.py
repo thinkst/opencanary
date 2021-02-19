@@ -16,7 +16,15 @@ from twisted.internet import protocol
 
 class MiniNtp(DatagramProtocol):
     def datagramReceived(self, data, host_and_port):
-        if len(data) < 4 or data.decode()[3]!= u'*': #monlist command
+        for encoding in ['utf8', 'latin1']:
+            try:
+                d = data.decode(encoding)
+                break
+            except UnicodeDecodeError:
+                print('Failed decoding: {}'.format(encoding))
+                pass
+
+        if d and (len(data) < 4 or d[3]!= u'*'): #monlist command
             #bogus packet, discard
             return
         logdata={'NTP CMD': 'monlist'}
