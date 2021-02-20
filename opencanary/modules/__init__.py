@@ -92,7 +92,7 @@ class CanaryService(object):
         # Log only if not in ignorelist
         notify = True
         for ip in self.ignorelist:
-            if check_ip(peer.host,ip) == True:
+            if check_ip(data['src_host'],ip) == True:
                 notify = False
                 break
 
