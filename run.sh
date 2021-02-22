@@ -1,7 +1,7 @@
 #! /bin/bash
 
-CONF="/root/opencanary.conf"
-TEMP_CONF="/root/.opencanary.conf"
+CONF="/etc/opencanaryd/opencanary.conf"
+TEMP_CONF="/etc/opencanaryd/.opencanary.conf"
 
 if [ -f $CONF ]; then
 	echo "INFO: Main configuration file found"
@@ -10,6 +10,6 @@ elif [ -f $TEMP_CONF ]; then
 	echo "INFO: Temp configuration file found"
 	opencanaryd --dev
 else
-	opencanaryd --copyconfig && echo "A Config file was generated at /etc/opencanaryd/.opencanary.conf. If the volume is mapped, move it to /root/opencanary.conf"
+	opencanaryd --copyconfig && echo "A Config file was generated at /etc/opencanaryd/.opencanary.conf."
 fi
 
