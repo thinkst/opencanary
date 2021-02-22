@@ -88,11 +88,14 @@ class CanaryService(object):
             password = logdata.get("PASSWORD", None)
             if username or password:
                 data["honeycred"] = self.honeyCredHook(username, password)
-        
+
         # Log only if not in ignorelist
         notify = True
         for ip in self.ignorelist:
-            if check_ip(data['src_host'],ip) == True:
+            if not 'src_host' in data:
+                break
+            
+            if check_ip(data['src_host'], ip) == True:
                 notify = False
                 break
 

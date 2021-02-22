@@ -26,6 +26,7 @@ Currently OpenCanary supports faking the following services natively:
 * `tftp` - a tftp server which alerts on requests
 * `ntp` - an NTP server which alerts on ntp requests.
 * `tcpbanner` - a TCPbanner service which alerts on connection and subsequent data recieved events.
+* `ignorelist` - comma separated ips or CIDRs that will ignore alerting on.
 
 Please note that each service may have other configurations such as `port`. For example, the `tcpbanner` service has a bunch
 of extra settings that drastically change the way the service would interact with an attacker.
@@ -127,6 +128,7 @@ you will receive a json formatted config file at `~/.opencanary.conf` such as th
 
     {
         "device.node_id": "opencanary-1",
+        "ip.ignorelist": [ ],
         "git.enabled": false,
         "git.port" : 9418,
         "ftp.enabled": true,
