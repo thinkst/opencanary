@@ -96,10 +96,14 @@ add to the `logger` section in your config file,
                     "fromaddr": "noreply@yourdomain.com",
                     "toaddrs" : ["youraddress@gmail.com"],
                     "subject" : "OpenCanary Alert"
-                 },
+                },
                 "slack":{
                     "class":"opencanary.logger.SlackHandler",
                     "webhook_url":"https://hooks.slack.com/services/..."
+                },
+                "teams": {
+                    "class": "opencanary.logger.TeamsHandler",
+                    "webhook_url":"https://my-organisation.webhook.office.com/webhookb2/..."
                 }
             }
         }
@@ -122,7 +126,7 @@ When you generate the default OpenCanary config file using,
 
     $ opencanaryd --copyconfig
 
-you will receive a json formatted config file at `~/.opencanary.conf` such as the following,
+you will receive a json formatted config file at `/etc/opencanary/opencanary.conf` such as the following,
 
 .. code-block:: json
 
