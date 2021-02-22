@@ -40,7 +40,6 @@ def getLogger(config):
         exit(1)
     try:
         logger = LoggerClass(config, **kwargs)
-        # logger = logging.getLogger()
     except Exception as e:
         print("An error occured initialising the logger class", file=sys.stderr)
         print(e)
