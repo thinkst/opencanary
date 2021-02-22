@@ -3,7 +3,7 @@ version: "3"
 services:
  canary:
       container_name: opencanary
-      restart: always
+      restart: unless-stopped
       volumes:
           - ./opencanary/:/etc/opencanaryd/
           - ./data/:/root/
