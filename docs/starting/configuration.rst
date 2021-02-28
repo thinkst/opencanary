@@ -26,6 +26,7 @@ Currently OpenCanary supports faking the following services natively:
 * `tftp` - a tftp server which alerts on requests
 * `ntp` - an NTP server which alerts on ntp requests.
 * `tcpbanner` - a TCPbanner service which alerts on connection and subsequent data recieved events.
+* `ignorelist` - comma separated ips or CIDRs that will ignore alerting on.
 
 Please note that each service may have other configurations such as `port`. For example, the `tcpbanner` service has a bunch
 of extra settings that drastically change the way the service would interact with an attacker.
@@ -95,10 +96,14 @@ add to the `logger` section in your config file,
                     "fromaddr": "noreply@yourdomain.com",
                     "toaddrs" : ["youraddress@gmail.com"],
                     "subject" : "OpenCanary Alert"
-                 },
+                },
                 "slack":{
                     "class":"opencanary.logger.SlackHandler",
                     "webhook_url":"https://hooks.slack.com/services/..."
+                },
+                "teams": {
+                    "class": "opencanary.logger.TeamsHandler",
+                    "webhook_url":"https://my-organisation.webhook.office.com/webhookb2/..."
                 }
             }
         }
@@ -121,12 +126,13 @@ When you generate the default OpenCanary config file using,
 
     $ opencanaryd --copyconfig
 
-you will receive a json formatted config file at `~/.opencanary.conf` such as the following,
+you will receive a json formatted config file at `/etc/opencanary/opencanary.conf` such as the following,
 
 .. code-block:: json
 
     {
         "device.node_id": "opencanary-1",
+        "ip.ignorelist": [ ],
         "git.enabled": false,
         "git.port" : 9418,
         "ftp.enabled": true,

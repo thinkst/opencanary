@@ -40,7 +40,6 @@ def getLogger(config):
         exit(1)
     try:
         logger = LoggerClass(config, **kwargs)
-        # logger = logging.getLogger()
     except Exception as e:
         print("An error occured initialising the logger class", file=sys.stderr)
         print(e)
@@ -244,3 +243,40 @@ class SlackHandler(logging.Handler):
             )
         if response.status_code != 200:
             print("Error %s sending Slack message, the response was:\n%s" % (response.status_code, response.text))
+
+class TeamsHandler(logging.Handler):
+    def __init__(self,webhook_url):
+        logging.Handler.__init__(self)
+        self.webhook_url=webhook_url
+
+    def message(self, data):
+        message = {
+            "@type": "MessageCard",
+            "@context": "http://schema.org/extensions",
+            "themeColor": "49c176",
+            "summary": "OpenCanary Notification",
+            "title": "OpenCanary Alert",
+            "sections": [{
+                "facts": self.facts(data)
+            }]
+        }
+        return message
+
+    def facts(self, data, prefix=None):
+        facts = []
+        for k, v in data.items():
+            key = str(k).lower() if prefix is None else prefix + '__' + str(k).lower()
+            if type(v) is not dict:
+                facts.append({"name": key, "value": str(v)})
+            else:
+                nested = self.facts(v, key)
+                facts.extend(nested)
+        return facts
+
+    def emit(self, record):
+        data = json.loads(record.msg)
+        payload = self.message(data)
+        headers = {'Content-Type': 'application/json'}
+        response = requests.post(self.webhook_url, headers=headers, json=payload)
+        if response.status_code != 200:
+            print("Error %s sending Teams message, the response was:\n%s" % (response.status_code, response.text))
