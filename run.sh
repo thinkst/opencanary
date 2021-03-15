@@ -1,7 +1,7 @@
 #! /bin/bash
 
-CONF="/etc/opencanaryd/opencanary.conf"
-TEMP_CONF="/etc/opencanaryd/.opencanary.conf"
+CONF="/root/opencanary.conf"
+TEMP_CONF="/root/.opencanary.conf"
 
 if [ -f $CONF ]; then
 	echo "INFO: Main configuration file found"
