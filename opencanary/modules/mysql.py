@@ -16,7 +16,7 @@ class MySQL(Protocol, TimeoutMixin):
     HEADER_LEN              = 4
     ERR_CODE_ACCESS_DENIED  = 1045
     ERR_CODE_PKT_ORDER      = 1156
-    SQL_STATE_ACCESS_DENIED = b"2800"
+    SQL_STATE_ACCESS_DENIED = b"28000"
     SQL_STATE_PKT_ORDER     = b"08S01"
 
     # https://dev.mysql.com/doc/internals/en/connection-phase-packets.html#packet-Protocol::Handshake
@@ -106,7 +106,7 @@ class MySQL(Protocol, TimeoutMixin):
                               MySQL.SQL_STATE_PKT_ORDER, msg)
 
     def error_pkt(self, seq_id, err_code, sql_state, msg):
-        data = b"\xff" + struct.pack("<H", err_code) + b"\x23#" + sql_state + msg
+        data = b"\xff" + struct.pack("<H", err_code) + b"#" + sql_state + msg
         return self.build_packet(0x02, data)
 
     def connectionMade(self):
