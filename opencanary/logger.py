@@ -10,6 +10,8 @@ from logging.handlers import SocketHandler
 from twisted.internet import reactor
 import requests
 
+from opencanary.iphelper import *
+
 class Singleton(type):
     _instances = {}
     def __call__(cls, *args, **kwargs):
@@ -149,6 +151,9 @@ class PyLogger(LoggerBase):
             print(e)
             exit(1)
 
+        # Check if ignorelist is populated
+        self.ignorelist = config.getVal('ip.ignorelist', default='')
+
         self.logger = logging.getLogger(self.node_id)
 
     def error(self, data):
@@ -159,8 +164,15 @@ class PyLogger(LoggerBase):
 
     def log(self, logdata, retry=True):
         logdata = self.sanitizeLog(logdata)
-        self.logger.warn(json.dumps(logdata, sort_keys=True))
-
+        # Log only if not in ignorelist
+        notify = True
+        if 'src_host' in logdata:
+            for ip in self.ignorelist:
+                if check_ip(logdata['src_host'], ip) == True:
+                    notify = False
+                    break
+        if notify == True:        
+            self.logger.warn(json.dumps(logdata, sort_keys=True))
 
 class SocketJSONHandler(SocketHandler):
     """Emits JSON messages over TCP delimited by newlines ('\n')"""
