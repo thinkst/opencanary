@@ -7,7 +7,6 @@ from twisted.internet.protocol import Factory
 from twisted.internet.protocol import DatagramProtocol
 
 from opencanary.honeycred import *
-from opencanary.iphelper import *
 
 # Monkey-patch-replace Twisted Protocol with CanaryProtocol class
 from twisted.internet import protocol
@@ -38,8 +37,6 @@ class CanaryService(object):
         self.creds = config.getVal("%s.honeycreds" % self.NAME, [])
         if self.creds:
             self.honeyCredHook = buildHoneyCredHook(self.creds)
-        # Check if ignorelist is populated
-        self.ignorelist = config.getVal('ip.ignorelist', default='')
 
     @classmethod
     def resource_dir(klass):
@@ -89,18 +86,7 @@ class CanaryService(object):
             if username or password:
                 data["honeycred"] = self.honeyCredHook(username, password)
 
-        # Log only if not in ignorelist
-        notify = True
-        for ip in self.ignorelist:
-            if not 'src_host' in data:
-                break
-            
-            if check_ip(data['src_host'], ip) == True:
-                notify = False
-                break
-
-        if notify == True:
-            self.logger.log(data)
+        self.logger.log(data)
 
     def getService(self):
         """Return service to be run
