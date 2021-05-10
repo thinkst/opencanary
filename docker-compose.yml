@@ -5,8 +5,9 @@ services:
       container_name: opencanary
       restart: unless-stopped
       volumes:
-          - ./opencanary/:/etc/opencanaryd/
-          - ./data/:/root/
+          # - ./opencanary/:/etc/opencanaryd/
+          # - ./data/:/root/
+          - ./opencanary.conf:/etc/opencanaryd/opencanary.conf
       ports:
               - '21:21'
               - '888:80'
@@ -14,3 +15,4 @@ services:
       build:
         context: .
         dockerfile: Dockerfile.latest
+      command: opencanaryd --dev

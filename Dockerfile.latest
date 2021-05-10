@@ -1,4 +1,4 @@
-FROM python:3.6-buster
+FROM python:3.8
 
 RUN mkdir -p /opencanary
 
@@ -14,3 +14,7 @@ WORKDIR /opencanary
 
 RUN pip install -r requirements.txt
 
+COPY run.sh /bin/run
+RUN chmod +x /bin/run
+
+CMD /bin/run
