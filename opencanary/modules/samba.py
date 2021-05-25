@@ -55,17 +55,17 @@ if sys.platform.startswith("linux"):
 
     class CanarySamba(CanaryService):
         NAME = 'smb'
-        def __init__(self,config=None, logger=None):                                                                                                                                                                                         
-            CanaryService.__init__(self, config=config, logger=logger)                                                                                                                                                                       
+        def __init__(self,config=None, logger=None):
+            CanaryService.__init__(self, config=config, logger=logger)
             self.audit_file = config.getVal('smb.auditfile', default='/var/log/samba-audit.log')
-            self.config = config                                   
-          
+            self.config = config
+
         def startYourEngines(self, reactor=None):
             #create samba run dir, so testparm doesn't error
-            #try:                                                  
-            #    os.stat('/var/run/samba')       
+            #try:
+            #    os.stat('/var/run/samba')
             #except OSError:
             #    os.mkdir('/var/run/samba')
-                                 
+
             fs = SambaLogWatcher(logFile=self.audit_file, logger=self.logger)
             fs.start()
