@@ -1,5 +1,6 @@
 from __future__ import print_function
 from opencanary.modules import CanaryService
+from opencanary.config import PY3
 
 import twisted
 from twisted.cred import portal, checkers, credentials, error
@@ -85,13 +86,15 @@ class HoneyPotSSHUserAuthServer(userauth.SSHUserAuthServer):
             key_blob = getNS(getNS(packet[1:])[1])[0]
         except:
             key_blob = "No public key found."
-
         try:
             #convert blob into openssh key format
             key = keys.Key.fromString(key_blob).toString('openssh')
         except:
-            key = "Invalid SSH Public Key Submitted: {key_blob}".format(key_blob=key_blob.encode('hex'))
-            for keytype in ['ecdsa-sha2-nistp256','ecdsa-sha2-nistp384','ecdsa-sha2-nistp521','ssh-ed25519']:
+            if not PY3:
+                key = "Invalid SSH Public Key Submitted: {key_blob}".format(key_blob=key_blob.encode('hex'))
+            else:
+                key = "Invalid SSH Public Key Submitted: {key_blob}".format(key_blob=key_blob.hex())
+            for keytype in [b'ecdsa-sha2-nistp256',b'ecdsa-sha2-nistp384',b'ecdsa-sha2-nistp521',b'ssh-ed25519']:
                 if keytype in key_blob:
                     key = '{keytype} {keydata}'.format(
                             keytype=keytype,

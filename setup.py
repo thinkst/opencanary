@@ -16,6 +16,7 @@ requirements = [
     'Jinja2==2.10.1',
     'ntlmlib==0.72',
     'bcrypt==3.1.7',
+    'setuptools==44.0.0',
     'hpfeeds==3.0.0']
 
 if sys.version_info.major < 3:
