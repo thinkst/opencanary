@@ -22,7 +22,7 @@ Prerequisites
 * ~[Optional] RDP requires the python library rdpy~ (this module has been removed; we are currently determing a way forward with this.)
 * [Optional] Samba module needs a working installation of samba
 
-Installation
+Installation [UBUNTU]
 ----------
 
 For updated and cleaner documentation, please head over to http://opencanary.org
@@ -38,6 +38,8 @@ $ . env/bin/activate
 $ pip install opencanary
 $ pip install scapy pcapy # optional
 ```
+Installation [OS X]
+----------
 
 Installation OS X needs an extra step, as multiple OpenSSL versions
 may exist which confounds the python libraries using to it.
@@ -64,6 +66,8 @@ Now installation can run as usual:
 $ pip install opencanary
 $ pip install scapy pcapy # optional
 ```
+Installation [GIT]
+----------
 
 To install from source, instead of running pip do the following:
 
@@ -77,7 +81,7 @@ $ pip install opencanary-<version>.tar.gz
 
 If you are looking to get OpenCanary working on OpenBSD, take a look at https://github.com/8com/opencanary.
 
-Run
+Running OpenCanary
 ----
 
 OpenCanary is started by running:
