@@ -31,7 +31,7 @@ Installation on Ubuntu 20.04:
 (Please note that although we support python 2.7; these instructions are aimed at running the python 3 version)
 
 ```
-$ sudo apt-get install python3-dev python3-pip python3-virtualenv python3-venv python3-scapy
+$ sudo apt-get install python3-dev python3-pip python3-virtualenv python3-venv python3-scapy libssl-dev libpcap-dev
 $ sudo apt install samba # if you plan to use the smb module
 $ virtualenv env/
 $ . env/bin/activate
