@@ -59,12 +59,10 @@ class MySQL(Protocol, TimeoutMixin):
         i+=1
         if plen == 0:
             return username, None
-
         if PY3:
             password="".join("{:02x}".format(c) for c in data[i:i+plen])
         else:
             password="".join("{:02x}".format(ord(c)) for c in data[i:i+plen])
-            
         return username, password
 
     def consume_packet(self):
@@ -94,11 +92,12 @@ class MySQL(Protocol, TimeoutMixin):
         return self.build_packet(0x00, data)
 
     def access_denied(self, seq_id, user, password=None):
-        Y = b"YES" if password else b"NO"
+        Y = "YES" if password else "NO"
         ip = self.transport.getPeer().host
-        msg = "Access denied for user '%s'@'%s' (using password: %s)" % (user, ip, Y)
+        msg = "Access denied for user '{}'@'{}' (using password: {})".format(
+            user.decode('utf8'), ip, Y)
         return self.error_pkt(seq_id, MySQL.ERR_CODE_ACCESS_DENIED,
-                              MySQL.SQL_STATE_ACCESS_DENIED, msg.encode())
+                              MySQL.SQL_STATE_ACCESS_DENIED, msg.encode('utf8'))
 
     def unordered_pkt(self, seq_id):
         msg = "Got packets out of order".encode()
