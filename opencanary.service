@@ -1,0 +1,15 @@
+[Unit]
+Description=OpenCanary
+After=syslog.target
+After=network-online.target
+
+[Service]
+User=root
+Type=oneshot
+RemainAfterExit=yes
+Restart=always
+ExecStart=<VIRTUAL_ENV_PATH>/bin/opencanaryd --start
+ExecStop=<VIRTUAL_ENV_PATH>/bin/opencanaryd --stop
+
+[Install]
+WantedBy=multi-user.target
