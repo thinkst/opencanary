@@ -43,7 +43,7 @@ class VNCProtocol(Protocol):
 
     def _send_handshake(self,):
         print('send handshake')
-        version_string = 'RFB {version}\n'.format(version=self.serv_version.decode('utf-8'))
+        version_string = 'RFB {version}\n'.format(version=self.serv_version)
         self.transport.write(version_string.encode('utf-8'))
         self.state = HANDSHAKE_SEND
 

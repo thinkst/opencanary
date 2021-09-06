@@ -4,7 +4,6 @@ import logging.config
 import socket
 import hpfeeds
 import sys
-import pymongo
 
 from datetime import datetime
 from logging.handlers import SocketHandler
@@ -293,23 +292,3 @@ class TeamsHandler(logging.Handler):
         response = requests.post(self.webhook_url, headers=headers, json=payload)
         if response.status_code != 200:
             print("Error %s sending Teams message, the response was:\n%s" % (response.status_code, response.text))
-
-class MongoHandler(logging.Handler):
-    def __init__(self, mongohost, port, db, col):
-        logging.Handler.__init__(self)
-        self.host=str(mongohost)
-        self.port=int(port)
-        self.db=str(db)
-        self.col=str(col)
-        client = pymongo.MongoClient(f'mongodb://{self.host}:{self.port}')
-        database = client[db]
-        self.collection = database[col]
-
-    def emit(self, record):                                               
-        try:                                                              
-            msg = {}
-            data = json.loads(record.msg)                                  
-            self.collection.insert_one(data)                                          
-        except Exception as e:                                                           
-            print("Error with mongo") 
-            print(e)
