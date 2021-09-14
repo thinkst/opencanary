@@ -102,7 +102,13 @@ the config file to determine which services and logging options you would like t
 
 Samba Setup (optional)
 ----------------------
+This is required for the `smb` module.
+
 Head over to our step by step wiki over [here](https://github.com/thinkst/opencanary/wiki/Opencanary-and-Samba)
+
+FAQ
+---
+We have a FAQ over [here](https://github.com/thinkst/opencanary/wiki)
 
 Docker
 ----------------
