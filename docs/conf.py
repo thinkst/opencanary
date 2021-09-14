@@ -47,7 +47,7 @@ master_doc = 'index'
 
 # General information about the project.
 project = u'OpenCanary'
-copyright = u'2018, Thinkst Applied Research'
+copyright = u'Thinkst Canary'
 author = u'Thinkst Applied Research'
 
 # The version info for the project you're documenting, acts as replacement for
