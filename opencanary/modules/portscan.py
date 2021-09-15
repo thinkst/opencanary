@@ -54,6 +54,8 @@ class SynLogWatcher(FileSystemWatcher):
             data['dst_port'] = kv.pop('DPT')
             data['logtype']  = logtype
             data['logdata']  = kv
+            if 'src_host' in data and data['src_host'] == '127.0.0.1':
+                continue
             self.logger.log(data)
 
 class CanaryPortscan(CanaryService):
@@ -66,6 +68,7 @@ class CanaryPortscan(CanaryService):
         self.nmaposrate = config.getVal('portscan.nmaposrate', default='5')
         self.lorate = config.getVal('portscan.lorate', default='3')
         self.listen_addr = config.getVal('device.listen_addr', default='')
+        self.ignore_localhost = config.getVal('portscan.ignore_localhost', default=False)
         self.config = config
 
         try:

@@ -30,22 +30,24 @@ MODULES = [Telnet, CanaryHTTP, CanaryFTP, CanarySSH, HTTPProxy, CanaryMySQL,
            MSSQL, CanaryVNC, CanaryTftp, CanaryNtp, CanarySIP, CanaryGit,
            CanaryTCPBanner, CanaryRedis]
            #CanaryExample0, CanaryExample1]
-try:
-    #Module needs RDP, but the rest of OpenCanary doesn't
-    from opencanary.modules.rdp import CanaryRDP
-    MODULES.append(CanaryRDP)
-except ImportError:
-    print("Can't import RDP. Please ensure you have RDP installed.")
-    pass
 
+if config.moduleEnabled('rdp'):
+    try:
+        #Module needs RDP, but the rest of OpenCanary doesn't
+        from opencanary.modules.rdp import CanaryRDP
+        MODULES.append(CanaryRDP)
+    except ImportError:
+        print("Can't import RDP. Please ensure you have RDP installed.")
+        pass
 
-try:
-    #Module need Scapy, but the rest of OpenCanary doesn't
-    from opencanary.modules.snmp import CanarySNMP
-    MODULES.append(CanarySNMP)
-except ImportError:
-    print("Can't import SNMP. Please ensure you have Scapy installed.")
-    pass
+if config.moduleEnabled('snmp'):
+    try:
+        #Module need Scapy, but the rest of OpenCanary doesn't
+        from opencanary.modules.snmp import CanarySNMP
+        MODULES.append(CanarySNMP)
+    except ImportError:
+        print("Can't import SNMP. Please ensure you have Scapy installed.")
+        pass
 
 # NB: imports below depend on inotify, only available on linux
 import sys

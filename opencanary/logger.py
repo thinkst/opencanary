@@ -171,7 +171,7 @@ class PyLogger(LoggerBase):
                 if check_ip(logdata['src_host'], ip) == True:
                     notify = False
                     break
-        if notify == True:        
+        if notify == True:
             self.logger.warn(json.dumps(logdata, sort_keys=True))
 
 class SocketJSONHandler(SocketHandler):
