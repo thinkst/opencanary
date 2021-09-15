@@ -76,7 +76,11 @@ class AlertProxyRequest(Request):
         factory = AlertProxyRequest.FACTORY
 
         username, password = "Invalid auth-token submitted", ""
-        atype, token  = auth.split(" ")
+        auth_arr = auth.split(" ")
+        if len(auth_arr) != 2:
+            return
+
+        atype, token  = auth_arr
         if atype == "Basic":
             try:
                 username, password = b64decode(token).split(":")
@@ -99,7 +103,7 @@ class AlertProxyRequest(Request):
         factory = AlertProxyRequest.FACTORY
         profile = PROFILES[factory.skin]
         content = factory.auth_template.render(
-            url=self.uri,
+            url=self.uri.decode(),
             date=datetime.datetime.utcnow().strftime("%a, %d %b %Y %H:%M:%S %ZGMT"),
             clientip=self.transport.getPeer().host
         )
