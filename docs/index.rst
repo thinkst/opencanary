@@ -3,9 +3,13 @@ OpenCanary
 
 Welcome to the OpenCanary guide.
 
+Please note we have a wiki on Github with FAQ and Samba Setup help over `here <https://github.com/thinkst/opencanary/wiki>`_.
+
 OpenCanary is a daemon that runs canary services, which trigger alerts
 when (ab)used. The alerts can be sent to a variety of sources,
 including syslog, emails and a companion daemon opencanary-correlator.
+
+This project is maintained by `Thinkst Canary <https://canary.tools>`_.
 
 The Correlator coalesces multiple related events (eg. individual
 brute-force login attempts) into a single alert sent via email or
