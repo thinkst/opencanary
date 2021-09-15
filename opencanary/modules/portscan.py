@@ -55,7 +55,7 @@ class SynLogWatcher(FileSystemWatcher):
             data['dst_port'] = kv.pop('DPT')
             data['logtype']  = logtype
             data['logdata']  = kv
-            if self.ignore_localhost and 'src_host' in data and data['src_host'] == '127.0.0.1':
+            if self.ignore_localhost and data.get('src_host', False) == '127.0.0.1':
                 continue
             self.logger.log(data)
 
