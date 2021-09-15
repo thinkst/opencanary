@@ -37,6 +37,7 @@
         }
     },
     "portscan.enabled": false,
+    "portscan.ignore_localhost": false,
     "portscan.logfile":"/var/log/kern.log",
     "portscan.synrate": 5,
     "portscan.nmaposrate": 5,

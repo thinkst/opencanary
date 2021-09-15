@@ -83,6 +83,7 @@ If you are looking to get OpenCanary working on OpenBSD, take a look at https://
 
 Running OpenCanary
 ----
+Please note that for the Portscan service, we have added an `portscan.ignore_localhost` setting which means the Opencanary `portscan` service will ignore (not alert on) portscans originating for the localhost IP (`127.0.0.1`). This setting is false by default.
 
 OpenCanary is started by running:
 
@@ -97,8 +98,7 @@ On the first run, instructions are printed that will get to a working config.
 $ opencanaryd --copyconfig
 ```
 
-Which will create a folder, `/etc/opencanary` and a config file inside that folder `opencanary.conf`. You must now edit
-the config file to determine which services and logging options you would like to enable.
+Which will create a folder, `/etc/opencanary` and a config file inside that folder `opencanary.conf`. You must now edit the config file to determine which services and logging options you would like to enable.
 
 Samba Setup (optional)
 ----------------------
