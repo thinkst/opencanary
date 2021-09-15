@@ -4,8 +4,9 @@ import os
 import re
 
 class SynLogWatcher(FileSystemWatcher):
-    def __init__(self, logger=None, logFile=None):
+    def __init__(self, logger=None, logFile=None, ignore_localhost=False):
         self.logger = logger
+        self.ignore_localhost = ignore_localhost
         #print ('SynLogWatcher started')
         FileSystemWatcher.__init__(self, fileName=logFile)
 
@@ -54,7 +55,7 @@ class SynLogWatcher(FileSystemWatcher):
             data['dst_port'] = kv.pop('DPT')
             data['logtype']  = logtype
             data['logdata']  = kv
-            if 'src_host' in data and data['src_host'] == '127.0.0.1':
+            if self.ignore_localhost and 'src_host' in data and data['src_host'] == '127.0.0.1':
                 continue
             self.logger.log(data)
 
@@ -68,7 +69,7 @@ class CanaryPortscan(CanaryService):
         self.nmaposrate = config.getVal('portscan.nmaposrate', default='5')
         self.lorate = config.getVal('portscan.lorate', default='3')
         self.listen_addr = config.getVal('device.listen_addr', default='')
-        self.ignore_localhost = config.getVal('portscan.ignore_localhost', default=False)
+        self.ignore_localhost =config.getVal('portscan.ignore_localhost', default=False)
         self.config = config
 
         try:
@@ -121,7 +122,7 @@ class CanaryPortscan(CanaryService):
         os.system('sudo /sbin/iptables -t mangle -D PREROUTING -p tcp -m u32 --u32 "6&0xFF=0x6 && 0>>22&0x3C@12=0x50010400" -j LOG --log-level=warning --log-prefix="canarynmapFIN: " -m limit --limit="{0}/second"'.format(self.nmaposrate))
         os.system('sudo /sbin/iptables -t mangle -A PREROUTING -p tcp -m u32 --u32 "6&0xFF=0x6 && 0>>22&0x3C@12=0x50010400" -j LOG --log-level=warning --log-prefix="canarynmapFIN: " -m limit --limit="{0}/second"'.format(self.nmaposrate))
 
-        fs = SynLogWatcher(logFile=self.audit_file, logger=self.logger)
+        fs = SynLogWatcher(logFile=self.audit_file, logger=self.logger, ignore_localhost=self.ignore_localhost)
         fs.start()
 
     def configUpdated(self,):
