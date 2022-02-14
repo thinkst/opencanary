@@ -1,7 +1,25 @@
+import codecs
+import os.path
 from setuptools import setup, find_packages
-
 import sys
-import opencanary
+
+
+def read(rel_path):
+    here = os.path.abspath(os.path.dirname(__file__))
+    with codecs.open(os.path.join(here, rel_path), 'r') as fp:
+        return fp.read()
+
+def get_version(rel_path):
+    """
+    Reading the package version dynamically.
+    https://packaging.python.org/en/latest/guides/single-sourcing-package-version/
+    """
+    for line in read(rel_path).splitlines():
+        if line.startswith('__version__'):
+            delim = '"' if '"' in line else "'"
+            return line.split(delim)[1]
+    else:
+        raise RuntimeError("Unable to find version string.")
 
 requirements = [
     'Twisted==19.10.0',
@@ -24,7 +42,7 @@ if sys.version_info.major < 3:
 
 setup(
     name='opencanary',
-    version=opencanary.__version__,
+    version=get_version("opencanary/__init__.py"),
     url='http://www.thinkst.com/',
     author='Thinkst Applied Research',
     author_email='info@thinkst.com',
