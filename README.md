@@ -110,17 +110,58 @@ FAQ
 ---
 We have a FAQ over [here](https://github.com/thinkst/opencanary/wiki)
 
+Docker Compose
+----------------
+
+> Requires [Docker](https://docs.docker.com/get-docker/) and [Docker Compose](https://docs.docker.com/compose/install/) installed.
+
+1. Edit the `data/.opencanary.conf` file to enable, disable or customize the services that will run.
+
+1. Edit the `ports` section of the `docker-compose.yml` file to enable/disable the desired ports based on the services you have enabled in the config file.
+
+1. Build and run the container.
+
+    To run the latest Docker image (based on the code on a given branch) run:
+    ```bash
+    docker-compose up -d --build latest
+    ```
+    To run a Docker image based on what has been released in Pypi, run:
+    ```bash
+    docker-compose up -d --build stable
+    ```
+
+> To view the logs run `docker-compose logs latest` or `docker-compose logs stable`
+
+> To stop the container run `docker-compose down`
+
 Docker
 ----------------
 
-To build the latest Docker image (based on the code on a given branch) run:
+> Requires [Docker](https://docs.docker.com/get-docker/) installed.
+
+1. Edit the `data/.opencanary.conf` file to enable, disable or customize the services that will run.
+
+1. Build a Docker image to run.
+    
+    To build the latest Docker image (based on the code on a given branch) run:
+
+    ```bash
+    docker build -t opencanary -f Dockerfile.latest .
+    ```
+
+    To build a Docker image based on what has been released in Pypi, run:
+
+    ```bash
+    docker build -t opencanary -f Dockerfile.stable .
+    ```
+
+1. Run the docker image with the following command:
 
 ```bash
-docker build -t opencanary -f Dockerfile.latest .
+# You will need to add/remove the ports you are using by listing them with `-p ##:##`
+docker run --rm --detach -p 21:21 -p 80:80 -v "${PWD}/data/.opencanary.conf":"/root/.opencanary.conf" --name opencanary opencanary
 ```
 
-To build a Docker image based on what has been released in Pypi, run:
+> To view the logs run `docker logs opencanary`
 
-```bash
-docker build -t opencanary -f Dockerfile.stable .
-```
+> To stop the container run `docker stop opencanary`
