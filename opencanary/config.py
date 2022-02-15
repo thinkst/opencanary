@@ -32,7 +32,7 @@ def expand_vars(var):
         for key, value in var.items():
             var[key] = expand_vars(value)
         return var
-    if isinstance(var, list):
+    if isinstance(var, (list, set, tuple)):
         return [expand_vars(v) for v in var]
     if isinstance(var, (str, bytes)):
         return os.path.expandvars(var)
