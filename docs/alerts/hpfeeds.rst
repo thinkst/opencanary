@@ -15,3 +15,10 @@ To enable hpfeeds add the following to the logging section of settings.json:
         "secret":"12345",
         "channels":["test.events"]
     }
+
+Environment Variables
+---------------------
+
+You can use environment variables in the configuration file to pass confidential information such as passwords or tokens from the host machine to the application.
+
+For more information, see the [Configuration page](../starting/configuration.rst#environment-variables).

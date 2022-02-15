@@ -80,3 +80,10 @@ Send with SMTP authentication
             }
         }
     }
+
+Environment Variables
+---------------------
+
+You can use environment variables in the configuration file to pass confidential information such as passwords or tokens from the host machine to the application.
+
+For more information, see the [Configuration page](../starting/configuration.rst#environment-variables).
