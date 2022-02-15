@@ -30,16 +30,11 @@ def expand_vars(var):
     """Recursively replace environment variables in a dictionary, list or string with their respective values."""
     if isinstance(var, dict):
         for key, value in var.items():
-            # print(key)
-            # print(value)
-            # print(type(value))
             var[key] = expand_vars(value)
         return var
     if isinstance(var, list):
         return [expand_vars(v) for v in var]
     if isinstance(var, (str, bytes)):
-        # print(var)
-        # print(os.path.expandvars(var))
         return os.path.expandvars(var)
     return var
 
