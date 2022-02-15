@@ -104,6 +104,13 @@ add to the `logger` section in your config file,
                 "teams": {
                     "class": "opencanary.logger.TeamsHandler",
                     "webhook_url":"https://my-organisation.webhook.office.com/webhookb2/..."
+                },
+                "Requests": {
+                    "class": "opencanary.logger.RequestsHandler",
+                    "url": "http://domain.example.com/path",
+                    "method": "POST",
+                    "data": {"message": "%(message)s"},
+                    "status_code": 200
                 }
             }
         }
