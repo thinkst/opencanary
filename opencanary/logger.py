@@ -308,7 +308,7 @@ def map_string(data, mapping):
         for key, value in data.items():
             data[key] = map_string(value, mapping)
         return data
-    if isinstance(data, list):
+    if isinstance(data, (list, set, tuple)):
         return [map_string(d, mapping) for d in data]
     if isinstance(data, (str, bytes)):
         return (data % mapping)
