@@ -1,0 +1,39 @@
+name: OpenCanary Tests
+
+on:
+  - "push"
+  - "pull_request"
+
+jobs:
+  opencanary_tests:
+    strategy:
+      matrix:
+        python-version: ["3.7", "3.8", "3.9", "3.10"]
+        os: ["ubuntu-18.04", "ubuntu-20.04", "macos-10.15", "macos-11"]
+    runs-on: ${{ matrix.os }}
+    steps:
+      - name: "Check out repository code"
+        uses: "actions/checkout@v2"
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v2
+        with:
+          python-version: "${{ matrix.python-version }}"
+      - name: Install required linux dependencies
+        if: ${{ contains(matrix.os, 'ubuntu') }}
+        run: |
+          sudo apt-get update
+          sudo apt-get install python3-setuptools
+      - name: Install wheel
+        run: sudo pip3 install wheel
+      - name: Create package
+        run: sudo python3 setup.py sdist
+      - name: Install package
+        run: sudo pip3 install dist/opencanary-*.tar.gz
+      - name: Install test dependencies
+        run: sudo pip3 install -r opencanary/test/requirements.txt
+      - name: Copy config file
+        run: cp opencanary/test/opencanary.conf .
+      - name: Start OpenCanary
+        run: opencanaryd --start
+      - name: Run Pytest
+        run: pytest -s
