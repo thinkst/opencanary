@@ -36,7 +36,7 @@ if sys.platform.startswith("linux"):
                     domainName = data[9]
                     auditAction = data[10]
                     auditStatus = data[11]
-                    path = data[13]
+                    path = data[12]
 
                     if user == "":
                       user = "anonymous"
