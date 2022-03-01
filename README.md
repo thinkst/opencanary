@@ -56,10 +56,18 @@ $ env ARCHFLAGS="-arch x86_64" LDFLAGS="-L/opt/local/lib" CFLAGS="-I/opt/local/i
 ```
 
 Alternatively homebrew users run:
+
+If Macbook is x86:
 ````
 $ brew install openssl
 $ env ARCHFLAGS="-arch x86_64" LDFLAGS="-L/usr/local/opt/openssl/lib" CFLAGS="-I/usr/local/opt/openssl/include" pip install cryptography
 ````
+
+if Macbook is M1:
+```
+$ brew install openssl
+$ env ARCHFLAGS="-arch arm64" LDFLAGS="-L/opt/homebrew/opt/openssl@1.1/lib" CFLAGS="-I/opt/homebrew/opt/openssl@1.1/include" pip install cryptography
+```
 
 Now installation can run as usual:
 ```
@@ -99,6 +107,14 @@ $ opencanaryd --copyconfig
 ```
 
 Which will create a folder, `/etc/opencanary` and a config file inside that folder `opencanary.conf`. You must now edit the config file to determine which services and logging options you would like to enable.
+
+When OpenCanary starts it looks for config files the following order:
+
+1. ./opencanary.conf (i.e. the directory where OpenCanary is installed)
+2. ~/.opencanary.conf (i.e. the home directory of the user, usually this will be root so /root/.opencanary.conf)
+3. /etc/opencanary/opencanary.conf
+
+It will use the first config file that exists.
 
 Samba Setup (optional)
 ----------------------
