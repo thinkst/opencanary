@@ -44,7 +44,7 @@ alerts to a file.
    }
 
 
-With that in place, we can run the daemon, and test that it logs a failed FTP login attempt to the log file.
+With that in place, we can run the daemon and test that it logs a failed FTP login attempt to the log file.
 
 .. code-block:: sh
 
