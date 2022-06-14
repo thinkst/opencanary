@@ -110,7 +110,7 @@ class TestHTTPModule(unittest.TestCase):
         """
         request = requests.get('http://localhost/')
         self.assertEqual(request.status_code, 200)
-        self.assertIn('Synology RackStation', request.text)
+        self.assertIn('Synology DiskStation', request.text)
         last_log = get_last_log()
         self.assertEqual(last_log['dst_port'], 80)
         self.assertEqual(last_log['logdata']['HOSTNAME'], "localhost")
@@ -125,7 +125,7 @@ class TestHTTPModule(unittest.TestCase):
         # Currently the web server returns 200, but in future it should return
         # a 403 statuse code.
         self.assertEqual(request.status_code, 200)
-        self.assertIn('Synology RackStation', request.text)
+        self.assertIn('Synology DiskStation', request.text)
         last_log = get_last_log()
         self.assertEqual(last_log['dst_port'], 80)
         self.assertEqual(last_log['logdata']['HOSTNAME'], "localhost")
@@ -148,7 +148,7 @@ class TestHTTPModule(unittest.TestCase):
         # Currently the web server returns 200, but in future it should return
         # a 403 status code.
         self.assertEqual(request.status_code, 200)
-        self.assertIn('Synology RackStation', request.text)
+        self.assertIn('Synology DiskStation', request.text)
         last_log = get_last_log()
         self.assertEqual(last_log['dst_port'], 80)
         self.assertEqual(last_log['logdata']['HOSTNAME'], "localhost")
