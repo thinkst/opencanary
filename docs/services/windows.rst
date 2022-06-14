@@ -1,7 +1,7 @@
 Windows Server
 ================
 
-The Samba and RDP modules require an extra installation steps. It's a
+The Samba and RDP modules require an extra installation step. It's a
 good idea to consult the `README <https://github.com/thinkst/opencanary>`_ before trying this out.
 
 Inside ~/.opencanary.conf:
@@ -51,15 +51,15 @@ Below is an example of an `smb.conf` for a Samba installation,
 Please note that there are some details in the above config that you would want to change,
 
 * server string
-* netbios name
+* NetBIOS name
 * [myshare] to the name of your share
 * path
 
-Of course you may change other settings as long as the `smbd_audit` logs to the file that your
+Of course, you may change other settings as long as the `smbd_audit` logs to the file that your
 OpenCanary daemon is watching (above we set it as `/var/log/samba-audit.log`).
 
-In the above config, we are relying on Samba using syslog (rsyslog in newer systems). In order for our Samba
-to use rsyslog, we will edit the `/etc/rsyslog.conf` file. Below is two lines we add to the bottom,
+In the above config, we are relying on Samba using Syslog (rsyslog in newer systems). For our Samba
+to use rsyslog, we will edit the `/etc/rsyslog.conf` file. Below are two lines we add to the bottom,
 
 .. code-block:: json
 
@@ -69,4 +69,4 @@ to use rsyslog, we will edit the `/etc/rsyslog.conf` file. Below is two lines we
 This will redirect any message of facility local7 to your `/var/log/samba-audit.log` file, which will be
 watched by our OpenCanary daemon. 
 
-Please note this is all written up in the github README.md
+Please note this is all written up in the GitHub README.md
