@@ -5,13 +5,14 @@ PIDFILE="${DIR}/opencanaryd.pid"
 cmd=$1
 
 function usage() {
-    echo -e "\n  OpenCanary v1.0\n"
-    echo -e "\topencanaryd [ --start | --dev | --stop | --restart | --copyconfig | --usermodule | --help ]\n\n"
+    echo -e "\n  OpenCanary\n"
+    echo -e "\topencanaryd [ --start | --dev | --stop | --restart | --copyconfig | --usermodule | --version | --help ]\n\n"
     echo -e "\t\t--start\tStarts the opencanaryd process"
     echo -e "\t\t--dev\tRun the opencanaryd process in the foreground"
     echo -e "\t\t--stop\tStops the opencanaryd process"
     echo -e "\t\t--usermodule\tRun opencanaryd in foreground with only usermodules enabled"
     echo -e "\t\t--copyconfig\tCreates a default config file at /etc/opencanaryd/opencanary.conf"
+    echo -e "\t\t--version\tDisplays the current opencanary version."
     echo -e "\t\t--"
     echo -e "\t\t--help\tThis help\n"
 
@@ -55,6 +56,8 @@ elif [ "${cmd}" == "--copyconfig" ]; then
     sudo cp "${defaultconf}" /etc/opencanaryd/opencanary.conf
     echo -e "[*] A sample config file is ready /etc/opencanaryd/opencanary.conf\n"
     echo    "[*] Edit your configuration, then launch with \"opencanaryd --start\""
+elif [ "${cmd}" == "--version" ]; then
+    python -c "from opencanary import __version__; print(__version__);"
 else
     usage
     exit 1
