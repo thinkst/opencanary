@@ -117,6 +117,47 @@ You may want to look through some other python logging options over at `PyLogger
 We have provided you with two different formatters. One is the plain message with incident information; the other is the Syslog RFC format. We have
 already added it to the `syslog-unix` handler for your convenience.
 
+Environment Variables
+---------------------
+
+You can use environment variables in the configuration file to pass confidential information such as passwords or tokens from the host machine to the application.
+
+For example on your host machine you would export your password:
+
+```bash
+export TELNET_PASSWORD=TopsyKretts
+```
+
+And in your config file you would reference it by name proceeded by a dollar sign (`$`):
+
+```python
+"telnet.honeycreds": [
+    {
+        "username": "admin",
+        "password": "$TELNET_PASSWORD"
+    }
+]
+```
+
+> Note: For Windows, you can also use `%TELNET_PASSWORD%`
+
+If you are using the Docker version, you would need to pass the environment variable to the container as well as part of the run command:
+
+```bash
+docker run -e TELNET_PASSWORD ...
+```
+
+For Docker Compose, you would need to add it to the service definition:
+
+```yaml
+service:
+  opencanary:
+    image: "..."
+    environment:
+      - TELNET_PASSWORD
+    ...
+```
+
 Default Configuration
 ---------------------
 
