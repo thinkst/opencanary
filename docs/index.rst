@@ -55,6 +55,7 @@ Alerting
 
    alerts/email
    alerts/hpfeeds
+   alerts/webhook
 
 
 Upgrading

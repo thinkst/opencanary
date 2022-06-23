@@ -292,3 +292,56 @@ class TeamsHandler(logging.Handler):
         response = requests.post(self.webhook_url, headers=headers, json=payload)
         if response.status_code != 200:
             print("Error %s sending Teams message, the response was:\n%s" % (response.status_code, response.text))
+
+
+def map_string(data, mapping):
+    """Recursively map a python string dict to strings in a dictionary/list of strings.
+
+    Example:
+    >>> data = {'top': '%(top)s', 'nest1': {'middle': '%(middle)s', 'nest2': {'bottom': '%(bottom)s'}}}
+    >>> mapping = {'top': 'one', 'middle': 'two', 'bottom': 'three'}
+    >>> map_string(data, mapping)
+    {'top': 'one', 'nest1': {'middle': 'two', 'nest2': {'bottom': 'three'}}}
+
+    """
+    if isinstance(data, dict):
+        for key, value in data.items():
+            data[key] = map_string(value, mapping)
+        return data
+    if isinstance(data, (list, set, tuple)):
+        return [map_string(d, mapping) for d in data]
+    if isinstance(data, (str, bytes)):
+        return (data % mapping)
+    return data
+
+
+class WebhookHandler(logging.Handler):
+    def __init__(self, url, method="POST", data=None, status_code=200, ignore=None, **kwargs):
+        logging.Handler.__init__(self)
+        self.url = url
+        self.method = method
+        self.data = data
+        self.status_code = status_code
+        self.ignore = ignore
+        self.kwargs = kwargs
+
+    def emit(self, record):
+        message = self.format(record)
+        if self.ignore is not None:
+            if any(e in message for e in self.ignore):
+                return
+
+        mapping = {"message": message}
+        if self.data is None:
+            data = mapping
+        else:
+            # Due to the recursive function, sending a shallow copy of self.data here is fine.
+            data = map_string(dict(self.data), mapping)
+
+        if "application/json" in self.kwargs.get("headers", {}).values():
+            response = requests.request(method=self.method, url=self.url, json=data, **self.kwargs)
+        else:
+            response = requests.request(method=self.method, url=self.url, data=data, **self.kwargs)
+
+        if response.status_code != self.status_code:
+            print("Error %s sending Requests payload, the response was:\n%s" % (response.status_code, response.text))
