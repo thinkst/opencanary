@@ -1,16 +1,56 @@
-version: "3"
+version: "3.4"
+
+x-common: &common
+  restart: unless-stopped
+  volumes:
+    - ./data/.opencanary.conf:/root/.opencanary.conf
+  image: "opencanary"
+  ports:
+    # Comment/un-comment the port lines below to disable/enable the services you are using
+    # FTP
+    - "21:21"
+    # SSH
+    # - "22:22"
+    # Telnet
+    # - "23:23"
+    # TFTP
+    # - "69:69"
+    # HTTP
+    - "80:80"
+    # NTP
+    # - "123:123"
+    # SNMP
+    # - "161:161"
+    # MSSQL
+    # - "1433:1433"
+    # MYSQL
+    # - "3306:3306"
+    # RDP
+    # - "3389:3389"
+    # VNC
+    # - "5000:5000"
+    # SIP
+    # - "5060:5060"
+    # REDIS
+    # - "6379:6379"
+    # TCP Banner
+    # - "8001:8001"
+    # HTTP Proxy
+    # - "8080:8080"
+    # Git
+    # - "9418:9418"
 
 services:
- canary:
-      container_name: opencanary
-      restart: unless-stopped
-      volumes:
-          - ./opencanary/:/etc/opencanaryd/
-          - ./data/:/root/
-      ports:
-              - '21:21'
-              - '888:80'
-      image: 'opencanary'
-      build:
-        context: .
-        dockerfile: Dockerfile.latest
+  latest: # docker-compose up --build -d latest
+    <<: *common
+    container_name: opencanary_latest
+    build:
+      context: .
+      dockerfile: Dockerfile.latest
+
+  stable: # docker-compose up --build -d stable
+    <<: *common
+    container_name: opencanary_stable
+    build:
+      context: .
+      dockerfile: Dockerfile.stable
