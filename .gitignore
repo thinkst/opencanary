@@ -7,9 +7,6 @@ __pycache__/
 py3env/
 openv/
 
-# Ignore helper scripts
-connect_to_ubuntu.sh
-
 # C extensions
 *.so
 
