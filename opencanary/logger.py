@@ -315,7 +315,7 @@ def map_string(data, mapping):
     return data
 
 
-class RequestsHandler(logging.Handler):
+class WebhookHandler(logging.Handler):
     def __init__(self, url, method="POST", data=None, status_code=200, ignore=None, **kwargs):
         logging.Handler.__init__(self)
         self.url = url

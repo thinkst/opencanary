@@ -1,11 +1,11 @@
-HTTP Requests Alerts
+HTTP Webhook Alerts
 ====================
 
-OpenCanary includes a customizable Python Requests logging handler to send data to a HTTP endpoint. The handler has a few defaults for a basic configuration, but is flexible enough that it can be customized for advanced usage.
+OpenCanary includes a customizable Webhook logging handler to send data to a HTTP endpoint. The handler has a few defaults for a basic configuration, but is flexible enough that it can be customized for advanced usage.
 
 The following configuration options are required for this handler:
 
-* **class** - Use "opencanary.logger.RequestsHandler".
+* **class** - Use "opencanary.logger.WebhookHandler".
 * **url** - The full URL (`http://domain.example.com/path`) of your HTTP endpoint.
 
 The following configuration options are optional:
@@ -24,8 +24,8 @@ Here is a basic configuration:
 
 ```json
 "handlers": {
-    "Requests": {
-        "class": "opencanary.logger.RequestsHandler",
+    "Webhook": {
+        "class": "opencanary.logger.WebhookHandler",
         "url": "http://domain.example.com/path",
         "method": "POST",
         "data": {"message": "%(message)s"},
