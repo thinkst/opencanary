@@ -18,9 +18,9 @@ function usage() {
 }
 
 if [ "${cmd}" == "--start" ]; then
-    sudo "${DIR}/twistd" -y "${DIR}/opencanary.tac" --pidfile "${PIDFILE}" --syslog --prefix=opencanaryd
+    sudo -E "${DIR}/twistd" -y "${DIR}/opencanary.tac" --pidfile "${PIDFILE}" --syslog --prefix=opencanaryd
 elif [ "${cmd}" == "--dev" ]; then
-    sudo "${DIR}/twistd" -noy "${DIR}/opencanary.tac"
+    sudo -E "${DIR}/twistd" -noy "${DIR}/opencanary.tac"
 elif [ "${cmd}" == "--usermodule" ]; then
   usermodconf=$(python -c "from __future__ import print_function; from pkg_resources import resource_filename; print(resource_filename('opencanary', 'data/settings-usermodule.json'))")
 
@@ -32,12 +32,12 @@ elif [ "${cmd}" == "--usermodule" ]; then
   fi
 
   cp "${usermodconf}" opencanary.conf
-  sudo "${DIR}/twistd" -noy "${DIR}/opencanary.tac"
+  sudo -E "${DIR}/twistd" -noy "${DIR}/opencanary.tac"
 
 elif [ "${cmd}" == "--restart" ]; then
     pid=`sudo cat "${PIDFILE}"`
     sudo kill "$pid"
-    sudo "${DIR}/twistd" -y "${DIR}/opencanary.tac" --pidfile "${PIDFILE}" --syslog --prefix=opencanaryd
+    sudo -E "${DIR}/twistd" -y "${DIR}/opencanary.tac" --pidfile "${PIDFILE}" --syslog --prefix=opencanaryd
 elif [ "${cmd}" == "--stop" ]; then
     pid=`sudo cat "${PIDFILE}"`
     sudo kill "$pid"
