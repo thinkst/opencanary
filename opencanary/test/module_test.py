@@ -93,7 +93,7 @@ class TestGitModule(unittest.TestCase):
         # This test must be run after the test_clone_a_repository.
         # Unless we add an attempt to clone into this test, or the setup.
         last_log = get_last_log()
-        self.assertEqual(last_log['logdata']['HOST'], "localhost")
+        self.assertIn("localhost", last_log['logdata']['HOST'])
         self.assertEqual(last_log['logdata']['REPO'], "test.git")
 
 
@@ -206,11 +206,11 @@ class TestSSHModule(unittest.TestCase):
             self.assertRaises(paramiko.ssh_exception.AuthenticationException,
                               self.connection.connect,
                               hostname="localhost",
-                              port=22,
+                              port=2222,
                               username="test_user",
                               password="test_pass")
         last_log = get_last_log()
-        self.assertEqual(last_log['dst_port'], 22)
+        self.assertEqual(last_log['dst_port'], 2222)
         self.assertIn('paramiko', last_log['logdata']['REMOTEVERSION'])
         self.assertEqual(last_log['logdata']['USERNAME'], "test_user")
         self.assertEqual(last_log['logdata']['PASSWORD'], "test_pass")
