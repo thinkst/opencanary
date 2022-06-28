@@ -131,39 +131,39 @@ You can use environment variables in the configuration file to pass confidential
 
 For example on your host machine you would export your password:
 
-```bash
-export TELNET_PASSWORD=TopsyKretts
-```
+.. code-block:: sh
+
+    export TELNET_PASSWORD=TopsyKretts
 
 And in your config file you would reference it by name proceeded by a dollar sign (`$`):
 
-```python
-"telnet.honeycreds": [
-    {
-        "username": "admin",
-        "password": "$TELNET_PASSWORD"
-    }
-]
-```
+.. code-block:: python
+
+    "telnet.honeycreds": [
+        {
+            "username": "admin",
+            "password": "$TELNET_PASSWORD"
+        }
+    ]
 
 > Note: For Windows, you can also use `%TELNET_PASSWORD%`
 
 If you are using the Docker version, you would need to pass the environment variable to the container as well as part of the run command:
 
-```bash
-docker run -e TELNET_PASSWORD ...
-```
+.. code-block:: sh
+
+    docker run -e TELNET_PASSWORD ...
 
 For Docker Compose, you would need to add it to the service definition:
 
-```yaml
-service:
-  opencanary:
-    image: "..."
-    environment:
-      - TELNET_PASSWORD
-    ...
-```
+.. code-block:: yaml
+
+    service:
+    opencanary:
+        image: "..."
+        environment:
+        - TELNET_PASSWORD
+        ...
 
 Default Configuration
 ---------------------
