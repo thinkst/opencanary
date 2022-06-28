@@ -159,10 +159,10 @@ For Docker Compose, you would need to add it to the service definition:
 .. code-block:: yaml
 
     service:
-    opencanary:
+      opencanary:
         image: "..."
         environment:
-        - TELNET_PASSWORD
+          - TELNET_PASSWORD
         ...
 
 Default Configuration
