@@ -95,4 +95,5 @@ Add query parameters. For example to add `?test=yes&redirect=no` you would use:
 Disable SSL verification
 
 .. code-block:: json
+
     "verify": False
