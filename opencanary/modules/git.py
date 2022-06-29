@@ -53,10 +53,10 @@ class GitProtocol(Protocol):
                 else:
                     self._data += data
 
-                if not self._checkDataLength(data):
+                if not self._checkDataLength(self._data):
                     raise GitCommandLengthMismatch()
 
-                git_command = data[4:]
+                git_command = self._data[4:]
                 if git_command[:15] == b'git-upload-pack':
                     self._buildResponseAndSend(git_command.decode('utf-8'))
                 else:
