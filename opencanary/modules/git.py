@@ -62,7 +62,7 @@ class GitProtocol(Protocol):
                 else:
                     raise ProtocolError()
 
-            except GitCommandLengthMismatch():
+            except GitCommandLengthMismatch:
                 pass
 
         except ProtocolError:
