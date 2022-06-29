@@ -8,6 +8,9 @@ from twisted.application import internet
 class ProtocolError(Exception):
     pass
 
+class GitCommandLengthMismatch(Exception):
+    pass
+
 
 class GitProtocol(Protocol):
     """
@@ -44,11 +47,24 @@ class GitProtocol(Protocol):
         Received data is unbuffered so we buffer it for telnet.
         """
         try:
-            git_command = data[4:]
-            if self._checkDataLength(data) and git_command[:15] == b'git-upload-pack':
-                self._buildResponseAndSend(git_command.decode('utf-8'))
-            else:
-                raise ProtocolError()
+            try:
+                if not hasattr(self, '_data'):
+                    self._data = data
+                else:
+                    self._data += data
+
+                if not self._checkDataLength(data):
+                    raise GitCommandLengthMismatch()
+
+                git_command = data[4:]
+                if git_command[:15] == b'git-upload-pack':
+                    self._buildResponseAndSend(git_command.decode('utf-8'))
+                else:
+                    raise ProtocolError()
+
+            except GitCommandLengthMismatch():
+                pass
+
         except ProtocolError:
             self.transport.loseConnection()
             return
