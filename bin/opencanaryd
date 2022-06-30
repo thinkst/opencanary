@@ -18,6 +18,16 @@ function usage() {
 
 }
 
+# Use sudo when not running as root
+function sudo() {
+  if [ "$EUID" -ne 0 ]; then
+    $(which sudo) $*
+  else
+    # Strip `sudo -E` before running the remaining command
+    ${*:2}
+  fi
+}
+
 if [ "${cmd}" == "--start" ]; then
     sudo -E "${DIR}/twistd" -y "${DIR}/opencanary.tac" --pidfile "${PIDFILE}" --syslog --prefix=opencanaryd
 elif [ "${cmd}" == "--dev" ]; then
