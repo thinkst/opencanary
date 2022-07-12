@@ -64,7 +64,7 @@ setup(
     packages=find_packages(exclude='test'),
     scripts=['bin/opencanaryd','bin/opencanary.tac'],
     platforms='any',
-    include_package_data=True,
+    #include_package_data=True,
     classifiers=[
         "Development Status :: 5 - Production/Stable",
         "Intended Audience :: Developers",
