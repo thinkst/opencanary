@@ -65,7 +65,7 @@ setup(
     scripts=['bin/opencanaryd','bin/opencanary.tac'],
     platforms='any',
     include_package_data=True,
-    package_data={"data":["*"], "modules.data":["*"]}
+    package_data={"data":["*"], "modules.data":["*"]},
     classifiers=[
         "Development Status :: 5 - Production/Stable",
         "Intended Audience :: Developers",
