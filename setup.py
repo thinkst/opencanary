@@ -58,7 +58,7 @@ setup(
     long_description='A low interaction honeypot intended to be run on internal networks.',
     install_requires=requirements,
     license='BSD',
-    packages=find_namespace_packages(exclude=['docs','docs*','opencanary.test','opencanary.test*']), # docs/conf.py is recognized and must be excluded
+    packages=find_namespace_packages(exclude=['docs','docs*','opencanary.test','opencanary.test*']), # docs/conf.py is unintentionally recognized and leads to a doc package
     package_data={
         'opencanary.data': ['**'],
         'opencanary.modules.data': ['**','*/*', '*/*/*', '*/*/*/*', '*/*/*/*/*', '*/*/*/*/*/*', '*/*/*/*/*/*/*', '*/*/*/*/*/*/*/*', '*/*/*/*/*/*/*/*/*', '*/*/*/*/*/*/*/*/*/*', '*/*/*/*/*/*/*/*/*/*/*', '*/*/*/*/*/*/*/*/*/*/*/*', '*/*/*/*/*/*/*/*/*/*/*/*/*'], # use of the recursive pattern */**/* is available for setuptools>=62.3.1
