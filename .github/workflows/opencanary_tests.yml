@@ -22,8 +22,7 @@ jobs:
       - name: Install required linux dependencies
         if: ${{ contains(matrix.os, 'ubuntu') }}
         run: |
-          sudo apt-get update
-          sudo apt-get install python3-setuptools
+          sudo pip3 install setuptools>=44.0.0
       - name: Install wheel
         run: sudo pip3 install wheel
       - name: Create package
