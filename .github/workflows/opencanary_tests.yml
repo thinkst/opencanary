@@ -58,13 +58,13 @@ jobs:
           sudo apt-get update
           sudo apt-get install python-setuptools
       - name: Install wheel
-        run: sudo pip install wheel
+        run: sudo pip2 install wheel
       - name: Create package
-        run: sudo python setup.py sdist
+        run: sudo python2.7 setup.py sdist
       - name: Install package
-        run: sudo pip install dist/opencanary-*.tar.gz
+        run: sudo pip2 install dist/opencanary-*.tar.gz
       - name: Install test dependencies
-        run: sudo pip install -r opencanary/test/requirements.txt
+        run: sudo pip3 install -r opencanary/test/requirements.txt
       - name: Copy config file
         run: cp opencanary/test/opencanary.conf .
       - name: Start OpenCanary
