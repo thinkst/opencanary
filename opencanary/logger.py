@@ -1,4 +1,3 @@
-from __future__ import print_function
 import simplejson as json
 import logging.config
 import socket

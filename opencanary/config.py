@@ -1,4 +1,3 @@
-from __future__ import print_function
 from six import iteritems
 import os, sys, json, copy, socket, itertools, string, subprocess
 from os.path import expanduser
@@ -6,24 +5,6 @@ from pkg_resources import resource_filename
 
 SAMPLE_SETTINGS = resource_filename(__name__, 'data/settings.json')
 SETTINGS = 'opencanary.conf'
-
-PY3 = sys.version_info > (3,)
-
-# Only check unicode on Python 2, In Python 3 unicode is the default and we can just return the input.
-if sys.version_info[0] < 3:
-    def byteify(input):
-        if isinstance(input, dict):
-            return {byteify(key): byteify(value)
-                    for key, value in iteritems(input)}
-        elif isinstance(input, list):
-            return [byteify(element) for element in input]
-        elif isinstance(input, unicode):
-                return input.encode('utf-8')
-        else:
-            return input
-else:
-    def byteify(input):
-        return input
 
 
 def expand_vars(var):
@@ -51,7 +32,6 @@ class Config:
                 with open(fname, "r") as f:
                     print("[-] Using config file: %s" % fname)
                     self.__config = json.load(f)
-                    self.__config = byteify(self.__config)
                     self.__config = expand_vars(self.__config)
                 return
             except IOError as e:
