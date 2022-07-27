@@ -1,4 +1,3 @@
-from __future__ import print_function
 from opencanary.modules import CanaryService
 
 from twisted.internet.protocol import Protocol
@@ -6,7 +5,6 @@ from twisted.internet.protocol import Factory
 from twisted.application import internet
 
 from opencanary.modules.des import des
-from opencanary.config import PY3
 import sys
 
 import os
@@ -86,14 +84,8 @@ class VNCProtocol(Protocol):
         if len(data) != 16:
             raise ProtocolError()
 
-        if PY3:
-            logdata = {"VNC Server Challenge" : self.challenge.hex(),
-                       "VNC Client Response": data.hex()
-                    }
-        else:
-            logdata = {"VNC Server Challenge" : self.challenge.encode('hex'),
-                       "VNC Client Response": data.encode('hex')
-                    }
+        logdata = {"VNC Server Challenge" : self.challenge.hex(),
+                    "VNC Client Response": data.hex()}
 
         used_password = self._try_decrypt_response(response=data)
         if used_password:
@@ -124,18 +116,12 @@ class VNCProtocol(Protocol):
             if len(pw) < 8:
                 pw+= '\x00'*(8-len(pw))
 
-            if not PY3:
-                #VNC use of DES requires password bits to be mirrored
-                pw = ''.join([chr(int('{:08b}'.format(ord(x))[::-1], 2))
-                                                           for x in pw])
-                desbox = des(pw)
-            else:
-                pw = pw.encode('ascii')
-                # VNC use of DES requires password bits to be mirrored
-                values = bytearray()
-                for x in pw:
-                    values.append(int('{:08b}'.format(x)[::-1], 2))
-                desbox = des(values)
+            pw = pw.encode('ascii')
+            # VNC use of DES requires password bits to be mirrored
+            values = bytearray()
+            for x in pw:
+                values.append(int('{:08b}'.format(x)[::-1], 2))
+            desbox = des(values)
 
             decrypted_challenge = desbox.decrypt(response)
             if decrypted_challenge == self.challenge:

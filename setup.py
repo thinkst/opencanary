@@ -3,14 +3,6 @@ import os.path
 from setuptools import setup, find_packages
 import sys
 
-PY3 = sys.version_info > (3,)
-
-# Only check unicode on Python 2, In Python 3 unicode is the default and we can just return the input.
-if sys.version_info[0] < 3:
-    jinja_version = '2.10.1'
-else:
-    jinja_version = '3.0.1'
-
 
 def read(rel_path):
     here = os.path.abspath(os.path.dirname(__file__))
@@ -39,14 +31,12 @@ requirements = [
     'PyPDF2==1.26.0',
     'fpdf==1.7.2',
     'passlib==1.7.1',
-    'Jinja2=={}'.format(jinja_version),
+    'Jinja2==3.0.1',
     'ntlmlib==0.72',
     'bcrypt==3.1.7',
     'setuptools==44.0.0',
     'hpfeeds==3.0.0']
 
-if sys.version_info.major < 3:
-    requirements.append('wsgiref==0.1.2')
 
 setup(
     name='opencanary',
@@ -76,7 +66,6 @@ setup(
         "Operating System :: Unix",
         "Operating System :: POSIX :: Linux",
         "Operating System :: POSIX :: BSD :: FreeBSD",
-        "Programming Language :: Python :: 2.7",
         "Programming Language :: Python :: 3",
         "Programming Language :: Python :: 3.5",
         "Programming Language :: Python :: 3.6",

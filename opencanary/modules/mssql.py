@@ -1,4 +1,3 @@
-from __future__ import print_function
 from opencanary.modules import CanaryService
 from opencanary.config import ConfigException
 
