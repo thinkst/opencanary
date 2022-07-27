@@ -56,7 +56,8 @@ jobs:
         if: ${{ contains(matrix.os, 'ubuntu') }}
         run: |
           sudo apt-get update
-          sudo apt-get install python-setuptools, python3-setuptools
+          sudo apt-get install python-setuptools
+          sudo apt-get install python3-setuptools
       - name: Install wheel
         run: sudo pip2 install wheel
       - name: Create package
