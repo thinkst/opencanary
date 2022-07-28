@@ -22,20 +22,20 @@ def get_version(rel_path):
         raise RuntimeError("Unable to find version string.")
 
 requirements = [
-    'Twisted==19.10.0',
-    'pyasn1==0.4.5',
-    'cryptography==3.0',
-    'simplejson==3.16.0',
-    'requests==2.21.0',
-    'zope.interface==5.0.0',
-    'PyPDF2==1.26.0',
-    'fpdf==1.7.2',
-    'passlib==1.7.1',
-    'Jinja2==3.0.1',
-    'ntlmlib==0.72',
-    'bcrypt==3.1.7',
-    'setuptools==44.0.0',
-    'hpfeeds==3.0.0']
+    'Twisted==22.4.0',
+    'pyasn1',
+    'cryptography',
+    'simplejson',
+    'requests',
+    'zope.interface',
+    'PyPDF2',
+    'fpdf',
+    'passlib',
+    'Jinja2',
+    'ntlmlib',
+    'bcrypt',
+    'setuptools',
+    'hpfeeds']
 
 
 setup(

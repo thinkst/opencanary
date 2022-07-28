@@ -1,5 +1,10 @@
 import traceback
-
+# import warnings
+# warnings.filterwarnings("ignore", category=DeprecationWarning)
+def warn(*args, **kwargs):
+    pass
+import warnings
+warnings.warn = warn
 from twisted.application import service
 from twisted.application import internet
 from twisted.internet.protocol import Factory
