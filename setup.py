@@ -25,7 +25,7 @@ requirements = [
     'Twisted==22.4.0',
     'pyasn1==0.4.8',
     'cryptography==37.0.4',
-    'simplejson====3.17.6',
+    'simplejson==3.17.6',
     'requests==2.28.1',
     'zope.interface==5.4.0',
     'PyPDF2==2.9.0',
