@@ -34,7 +34,7 @@ requirements = [
     'Jinja2==3.0.1',
     'ntlmlib==0.72',
     'bcrypt==3.1.7',
-    'setuptools==44.0.0',
+    'setuptools==63.2.0',
     'hpfeeds==3.0.0']
 
 

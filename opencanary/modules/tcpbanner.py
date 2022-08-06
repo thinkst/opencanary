@@ -35,33 +35,39 @@ class TCPBannerProtocol(Protocol):
 
     def connectionMade(self):
         #We limit the data sent through to 255 chars
-        data = str(self.accept_banner)[:255]
+        try:
+            data = str(self.accept_banner)[:255]
 
-        logdata = {'FUNCTION': 'CONNECTION_MADE', 'DATA':data,
-                   'BANNER_ID':str(self.banner_id)}
+            logdata = {'FUNCTION': 'CONNECTION_MADE', 'DATA':data,
+                    'BANNER_ID':str(self.banner_id)}
 
-        if self.keep_alive_enabled:
-            if hasattr(socket, 'TCP_KEEPIDLE'):
-                # overrides value (in seconds) of system-wide ipv4 tcp_keepalive_time
-                self.transport.getHandle().setsockopt(socket.SOL_TCP, socket.TCP_KEEPIDLE, self.keep_alive_idle)
-            # overrides value (in seconds) of system-wide ipv4 tcp_keepalive_intvl
-            self.transport.getHandle().setsockopt(socket.SOL_TCP, socket.TCP_KEEPINTVL, self.keep_alive_interval)
-            # overrides value (in seconds) of system-wide ipv4 tcp_keepalive_probes
-            self.transport.getHandle().setsockopt(socket.SOL_TCP, socket.TCP_KEEPCNT, self.keep_alive_probes)
-            # set keep alive on socket
-            self.transport.setTcpKeepAlive(1)
+            if self.keep_alive_enabled:
+                if hasattr(socket, 'TCP_KEEPIDLE'):
+                    # overrides value (in seconds) of system-wide ipv4 tcp_keepalive_time
+                    self.transport.getHandle().setsockopt(socket.SOL_TCP, socket.TCP_KEEPIDLE, self.keep_alive_idle)
+                # overrides value (in seconds) of system-wide ipv4 tcp_keepalive_intvl
+                self.transport.getHandle().setsockopt(socket.SOL_TCP, socket.TCP_KEEPINTVL, self.keep_alive_interval)
+                # overrides value (in seconds) of system-wide ipv4 tcp_keepalive_probes
+                self.transport.getHandle().setsockopt(socket.SOL_TCP, socket.TCP_KEEPCNT, self.keep_alive_probes)
+                # set keep alive on socket
+                self.transport.setTcpKeepAlive(1)
 
-            self.factory.canaryservice.logtype = self.factory.canaryservice.logger.LOG_TCP_BANNER_KEEP_ALIVE_CONNECTION_MADE
-            self.factory.canaryservice.log(logdata, transport=self.transport)
+                self.factory.canaryservice.logtype = self.factory.canaryservice.logger.LOG_TCP_BANNER_KEEP_ALIVE_CONNECTION_MADE
+                self.factory.canaryservice.log(logdata, transport=self.transport)
 
-        elif not self.alert_string_enabled:
-            #flag says we need to wait for incoming data to include a string
-            #so no point in logging anything here
+            elif not self.alert_string_enabled:
+                #flag says we need to wait for incoming data to include a string
+                #so no point in logging anything here
 
+                self.factory.canaryservice.logtype = self.factory.canaryservice.logger.LOG_TCP_BANNER_CONNECTION_MADE
+                self.factory.canaryservice.log(logdata, transport=self.transport)
+
+            self.transport.write(self.accept_banner)
+
+        except OSError:
+            print('Received an OSError. Likely the socket has closed.')
             self.factory.canaryservice.logtype = self.factory.canaryservice.logger.LOG_TCP_BANNER_CONNECTION_MADE
             self.factory.canaryservice.log(logdata, transport=self.transport)
-
-        self.transport.write(self.accept_banner)
 
     def dataReceived(self, data):
         """
