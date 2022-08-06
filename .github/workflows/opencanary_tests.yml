@@ -25,7 +25,7 @@ jobs:
           sudo apt-get update
           sudo apt-get install python3-setuptools
           sudo pip3 install --upgrade pip
-          sudo pip3 install setuptools>=62.0.0
+          sudo pip3 install setuptools>=58.0.0
       - name: Install wheel
         run: sudo pip3 install wheel
       - name: Create package
