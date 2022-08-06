@@ -31,7 +31,7 @@ requirements = [
     'PyPDF2==2.9.0',
     'fpdf==1.7.2',
     'passlib==1.7.4',
-    'Jinja2==3.1.2',
+    'Jinja2==3.0.0',
     'ntlmlib==0.72',
     'bcrypt==3.2.2',
     'setuptools==63.4.1',
