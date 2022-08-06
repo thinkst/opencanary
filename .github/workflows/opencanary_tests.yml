@@ -31,7 +31,7 @@ jobs:
       - name: Create package
         run: sudo python3 setup.py sdist
       - name: Install package
-        run: sudo pip3 install dist/opencanary-*.tar.gz
+        run: sudo pip3 install --ignore-installed dist/opencanary-*.tar.gz
       - name: Install test dependencies
         run: sudo pip3 install -r opencanary/test/requirements.txt
       - name: Copy config file
