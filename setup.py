@@ -9,6 +9,7 @@ def read(rel_path):
     with codecs.open(os.path.join(here, rel_path), 'r') as fp:
         return fp.read()
 
+
 def get_version(rel_path):
     """
     Reading the package version dynamically.
@@ -21,22 +22,22 @@ def get_version(rel_path):
     else:
         raise RuntimeError("Unable to find version string.")
 
-requirements = [
-    'Twisted==19.10.0',
-    'pyasn1==0.4.5',
-    'cryptography==3.0',
-    'simplejson==3.16.0',
-    'requests==2.21.0',
-    'zope.interface==5.0.0',
-    'PyPDF2==1.26.0',
-    'fpdf==1.7.2',
-    'passlib==1.7.1',
-    'Jinja2==3.0.1',
-    'ntlmlib==0.72',
-    'bcrypt==3.1.7',
-    'setuptools==63.2.0',
-    'hpfeeds==3.0.0']
 
+requirements = [
+    'Twisted',
+    'pyasn1',
+    'cryptography',
+    'simplejson',
+    'requests',
+    'zope.interface',
+    'PyPDF2',
+    'fpdf',
+    'passlib',
+    'Jinja2',
+    'ntlmlib',
+    'bcrypt',
+    'setuptools',
+    'hpfeeds']
 
 setup(
     name='opencanary',
@@ -52,7 +53,7 @@ setup(
     ],
     license='BSD',
     packages=find_packages(exclude='test'),
-    scripts=['bin/opencanaryd','bin/opencanary.tac'],
+    scripts=['bin/opencanaryd', 'bin/opencanary.tac'],
     platforms='any',
     include_package_data=True,
     classifiers=[
