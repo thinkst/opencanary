@@ -1,6 +1,6 @@
 import codecs
 import os.path
-from setuptools import setup, find_packages
+from setuptools import setup, find_namespace_packages
 import sys
 
 
@@ -47,14 +47,14 @@ setup(
     description='OpenCanary daemon',
     long_description='A low interaction honeypot intended to be run on internal networks.',
     install_requires=requirements,
-    setup_requires=[
-        'setuptools_git'
-    ],
     license='BSD',
-    packages=find_packages(exclude='test'),
+    packages=find_namespace_packages(exclude=['docs','docs*','opencanary.test','opencanary.test*']),
+    package_data={
+        'opencanary.data': ['**'],
+        'opencanary.modules.data': ['*/**/*'],
+    },
     scripts=['bin/opencanaryd','bin/opencanary.tac'],
     platforms='any',
-    include_package_data=True,
     classifiers=[
         "Development Status :: 5 - Production/Stable",
         "Intended Audience :: Developers",
