@@ -12,6 +12,7 @@ from subprocess import CalledProcessError, check_output
 
 DEFAULT_SERVICE_NAME = 'com.thinkst.opencanary'
 LAUNCH_DAEMONS_DIR = '/Library/LaunchDaemons'
+OPENCANARY_RUNTIME_OPTIONS="--dev"
 
 # Opencanary paths
 OPENCANARY_BUILD_SCRIPTS_DIR = path.dirname(path.realpath(__file__))
@@ -19,7 +20,7 @@ OPENCANARY_DIR = path.abspath(path.join(OPENCANARY_BUILD_SCRIPTS_DIR, pardir, pa
 OPENCANARY_BIN_DIR = path.join(OPENCANARY_DIR, 'bin')
 OPENCANARY_VENV_DIR = path.join(OPENCANARY_DIR, 'env')
 OPENCANARY_VENV_BIN_DIR = path.join(OPENCANARY_VENV_DIR, 'bin')
-OPENCANARY_START_CMD="opencanaryd --dev"
+OPENCANARY_DAEMON_PATH = path.join(OPENCANARY_VENV_BIN_DIR, 'opencanaryd')
 
 # Homebrew
 try:
@@ -54,14 +55,14 @@ parser.add_argument(
     help=f'write directly to {LAUNCH_DAEMONS_DIR} instead of to {OPENCANARY_DIR} (IMPORTANT: requires sudo)')
 
 args = parser.parse_args()
-
-
-# Write .plist, write start/stop scripts
 plist_basename = args.service_name + ".plist"
 launch_daemon_path = path.join(LAUNCH_DAEMONS_DIR, plist_basename)
+launcher_script = path.join(OPENCANARY_BIN_DIR, f"launch_{args.service_name}.sh")
 bootstrap_service_script = path.join(OPENCANARY_BIN_DIR, f"bootstrap_service_{args.service_name}.sh")
-bootout_service_script = path.join(OPENCANARY_BIN_DIR, f"bootout_service_{args.service_name}.sh")
+uninstall_service_script = path.join(OPENCANARY_BIN_DIR, f"uninstall_service_{args.service_name}.sh")
 
+
+# Write the plist and scripts
 launchctl_instructions = {
     'Label': args.service_name,
     'RunAtLoad': True,
@@ -73,28 +74,44 @@ launchctl_instructions = {
         'PATH': f"{OPENCANARY_VENV_BIN_DIR}:{HOMEBREW_BIN_DIR}:/usr/bin:/bin",
         'VIRTUAL_ENV': OPENCANARY_VENV_DIR
     },
-    'ProgramArguments': OPENCANARY_START_CMD.split()
+    'ProgramArguments': [launcher_script]
 }
-
 
 if args.write_launchdaemon:
     service_plist_path = path.join(LAUNCH_DAEMONS_DIR, plist_basename)
 else:
     service_plist_path = path.join(OPENCANARY_DIR, plist_basename)
 
-
+# plist
 with open(service_plist_path, 'wb+') as _plist_file:
     plistlib.dump(launchctl_instructions, _plist_file)
+
+# Launcher script
+with open(launcher_script, 'w') as file:
+    file.write(f'. "{OPENCANARY_VENV_BIN_DIR}/activate"\n')
+    file.write(f'"{OPENCANARY_DAEMON_PATH}" {OPENCANARY_RUNTIME_OPTIONS}\n')
+
+# bootstrap script
 with open(bootstrap_service_script, 'w') as file:
+    file.write(f'chown root "{launcher_script}"\n')
     file.write(f'cp "{service_plist_path}" {LAUNCH_DAEMONS_DIR}\n')
     file.write(f"launchctl bootstrap system '{launch_daemon_path}'\n")
-with open(bootout_service_script, 'w') as file:
+
+# uninstall/bootout script
+with open(uninstall_service_script, 'w') as file:
     file.write(f"launchctl bootout system/{args.service_name}\n")
 
-chmod(bootout_service_script, stat.S_IRWXU)
+
+# Set permissions
+chmod(launcher_script, stat.S_IRWXU)  # stat.S_IEXEC | stat.S_IREAD
+chmod(uninstall_service_script, stat.S_IRWXU)
 chmod(bootstrap_service_script, stat.S_IRWXU)
 
+
+# Print results
 print("Generated files...\n")
-print(f"   Service .plist file: '{service_plist_path}'")
-print(f"      Bootstrap script: '{bootstrap_service_script}'")
-print(f"        Bootout script: '{bootout_service_script}'\n")
+print(f"    Service definition: ./{path.relpath(service_plist_path)}")
+print(f"       Launcher script: ./{path.relpath(launcher_script)}")
+print(f"      Bootstrap script: ./{path.relpath(bootstrap_service_script)}")
+print(f"        Bootout script: ./{path.relpath(uninstall_service_script)}\n")
+print(f"Run 'sudo {bootstrap_service_script}' to install as a system service.")

@@ -39,7 +39,6 @@ create_venv() {
 }
 
 
-
 echo -e "Build log will be written to '$BUILD_LOG'..."
 pushd "$OPENCANARY_DIR" >> "$BUILD_LOG"
 
@@ -113,19 +112,25 @@ else
 fi
 
 
-echo_log "Activating virtual env..."
+echo_log "Activating virtual env in subshell..."
 . "$VENV_PATH/bin/activate"
 
 echo_log "Installing cryptography package..."
 pip3 install cryptography >> "$BUILD_LOG"
 
-echo_log Building...
+echo_log "Building..."
 python3 setup.py sdist >> "$BUILD_LOG" 2>&1
 BUILT_PKG=$(ls dist/opencanary*.tar.gz)
 
 echo_log "Installing built package '$BUILT_PKG'..."
 pip install dist/opencanary-0.7.1.tar.gz >> "$BUILD_LOG"
 
-echo_log "\nInstall complete.\nIMPORTANT: virtualenv is NOT active. To activate now and in the future:"
+echo_log "Install complete.\n"
+
+if [[ "${VIRTUAL_ENV+set}" = set ]]; then
+    echo_log "IMPORTANT: virtualenv is NOT active!"
+fi
+
+echo_log "To activate the virtualenv now and in the future:"
 echo_log "\n    . '$OPENCANARY_DIR/env/bin/activate'\n\n"
 popd >> "$BUILD_LOG"
