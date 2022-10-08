@@ -40,12 +40,9 @@ DAEMON_RUNTIME_OPTIONS = "--dev"
 # This script writes to the launchctl/ folder
 LAUNCHCTL_DIR = join(OPENCANARY_DIR, 'launchctl')
 
-build_launchctl_dir_path = partial(join, LAUNCHCTL_DIR) # join(args.log_output_dir, 'opencanary.err.log')
-build_logfile_name = lambda log_name: join(args.log_output_dir, f"opencanary.{log_name}.log")
-
 # Homebrew (TODO: is this necessary?)
 try:
-    homebrew_bin_dir = join(check_output(['brew', '--prefix']).decode(), 'bin')
+    homebrew_bin_dir = join(check_output(['brew', '--prefix']).decode().rstrip(), 'bin')
 except CalledProcessError as e:
     print(f"Couldn't get homebrew install location: {e}")
     sys.exit()
@@ -81,17 +78,16 @@ parser.add_argument('--canary', action='append',
 
 args = parser.parse_args()
 args.canaries = args.canaries or []
+plist_basename = args.service_name + ".plist"
 
 # Setup dirs
 for dir in [LAUNCHCTL_DIR, args.log_output_dir]:
     print(f"Creating '{dir}'...")
     pathlib.Path(dir).mkdir(parents=True, exist_ok=True)
 
-# Files
-plist_basename = args.service_name + ".plist"
+# File builders
 build_launchctl_dir_path = partial(join, LAUNCHCTL_DIR)
-install_service_script = build_launchctl_dir_path(f"install_service_{args.service_name}.sh")
-uninstall_service_script = build_launchctl_dir_path(f"uninstall_service_{args.service_name}.sh")
+build_logfile_name = lambda log_name: join(args.log_output_dir, f"opencanary.{log_name}.log")
 
 
 # daemon launcher script
@@ -148,6 +144,7 @@ with open(config_output_file, 'w') as file:
 
 
 # service bootstrap script
+install_service_script = build_launchctl_dir_path(f"install_service_{args.service_name}.sh")
 daemon_plist_path = join(LAUNCH_DAEMONS_DIR, plist_basename)
 
 with open(install_service_script, 'w') as file:
@@ -165,6 +162,8 @@ with open(install_service_script, 'w') as file:
 
 
 # uninstall/bootout script
+uninstall_service_script = build_launchctl_dir_path(f"uninstall_service_{args.service_name}.sh")
+
 with open(uninstall_service_script, 'w') as file:
     file.write(f"launchctl bootout system/{args.service_name}\n")
 
