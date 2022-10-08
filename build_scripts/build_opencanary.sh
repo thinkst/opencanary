@@ -15,20 +15,29 @@ BUILD_LOG="$BUILD_SCRIPT_DIR/build.log"
 VENV_PATH="$OPENCANARY_DIR/$VENV_DIR"
 
 
+# Echo a string to both STDOUT and the build log
+echo_log() {
+    echo -e "$1"
+    echo >> $BUILD_LOG
+    echo -e "$1" >> "$BUILD_LOG"
+    echo >> $BUILD_LOG
+}
+
 # Bash fxn to move files/dirs out of the way
 mv_to_old() {
     local FILE_TO_MOVE="$1"
     local OLD_COPY="$1.old"
     [[ -a $OLD_COPY ]] && mv_to_old $OLD_COPY   # Recursively move old copies out the way
-    echo "Moving '$FILE_TO_MOVE' out of the way to '$OLD_COPY'"
-    mv "$FILE_TO_MOVE" "$OLD_COPY"
+    echo_log "Moving '$FILE_TO_MOVE' out of the way to '$OLD_COPY'"
+    mv -v "$FILE_TO_MOVE" "$OLD_COPY" >> "$BUILD_LOG"
 }
 
 # Create python virtual env
 create_venv() {
-    echo "Creating new virtualenv in '$VENV_DIR'..."
+    echo_log "Creating new virtualenv in '$VENV_DIR'..."
     $VENV_CREATION_CMD "$VENV_PATH" >> "$BUILD_LOG"
 }
+
 
 
 echo -e "Build log will be written to '$BUILD_LOG'..."
@@ -36,10 +45,10 @@ pushd "$OPENCANARY_DIR" >> "$BUILD_LOG"
 
 
 if [[ $SYSTEM_INFO =~ 'Darwin' ]]; then
-    echo 'macOS detected...'
+    echo_log 'macOS detected...'
 
     if ! command -v brew &>/dev/null; then
-        echo 'ERROR: homebrew not found. Try visiting https://brew.sh/'
+        echo_log 'ERROR: homebrew not found. Try visiting https://brew.sh/'
         exit 1
     fi
 
@@ -47,45 +56,45 @@ if [[ $SYSTEM_INFO =~ 'Darwin' ]]; then
     OPENSSL_PATH=$(brew --prefix "$HOMEBREW_OPENSSL_FORMULA" 2>/dev/null)
 
     if [ $? -ne 0 ] ; then
-        echo "ERROR: $HOMEBREW_OPENSSL_FORMULA not found. Try 'brew install $HOMEBREW_OPENSSL_FORMULA'."
+        echo_log "ERROR: $HOMEBREW_OPENSSL_FORMULA not found. Try 'brew install $HOMEBREW_OPENSSL_FORMULA'."
         exit 1
     fi
 
     set -e
 
     if [[ $SYSTEM_INFO =~ 'X86' ]]; then
-        echo 'x86 detected...'
+        echo_log 'x86 detected...'
         export ARCHFLAGS="-arch x86_64"
     elif [[ $SYSTEM_INFO =~ 'ARM64' ]]; then
-        echo 'm1 detected...'
+        echo_log 'm1 detected...'
         export ARCHFLAGS="-arch arm64"
     else
-        echo "ERROR: Architecture not identifiable from system info, exiting."
-        echo -e "'uname -a' output was: $SYSTEM_INFO"
+        echo_log "ERROR: Architecture not identifiable from system info, exiting."
+        echo_log "'uname -a' output was: $SYSTEM_INFO"
         exit 1
     fi
 
     export LDFLAGS="-L$OPENSSL_PATH/lib"
     export CPPFLAGS="-I$OPENSSL_PATH/include"
 
-    echo -e "Found $HOMEBREW_OPENSSL_FORMULA at '$OPENSSL_PATH'"
-    echo -e "    LDFLAGS set to '$LDFLAGS'"
-    echo -e "    CPPFLAGS set to '$CPPFLAGS'"
-    echo -e "    ARCHFLAGS set to '$ARCHFLAGS'"
+    echo_log "Found $HOMEBREW_OPENSSL_FORMULA at '$OPENSSL_PATH'"
+    echo_log "    LDFLAGS set to '$LDFLAGS'"
+    echo_log "    CPPFLAGS set to '$CPPFLAGS'"
+    echo_log "    ARCHFLAGS set to '$ARCHFLAGS'"
 else
-    echo "Unknown system. You may need to set LDFLAGS, CPPFLAGS, and ARCHFLAGS to compile 'cryptography'."
+    echo_log "Unknown system. You may need to set LDFLAGS, CPPFLAGS, and ARCHFLAGS to compile 'cryptography'."
 fi
 
 
 # Backup current checkout and pull a fresh one from github if requested
 if [ "${OPENCANARY_BUILD_FULL_CLEAN+set}" = set ]; then
-    echo "OPENCANARY_BUILD_FULL_CLEAN requested; backing up repo and rebuilding from scratch..."
-    pushd ..
+    echo_log "OPENCANARY_BUILD_FULL_CLEAN requested; backing up repo and rebuilding from scratch..."
+    pushd .. >> "$BUILD_LOG"
     [[ -a opencanary ]] && mv_to_old opencanary
     git clone "$OPENCANARY_GIT_REPO"
-    popd
+    popd >> "$BUILD_LOG"
 else
-    echo "Using current repo at '$OPENCANARY_DIR'"
+    echo_log "Using current repo at '$OPENCANARY_DIR'"
     echo "    (Set OPENCANARY_BUILD_FULL_CLEAN=true to start from a fresh git checkout)"
 fi
 
@@ -96,7 +105,7 @@ if [[ -d $VENV_PATH ]]; then
         mv_to_old "$VENV_PATH"
         create_venv
     else
-        echo "Using current virtualenv in '$VENV_PATH'"
+        echo_log "Using current virtualenv in '$VENV_PATH'"
         echo "    (Set OPENCANARY_BUILD_FRESH_VENV=true to rebuild a new virtualenv)"
     fi
 else
@@ -104,19 +113,19 @@ else
 fi
 
 
-echo "Activating virtual env..."
+echo_log "Activating virtual env..."
 . "$VENV_PATH/bin/activate"
 
-echo "Installing cryptography package..."
+echo_log "Installing cryptography package..."
 pip3 install cryptography >> "$BUILD_LOG"
 
-echo Building...
+echo_log Building...
 python3 setup.py sdist >> "$BUILD_LOG" 2>&1
 BUILT_PKG=$(ls dist/opencanary*.tar.gz)
 
-echo "Installing built package '$BUILT_PKG'..."
+echo_log "Installing built package '$BUILT_PKG'..."
 pip install dist/opencanary-0.7.1.tar.gz >> "$BUILD_LOG"
 
-echo -e "\nInstall complete.\nIMPORTANT: virtualenv is NOT active. To activate now and in the future:"
-echo -e "\n    . '$OPENCANARY_DIR/env/bin/activate'\n\n"
+echo_log "\nInstall complete.\nIMPORTANT: virtualenv is NOT active. To activate now and in the future:"
+echo_log "\n    . '$OPENCANARY_DIR/env/bin/activate'\n\n"
 popd >> "$BUILD_LOG"
