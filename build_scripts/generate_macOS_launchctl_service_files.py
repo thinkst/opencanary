@@ -16,31 +16,33 @@ from subprocess import CalledProcessError, check_output
 
 from pkg_resources import resource_filename
 
-DEFAULT_SERVICE_NAME = 'com.thinkst.opencanary'
-DEFAULT_SETTINGS_DIR = '/etc/opencanaryd'
 LAUNCH_DAEMONS_DIR = '/Library/LaunchDaemons'
-RUNTIME_OPTIONS = "--dev"
+DEFAULT_SERVICE_NAME = 'com.thinkst.opencanary'
+CONFIG_FILE_BASENAME = 'opencanary.conf'
 
-# opencanary repo dirs
+# opencanary paths
 OPENCANARY_DIR = realpath(join(dirname(__file__), pardir))
 OPENCANARY_BIN_DIR = join(OPENCANARY_DIR, 'bin')
+DEFAULT_CONFIG_PATH = resource_filename('opencanary', 'data/settings.json')
 VENV_DIR = join(OPENCANARY_DIR, 'env')
 VENV_BIN_DIR = join(VENV_DIR, 'bin')
 
-# opencanary files
+# daemon config
+DAEMON_CONFIG_DIR = '/etc/opencanaryd'
+DAEMON_CONFIG_PATH = join(DAEMON_CONFIG_DIR, CONFIG_FILE_BASENAME)
+CONFIG_OUTPUT_PATH = join(OPENCANARY_BIN_DIR, CONFIG_FILE_BASENAME)
 DAEMON_PATH = join(VENV_BIN_DIR, 'opencanaryd')
-OPENCANARY_DAEMON_CONFIG_PATH = join(VENV_BIN_DIR, 'opencanary.conf')
-DEFAULT_CONFIG_PATH = resource_filename('opencanary', 'data/settings.json')
+DAEMON_RUNTIME_OPTIONS = "--dev"
+
 
 # Homebrew (TODO: is this necessary?)
 try:
-    HOMEBREW_DIR = check_output(['brew', '--prefix']).decode()
-    HOMEBREW_BIN_DIR = join(HOMEBREW_DIR, 'bin')
+    homebrew_bin_dir = join(check_output(['brew', '--prefix']).decode(), 'bin')
 except CalledProcessError as e:
     print(f"Couldn't get homebrew install location: {e}")
     sys.exit()
 
-# Load opencanary.conf defaults
+# Load opencanary.conf default config
 with open(DEFAULT_CONFIG_PATH, 'r') as file:
     config = json.load(file)
     canaries = [k.split(".")[0] for k in config.keys() if re.match("[a-z]+\\.enabled", k)]
@@ -76,10 +78,8 @@ args = parser.parse_args()
 args.canaries = args.canaries or []
 
 # Files
-plist_basename = args.service_name + ".plist"
-launch_daemon_path = join(LAUNCH_DAEMONS_DIR, plist_basename)
 launcher_script = join(OPENCANARY_BIN_DIR, f"launch_{args.service_name}.sh")
-bootstrap_service_script = join(OPENCANARY_BIN_DIR, f"bootstrap_service_{args.service_name}.sh")
+install_service_script = join(OPENCANARY_BIN_DIR, f"install_service_{args.service_name}.sh")
 uninstall_service_script = join(OPENCANARY_BIN_DIR, f"uninstall_service_{args.service_name}.sh")
 
 
@@ -92,32 +92,41 @@ launchctl_instructions = {
     'StandardOutPath':  join(args.log_output_dir, 'opencanary.err.log'),
     'StandardErrorPath': join(args.log_output_dir, 'opencanary.out.log'),
     'EnvironmentVariables': {
-        'PATH': f"{VENV_BIN_DIR}:{HOMEBREW_BIN_DIR}:/usr/bin:/bin",
+        'PATH': f"{VENV_BIN_DIR}:{homebrew_bin_dir}:/usr/bin:/bin",
         'VIRTUAL_ENV': VENV_DIR
     },
     'ProgramArguments': [launcher_script]
 }
 
-if args.write_launchdaemon:
-    service_plist_path = join(LAUNCH_DAEMONS_DIR, plist_basename)
-else:
-    service_plist_path = join(OPENCANARY_DIR, plist_basename)
 
-# plist
-with open(service_plist_path, 'wb+') as _plist_file:
+# Write launchctl daemon service .plist
+plist_dir = LAUNCH_DAEMONS_DIR if args.write_launchdaemon else OPENCANARY_BIN_DIR
+plist_basename = args.service_name + ".plist"
+plist_output_path = join(plist_dir, plist_basename)
+daemon_plist_path = join(LAUNCH_DAEMONS_DIR, plist_basename)
+
+with open(plist_output_path, 'wb+') as _plist_file:
     plistlib.dump(launchctl_instructions, _plist_file)
 
 # Launcher script
 with open(launcher_script, 'w') as file:
     file.write(f'. "{VENV_BIN_DIR}/activate"\n')
-    file.write(f'"{DAEMON_PATH}" {RUNTIME_OPTIONS}\n')
+    file.write(f'"{DAEMON_PATH}" {DAEMON_RUNTIME_OPTIONS}\n')
 
 # bootstrap script
-with open(bootstrap_service_script, 'w') as file:
-    #file.write(f'mkdir -p "{DEFAULT_SETTINGS_DIR}"')
-    file.write(f'chown root "{launcher_script}"\n')
-    file.write(f'cp "{service_plist_path}" {LAUNCH_DAEMONS_DIR}\n')
-    file.write(f"launchctl bootstrap system '{launch_daemon_path}'\n")
+with open(install_service_script, 'w') as file:
+    script_contents = [
+        f"set -e\n\n"
+        f"chown root '{launcher_script}'",
+        f"mkdir -p '{DAEMON_CONFIG_DIR}'",
+        f"cp '{CONFIG_OUTPUT_PATH}' {DAEMON_CONFIG_PATH}",
+        f"cp '{plist_output_path}' {LAUNCH_DAEMONS_DIR}",
+        f"launchctl bootstrap system '{daemon_plist_path}'",
+        ""
+    ]
+
+    file.write("\n".join(script_contents))
+
 
 # uninstall/bootout script
 with open(uninstall_service_script, 'w') as file:
@@ -127,22 +136,21 @@ with open(uninstall_service_script, 'w') as file:
 for canary in canaries:
     config[f"{canary}.enabled"] = canary in args.canaries
 
-with open(OPENCANARY_DAEMON_CONFIG_PATH, 'w') as config_file:
+with open(CONFIG_OUTPUT_PATH, 'w') as config_file:
     config_file.write(json.dumps(config, indent=4))
 
 # Set permissions
 chmod(launcher_script, stat.S_IRWXU)  # stat.S_IEXEC | stat.S_IREAD
 chmod(uninstall_service_script, stat.S_IRWXU)
-chmod(bootstrap_service_script, stat.S_IRWXU)
+chmod(install_service_script, stat.S_IRWXU)
 
 
 # Print results
 print("Generated files...\n")
-print(f"    Service definition: ./{path.relpath(service_plist_path)}")
+print(f"    Service definition: ./{path.relpath(plist_output_path)}")
 print(f"       Launcher script: ./{path.relpath(launcher_script)}")
-print(f"      Bootstrap script: ./{path.relpath(bootstrap_service_script)}")
+print(f"      Bootstrap script: ./{path.relpath(install_service_script)}")
 print(f"        Bootout script: ./{path.relpath(uninstall_service_script)}\n")
-print(f"                Config: ./{path.relpath(OPENCANARY_DAEMON_CONFIG_PATH)}")
+print(f"                Config: ./{path.relpath(CONFIG_OUTPUT_PATH)}")
 print(f"      Enabled canaries: {', '.join(args.canaries)}\n")
-print(f"Run 'sudo {bootstrap_service_script}' to install as a system service.")
-print(f"(Make edits to the deamon's config file )")
+print(f"To install as a system service run:\n    'sudo {install_service_script}'\n")
