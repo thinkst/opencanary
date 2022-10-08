@@ -94,7 +94,7 @@ with open(launcher_script, 'w') as file:
     file.write(f'"{DAEMON_PATH}" {DAEMON_RUNTIME_OPTIONS}\n')
 
 
-# launchctl service .plist
+# Write launchctl service .plist
 plist_output_file = build_launchctl_dir_path(plist_basename)
 
 plist_contents = {
