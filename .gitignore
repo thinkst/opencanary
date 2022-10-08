@@ -12,13 +12,13 @@ openv/
 
 # Distribution / packaging
 .Python
-/bin/
 build/
 develop-eggs/
 dist/
 downloads/
 eggs/
 .eggs/
+launchctl/
 lib/
 lib64/
 parts/
