@@ -125,8 +125,3 @@ dmypy.json
 
 # MacOS detritus
 .DS_Store
-
-#/build_scripts/stop_service.sh
-#/build_scripts/start_service.sh
-#/opencanary.conf
-#/twistd.pid

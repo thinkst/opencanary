@@ -1,5 +1,8 @@
 #!/bin/bash -e
-# Build opencanary package and create virtualenv where it can be run. Environment variable options:
+# Build opencanary package from git repo and create virtualenv where it can be run.
+# Tested on macOS but should work elsewhere as long as the compile flags are configured.
+#
+# Environment variable options:
 #    OPENCANARY_BUILD_FULL_CLEAN=True - do a new git checkout
 #    OPENCANARY_BUILD_FRESH_VENV=True - recreate the venv
 
