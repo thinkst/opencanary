@@ -24,7 +24,7 @@ def getLogger(config):
     except Exception as e:
         print("Error: config does not have 'logger' section", file=sys.stderr)
         exit(1)
-
+    import pdb;pdb.set_trace()
     classname = d.get('class', None)
     if classname is None:
         print("Logger section is missing the class key.", file=sys.stderr)
