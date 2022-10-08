@@ -4,15 +4,19 @@
 # Requires homebrew
 
 import plistlib
+from shutil import copyfile
 import stat
 import sys
 from argparse import ArgumentDefaultsHelpFormatter, ArgumentParser
 from os import chmod, pardir, path
+from pkg_resources import resource_filename
 from subprocess import CalledProcessError, check_output
 
 DEFAULT_SERVICE_NAME = 'com.thinkst.opencanary'
+DEFAULT_SETTINGS_DIR = '/etc/opencanaryd'
 LAUNCH_DAEMONS_DIR = '/Library/LaunchDaemons'
-OPENCANARY_RUNTIME_OPTIONS="--dev"
+RUNTIME_OPTIONS = "--dev"
+DEFAULT_CONFIG_PATH = resource_filename('opencanary', 'data/settings.json')
 
 # Opencanary paths
 OPENCANARY_BUILD_SCRIPTS_DIR = path.dirname(path.realpath(__file__))
@@ -21,6 +25,7 @@ OPENCANARY_BIN_DIR = path.join(OPENCANARY_DIR, 'bin')
 OPENCANARY_VENV_DIR = path.join(OPENCANARY_DIR, 'env')
 OPENCANARY_VENV_BIN_DIR = path.join(OPENCANARY_VENV_DIR, 'bin')
 OPENCANARY_DAEMON_PATH = path.join(OPENCANARY_VENV_BIN_DIR, 'opencanaryd')
+OPENCANARY_DAEMON_CONFIG_PATH = path.join(OPENCANARY_VENV_BIN_DIR, 'opencanary.conf')
 
 # Homebrew
 try:
@@ -67,7 +72,7 @@ launchctl_instructions = {
     'Label': args.service_name,
     'RunAtLoad': True,
     'KeepAlive': True,
-    'WorkingDirectory': OPENCANARY_DIR,
+    'WorkingDirectory': OPENCANARY_VENV_BIN_DIR,
     'StandardOutPath':  path.join(args.log_output_dir, 'opencanary.err.log'),
     'StandardErrorPath': path.join(args.log_output_dir, 'opencanary.out.log'),
     'EnvironmentVariables': {
@@ -89,10 +94,11 @@ with open(service_plist_path, 'wb+') as _plist_file:
 # Launcher script
 with open(launcher_script, 'w') as file:
     file.write(f'. "{OPENCANARY_VENV_BIN_DIR}/activate"\n')
-    file.write(f'"{OPENCANARY_DAEMON_PATH}" {OPENCANARY_RUNTIME_OPTIONS}\n')
+    file.write(f'"{OPENCANARY_DAEMON_PATH}" {RUNTIME_OPTIONS}\n')
 
 # bootstrap script
 with open(bootstrap_service_script, 'w') as file:
+    #file.write(f'mkdir -p "{DEFAULT_SETTINGS_DIR}"')
     file.write(f'chown root "{launcher_script}"\n')
     file.write(f'cp "{service_plist_path}" {LAUNCH_DAEMONS_DIR}\n')
     file.write(f"launchctl bootstrap system '{launch_daemon_path}'\n")
@@ -101,6 +107,8 @@ with open(bootstrap_service_script, 'w') as file:
 with open(uninstall_service_script, 'w') as file:
     file.write(f"launchctl bootout system/{args.service_name}\n")
 
+# settings
+copyfile(DEFAULT_CONFIG_PATH, OPENCANARY_DAEMON_CONFIG_PATH)
 
 # Set permissions
 chmod(launcher_script, stat.S_IRWXU)  # stat.S_IEXEC | stat.S_IREAD
@@ -115,3 +123,4 @@ print(f"       Launcher script: ./{path.relpath(launcher_script)}")
 print(f"      Bootstrap script: ./{path.relpath(bootstrap_service_script)}")
 print(f"        Bootout script: ./{path.relpath(uninstall_service_script)}\n")
 print(f"Run 'sudo {bootstrap_service_script}' to install as a system service.")
+print(f"(Make edits to the deamon's config file ./{path.relpath(OPENCANARY_DAEMON_CONFIG_PATH)})")
