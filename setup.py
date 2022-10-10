@@ -1,7 +1,7 @@
 import codecs
 import os.path
 from setuptools import setup, find_namespace_packages
-import glob
+import sys
 
 
 def read(rel_path):
@@ -51,7 +51,7 @@ setup(
     packages=find_namespace_packages(exclude=['docs','docs*','opencanary.test','opencanary.test*']),
     package_data={
         'opencanary.data': ['**'],
-        'opencanary.modules.data': glob.iglob('opencanary/modules/data/**/*', recursive=True),
+        'opencanary.modules.data': ['*/**/*'],
     },
     scripts=['bin/opencanaryd','bin/opencanary.tac'],
     platforms='any',
