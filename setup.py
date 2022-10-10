@@ -48,12 +48,6 @@ setup(
     long_description='A low interaction honeypot intended to be run on internal networks.',
     install_requires=requirements,
     license='BSD',
-    packages=find_namespace_packages(
-        exclude=[
-            'docs','docs*'
-            'opencanary.test','opencanary.test*'
-        ]
-    ),
     include_package_data = True,
     scripts=['bin/opencanaryd','bin/opencanary.tac'],
     platforms='any',
