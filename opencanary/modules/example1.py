@@ -3,7 +3,6 @@ from opencanary.modules import CanaryService
 from twisted.internet.protocol import Protocol
 from twisted.internet.protocol import Factory
 from twisted.application import internet
-from __future__ import print_function
 
 class Example1Protocol(Protocol):
     """
