@@ -54,10 +54,7 @@ setup(
             'opencanary.test','opencanary.test*'
         ]
     ),
-    package_data={
-        'opencanary.data': ['**'],
-        'opencanary.modules.data': ['**','*/*', '*/*/*', '*/*/*/*', '*/*/*/*/*', '*/*/*/*/*/*', '*/*/*/*/*/*/*', '*/*/*/*/*/*/*/*', '*/*/*/*/*/*/*/*/*', '*/*/*/*/*/*/*/*/*/*', '*/*/*/*/*/*/*/*/*/*/*', '*/*/*/*/*/*/*/*/*/*/*/*', '*/*/*/*/*/*/*/*/*/*/*/*/*'],
-    },
+    include_package_data = True,
     scripts=['bin/opencanaryd','bin/opencanary.tac'],
     platforms='any',
     classifiers=[

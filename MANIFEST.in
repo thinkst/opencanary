@@ -1,0 +1,2 @@
+recursive-include opencanary/data *
+recursive-include opencanary/modules/data *
