@@ -19,18 +19,16 @@ jobs:
         uses: actions/setup-python@v2
         with:
           python-version: "${{ matrix.python-version }}"
-      - name: Install required linux dependencies
-        if: ${{ contains(matrix.os, 'ubuntu') }}
-        run: |
-          sudo pip3 install setuptools>=63.2.0
+      - name: Install setuptools
+        run: pip3 install setuptools>=63.2.0
       - name: Install wheel
-        run: sudo pip3 install wheel
+        run: pip3 install wheel
       - name: Create package
-        run: sudo python3 setup.py sdist
+        run: python3 setup.py sdist
       - name: Install package
-        run: sudo pip3 install dist/opencanary-*.tar.gz
+        run: pip3 install dist/opencanary-*.tar.gz
       - name: Install test dependencies
-        run: sudo pip3 install -r opencanary/test/requirements.txt
+        run: pip3 install -r opencanary/test/requirements.txt
       - name: Copy config file
         run: cp opencanary/test/opencanary.conf .
       - name: Start OpenCanary
