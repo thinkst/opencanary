@@ -49,10 +49,7 @@ setup(
     install_requires=requirements,
     license='BSD',
     packages=find_namespace_packages(exclude=['docs','docs*','opencanary.test','opencanary.test*']),
-    package_data={
-        'opencanary.data': ['**'],
-        'opencanary.modules.data': ['*/**/*'],
-    },
+    include_package_data=True,
     scripts=['bin/opencanaryd','bin/opencanary.tac'],
     platforms='any',
     classifiers=[
