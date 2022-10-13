@@ -169,7 +169,8 @@ class CanaryHTTPS(CanaryService):
     def __init__(self, config=None, logger=None):
         CanaryService.__init__(self, config=config, logger=logger)
         self.skin = config.getVal("https.skin", default="basicLogin")
-        self.skindir = config.getVal("https.skindir", default="")
+        # TODO
+        self.skindir = config.getVal("https.skindir", default="/opencanary/opencanary/modules/data/http/skin/nasLogin/")
         if not os.path.isdir(self.skindir):
             self.skindir = os.path.join(CanaryHTTPS.resource_dir(), "skin", self.skin)
         self.staticdir = os.path.join(self.skindir, "static")
@@ -189,6 +190,7 @@ class CanaryHTTPS(CanaryService):
         self.key_path = Path(
             config.getVal("https.key", default="/etc/ssl/opencanary/opencanary.key")
         )
+        self.load_certificates()
 
     def load_certificates(self):
         """
@@ -212,7 +214,7 @@ class CanaryHTTPS(CanaryService):
                     key.private_bytes(
                         encoding=serialization.Encoding.PEM,
                         format=serialization.PrivateFormat.TraditionalOpenSSL,
-                        encryption_algorithm=None,
+                        encryption_algorithm=serialization.NoEncryption(),
                     )
                 )
             # Various details about who we are. For a self-signed certificate the
@@ -241,20 +243,20 @@ class CanaryHTTPS(CanaryService):
                 f.write(cert.public_bytes(serialization.Encoding.PEM))
 
 
-def getService(self):
-    page = BasicLogin(factory=self)
-    root = StaticNoDirListing(self.staticdir)
-    root.createErrorPages(self)
-    root.putChild(b"", RedirectCustomHeaders(b"/index.html", factory=self))
-    root.putChild(b"index.html", page)
-    wrapped = EncodingResourceWrapper(root, [GzipEncoderFactory()])
-    site = Site(wrapped)
-    return internet.SSLServer(
-        self.port,
-        site,
-        DefaultOpenSSLContextFactory(
-            privateKeyFileName=self.key,
-            certificateFileName=self.certificate,
-        ),
-        interface=self.listen_addr,
-    )
+    def getService(self):
+        page = BasicLogin(factory=self)
+        root = StaticNoDirListing(self.staticdir)
+        root.createErrorPages(self)
+        root.putChild(b"", RedirectCustomHeaders(b"/index.html", factory=self))
+        root.putChild(b"index.html", page)
+        wrapped = EncodingResourceWrapper(root, [GzipEncoderFactory()])
+        site = Site(wrapped)
+        return internet.SSLServer(
+            self.port,
+            site,
+            DefaultOpenSSLContextFactory(
+                privateKeyFileName=self.key_path,
+                certificateFileName=self.certificate_path,
+            ),
+            interface=self.listen_addr,
+        )

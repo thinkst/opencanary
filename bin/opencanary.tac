@@ -8,7 +8,7 @@ from pkg_resources import iter_entry_points
 from opencanary.config import config
 from opencanary.logger import getLogger
 from opencanary.modules.http import CanaryHTTP
-from opencanary.modules.http import CanaryHTTPS
+from opencanary.modules.https import CanaryHTTPS
 from opencanary.modules.ftp import CanaryFTP
 from opencanary.modules.ssh import CanarySSH
 from opencanary.modules.telnet import Telnet

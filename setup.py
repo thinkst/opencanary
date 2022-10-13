@@ -22,9 +22,9 @@ def get_version(rel_path):
         raise RuntimeError("Unable to find version string.")
 
 requirements = [
-    'Twisted==19.10.0',
+    'Twisted==22.8.0',
     'pyasn1==0.4.5',
-    'cryptography==3.0',
+    'cryptography==38.0.1',
     'simplejson==3.16.0',
     'requests==2.21.0',
     'zope.interface==5.0.0',
@@ -35,7 +35,10 @@ requirements = [
     'ntlmlib==0.72',
     'bcrypt==3.1.7',
     'setuptools==63.2.0',
-    'hpfeeds==3.0.0']
+    'hpfeeds==3.0.0',
+    'pyOpenSSL==22.1.0',
+    "service-identity==21.1.0"
+]
 
 
 setup(
