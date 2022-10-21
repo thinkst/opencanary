@@ -130,7 +130,7 @@ class VNCProtocol(Protocol):
 
     def dataReceived(self, data):
         """
-        Recieved data is unbuffered so we buffer it for telnet.
+        Received data is unbuffered so we buffer it for telnet.
         """
         try:
             if self.state == HANDSHAKE_SEND:

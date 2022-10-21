@@ -381,7 +381,7 @@ class RedisProtocol(Protocol):
 
     def dataReceived(self, data):
         """
-        Recieved data is unbuffered so we buffer it for telnet.
+        Received data is unbuffered so we buffer it for telnet.
         """
         try:
             try:

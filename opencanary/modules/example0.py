@@ -26,7 +26,7 @@ class Example0Protocol(Protocol):
 
     def dataReceived(self, data):
         """
-        Careful, data recieved here is unbuffered. See example1
+        Careful, data received here is unbuffered. See example1
         for how this can be better handled.
         """
         password = data.strip("\r\n")
