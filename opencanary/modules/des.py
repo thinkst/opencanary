@@ -582,7 +582,7 @@ class des(_baseDes):
             else:
                 raise ValueError("For CBC mode, you must supply the Initial Value (IV) for ciphering")
 
-        # Split the data into blocks, crypting each one seperately
+        # Split the data into blocks, crypting each one separately
         i = 0
         dict = {}
         result = []

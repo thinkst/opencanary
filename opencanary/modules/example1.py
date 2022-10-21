@@ -38,10 +38,10 @@ class Example1Protocol(Protocol):
 
     def dataReceived(self, data):
         """
-        Recieved data is unbuffered so we buffer it for telnet.
+        Received data is unbuffered so we buffer it for telnet.
         """
         self.buffer += data
-        print("Recieved data: ", repr(data))
+        print("Received data: ", repr(data))
 
         # Discard inital telnet client control chars
         i = self.buffer.find("\x01")
