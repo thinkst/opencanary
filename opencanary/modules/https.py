@@ -15,6 +15,7 @@ from twisted.web.util import Redirect
 from twisted.internet.ssl import DefaultOpenSSLContextFactory
 
 from opencanary.modules import CanaryService
+from opencanary.modules.http import CanaryHTTP
 
 
 class Error(Resource):
@@ -169,10 +170,10 @@ class CanaryHTTPS(CanaryService):
     def __init__(self, config=None, logger=None):
         CanaryService.__init__(self, config=config, logger=logger)
         self.skin = config.getVal("https.skin", default="basicLogin")
-        # TODO
-        self.skindir = config.getVal("https.skindir", default="/opencanary/opencanary/modules/data/http/skin/nasLogin/")
+        # We share the skin dir with HTTP rather than duplicate everything
+        self.skindir = config.getVal("http.skindir", default="")
         if not os.path.isdir(self.skindir):
-            self.skindir = os.path.join(CanaryHTTPS.resource_dir(), "skin", self.skin)
+            self.skindir = os.path.join(CanaryHTTP.resource_dir(), "skin", self.skin)
         self.staticdir = os.path.join(self.skindir, "static")
         self.port = int(config.getVal("https.port", default=443))
         ubanner = config.getVal("http.banner", default="Apache/2.2.22 (Ubuntu)")
