@@ -40,7 +40,7 @@ class Config:
                 print("[-] Failed to decode json from %s (%s)" % (fname, e))
                 subprocess.call("cp -r %s /var/tmp/config-err-$(date +%%s)" % fname, shell=True)
             except Exception as e:
-                print("[-] An error occured loading %s (%s)" % (fname, e))
+                print("[-] An error occurred loading %s (%s)" % (fname, e))
         if self.__config is None:
             print('No config file found. Please create one with "opencanaryd --copyconfig"')
             sys.exit(1)
@@ -120,7 +120,7 @@ class Config:
         """Set value only if valid otherwise throw exception"""
         errs = self.setValues({key: val})
 
-        # sucessful update
+        # successful update
         if not errs:
             return
 

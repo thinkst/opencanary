@@ -71,7 +71,7 @@ class TCPBannerProtocol(Protocol):
 
     def dataReceived(self, data):
         """
-        Recieved data from tcp connection after connection has been made.
+        Received data from tcp connection after connection has been made.
         """
         try:
             if self.keep_alive_disable_alerting:
