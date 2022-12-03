@@ -22,7 +22,7 @@ The correlator runs with a default config, which we'll copy and edit to get star
    /[...]/opencanary_correlator.conf
    $ cp /[...]/opencanary_correlator.conf opencanary-correlator.conf
 
-In the config file, fill the twilio or mandrill details (or both), and the notification addresses for both.
+In the config file, fill the Twilio or mandrill details (or both), and the notification addresses for both.
 
 .. code-block:: json
 
@@ -40,14 +40,14 @@ In the config file, fill the twilio or mandrill details (or both), and the notif
      "scans.network_portscan_horizon": 1000,
    }
 
-With that in place, ensure that redis is running and then run the correlator daemon.
+With that in place, ensure that Redis is running and then run the correlator daemon.
 
 .. code-block:: sh
 
    $ pgrep redis-server || echo 'Redis is not running!'
    $ opencanary-correlator --config=./opencanary-correlator.conf
 
-To configure OpenCanary daemons to send their events to correlator, edit the **logger** field in its config and restart the daemon to reload the config.
+To configure OpenCanary daemons to send their events to the correlator, edit the **logger** field in its config and restart the daemon to reload the config.
 
 .. code-block:: json
 
@@ -68,7 +68,7 @@ To configure OpenCanary daemons to send their events to correlator, edit the **l
 Troubleshooting
 ---------------
 
-You can test that the Correlator alerts are working be sending an event direclty to it (without using OpenCanary).
+You can test that the Correlator alerts are working by sending an event directly to it (without using OpenCanary).
 
 .. code-block:: sh
 

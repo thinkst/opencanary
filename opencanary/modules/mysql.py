@@ -1,5 +1,5 @@
 from opencanary.modules import CanaryService
-from opencanary.config import ConfigException, PY3
+from opencanary.config import ConfigException
 
 from twisted.protocols.policies import TimeoutMixin
 from twisted.internet.protocol import Protocol
@@ -54,27 +54,18 @@ class MySQL(Protocol, TimeoutMixin):
 
         username = data[offset:i]
         i += 1
-        if PY3:
-            plen = data[i]
-        else:
-            plen = struct.unpack('B', data[i])[0]
+        plen = data[i]
         i+=1
         if plen == 0:
             return username, None
-        if PY3:
-            password="".join("{:02x}".format(c) for c in data[i:i+plen])
-        else:
-            password="".join("{:02x}".format(ord(c)) for c in data[i:i+plen])
+        password="".join("{:02x}".format(c) for c in data[i:i+plen])
         return username, password
 
     def consume_packet(self):
         if len(self._buffer) < MySQL.HEADER_LEN:
             return None, None
         length = struct.unpack('<I', self._buffer[:3] + b'\x00')[0]
-        if PY3:
-            seq_id = self._buffer[3]
-        else:
-            seq_id = struct.unpack('<B', self._buffer[3])[0]
+        seq_id = self._buffer[3]
 
         # enough buffer data to consume packet?
         if len(self._buffer) < MySQL.HEADER_LEN + length:
@@ -87,7 +78,7 @@ class MySQL(Protocol, TimeoutMixin):
         return seq_id, payload
 
     def server_greeting(self):
-        # struct.pack returns a byte string for py2 and py3
+        # struct.pack returns a byte string
         _threadid = struct.pack('<I', self.threadid)
         salt1, salt2 = self.gen_salt(8), self.gen_salt(12) 
         data = b'\x0a' + self.factory.canaryservice.banner + b'\x00' + _threadid + salt1 + b'\x00\xff\xf7\x08\x02\x00\x0f\x80\x15\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00' + salt2 + b'\x00\x6d\x79\x73\x71\x6c\x5f\x6e\x61\x74\x69\x76\x65\x5f\x70\x61\x73\x73\x77\x6f\x72\x64\x00'

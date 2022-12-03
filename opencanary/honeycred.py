@@ -21,7 +21,7 @@ def testCred(cred, username=None, password=None):
 
     user_match = True
     if cred_username is not None:
-        user_match = (cred_username == username)
+        user_match = (cred_username.encode() == username)
 
     password_match = True
     if cred_password is not None:

@@ -6,8 +6,8 @@ Welcome to the OpenCanary guide.
 Please note we have a wiki on Github with FAQ and Samba Setup help over `here <https://github.com/thinkst/opencanary/wiki>`_.
 
 OpenCanary is a daemon that runs canary services, which trigger alerts
-when (ab)used. The alerts can be sent to a variety of sources,
-including syslog, emails and a companion daemon opencanary-correlator.
+when (ab) is used. The alerts can be sent to a variety of sources,
+including Syslog, emails, and a companion daemon opencanary-correlator.
 
 This project is maintained by `Thinkst Canary <https://canary.tools>`_.
 
@@ -55,6 +55,7 @@ Alerting
 
    alerts/email
    alerts/hpfeeds
+   alerts/webhook
 
 
 Upgrading
@@ -62,14 +63,14 @@ Upgrading
 
 If you have a previous version of OpenCanary installed already, you can upgrade it easily.
 
-Start by activating your virtual evnironment (`env` in the below example) that has your installed version of OpenCanary,
+Start by activating your virtual environment (`env` in the below example) that has your installed version of OpenCanary,
 
 .. code-block:: sh
 
    $ . env/bin/activate
 
 
-Inside the virtualenv, you can upgrape your OpenCanary by,
+Inside the virtualenv, you can upgrade your OpenCanary by,
 
 .. code-block:: sh
 

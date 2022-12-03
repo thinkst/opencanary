@@ -17,9 +17,9 @@ Features
 Prerequisites
 ----------------
 
-* Python 2.7, 3.7 (Recommended python 3.7+)
-* [Optional] SNMP requires the python library scapy
-* ~[Optional] RDP requires the python library rdpy~ (this module has been removed; we are currently determing a way forward with this.)
+* Python 2.7, 3.7 (Recommended Python 3.7+)
+* [Optional] SNMP requires the Python library scapy
+* ~[Optional] RDP requires the Python library rdpy~ (this module has been removed; we are currently determining a way forward with this.)
 * [Optional] Samba module needs a working installation of samba
 
 Installation [UBUNTU]
@@ -28,7 +28,7 @@ Installation [UBUNTU]
 For updated and cleaner documentation, please head over to http://opencanary.org
 
 Installation on Ubuntu 20.04:
-(Please note that although we support python 2.7; these instructions are aimed at running the python 3 version)
+(Please note that although we support Python 2.7; these instructions are aimed at running the Python 3 version)
 
 ```
 $ sudo apt-get install python3-dev python3-pip python3-virtualenv python3-venv python3-scapy libssl-dev libpcap-dev
@@ -42,7 +42,7 @@ Installation [OS X]
 ----------
 
 Installation OS X needs an extra step, as multiple OpenSSL versions
-may exist which confounds the python libraries using to it.
+may exist which confounds the Python libraries using it.
 
 ```
 $ virtualenv env/
@@ -55,7 +55,7 @@ $ sudo port install openssl
 $ env ARCHFLAGS="-arch x86_64" LDFLAGS="-L/opt/local/lib" CFLAGS="-I/opt/local/include" pip install cryptography
 ```
 
-Alternatively homebrew users run:
+Alternatively, homebrew users run:
 
 If Macbook is x86:
 ````
@@ -69,7 +69,7 @@ $ brew install openssl
 $ env ARCHFLAGS="-arch arm64" LDFLAGS="-L/opt/homebrew/opt/openssl@1.1/lib" CFLAGS="-I/opt/homebrew/opt/openssl@1.1/include" pip install cryptography
 ```
 
-Now installation can run as usual:
+Now the installation can run as usual:
 ```
 $ pip install opencanary
 $ pip install scapy pcapy # optional
@@ -91,7 +91,7 @@ If you are looking to get OpenCanary working on OpenBSD, take a look at https://
 
 Running OpenCanary
 ----
-Please note that for the Portscan service, we have added an `portscan.ignore_localhost` setting which means the Opencanary `portscan` service will ignore (not alert on) portscans originating for the localhost IP (`127.0.0.1`). This setting is false by default.
+Please note that for the Portscan service, we have added a `portscan.ignore_localhost` setting which means the Opencanary `portscan` service will ignore (not alert on) portscans originating for the localhost IP (`127.0.0.1`). This setting is false by default.
 
 OpenCanary is started by running:
 
@@ -108,7 +108,7 @@ $ opencanaryd --copyconfig
 
 Which will create a folder, `/etc/opencanaryd` and a config file inside that folder `opencanary.conf`. You must now edit the config file to determine which services and logging options you would like to enable.
 
-When OpenCanary starts it looks for config files the following order:
+When OpenCanary starts it looks for config files in the following order:
 
 1. ./opencanary.conf (i.e. the directory where OpenCanary is installed)
 2. ~/.opencanary.conf (i.e. the home directory of the user, usually this will be root so /root/.opencanary.conf)
@@ -126,17 +126,58 @@ FAQ
 ---
 We have a FAQ over [here](https://github.com/thinkst/opencanary/wiki)
 
+Docker Compose
+----------------
+
+> Requires [Docker](https://docs.docker.com/get-docker/) and [Docker Compose](https://docs.docker.com/compose/install/) installed.
+
+1. Edit the `data/.opencanary.conf` file to enable, disable or customize the services that will run.
+
+1. Edit the `ports` section of the `docker-compose.yml` file to enable/disable the desired ports based on the services you have enabled in the config file.
+
+1. Build and run the container.
+
+    To run the latest Docker image (based on the code on a given branch) run:
+    ```bash
+    docker-compose up -d --build latest
+    ```
+    To run a Docker image based on what has been released in Pypi, run:
+    ```bash
+    docker-compose up -d --build stable
+    ```
+
+> To view the logs run `docker-compose logs latest` or `docker-compose logs stable`
+
+> To stop the container run `docker-compose down`
+
 Docker
 ----------------
 
-To build the latest Docker image (based on the code on a given branch) run:
+> Requires [Docker](https://docs.docker.com/get-docker/) installed.
+
+1. Edit the `data/.opencanary.conf` file to enable, disable or customize the services that will run.
+
+1. Build a Docker image to run.
+    
+    To build the latest Docker image (based on the code on a given branch) run:
+
+    ```bash
+    docker build -t opencanary -f Dockerfile.latest .
+    ```
+
+    To build a Docker image based on what has been released in Pypi, run:
+
+    ```bash
+    docker build -t opencanary -f Dockerfile.stable .
+    ```
+
+1. Run the docker image with the following command:
 
 ```bash
-docker build -t opencanary -f Dockerfile.latest .
+# You will need to add/remove the ports you are using by listing them with `-p ##:##`
+docker run --rm --detach -p 21:21 -p 80:80 -v "${PWD}/data/.opencanary.conf":"/root/.opencanary.conf" --name opencanary opencanary
 ```
 
-To build a Docker image based on what has been released in Pypi, run:
+> To view the logs run `docker logs opencanary`
 
-```bash
-docker build -t opencanary -f Dockerfile.stable .
-```
+> To stop the container run `docker stop opencanary`

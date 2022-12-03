@@ -1,4 +1,3 @@
-from __future__ import print_function
 from opencanary.modules import CanaryService
 from opencanary.config import ConfigException
 
@@ -205,7 +204,7 @@ class MSSQLProtocol(Protocol, TimeoutMixin):
                 tds = TDSPacket._make(header  + [payload])
                 return tds
             else:
-                # Whole payload not yet recieved. Leave header in
+                # Whole payload not yet received. Leave header in
                 # buffer but return copy of header anyway
                 return TDSPacket._make(header + [None])
         except Exception as e:

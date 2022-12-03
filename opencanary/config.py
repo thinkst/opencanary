@@ -1,4 +1,3 @@
-from __future__ import print_function
 from six import iteritems
 import os, sys, json, copy, socket, itertools, string, subprocess
 from os.path import expanduser
@@ -7,23 +6,19 @@ from pkg_resources import resource_filename
 SAMPLE_SETTINGS = resource_filename(__name__, 'data/settings.json')
 SETTINGS = 'opencanary.conf'
 
-PY3 = sys.version_info > (3,)
 
-# Only check unicode on Python 2, In Python 3 unicode is the default and we can just return the input.
-if sys.version_info[0] < 3:
-    def byteify(input):
-        if isinstance(input, dict):
-            return {byteify(key): byteify(value)
-                    for key, value in iteritems(input)}
-        elif isinstance(input, list):
-            return [byteify(element) for element in input]
-        elif isinstance(input, unicode):
-                return input.encode('utf-8')
-        else:
-            return input
-else:
-    def byteify(input):
-        return input
+def expand_vars(var):
+    """Recursively replace environment variables in a dictionary, list or string with their respective values."""
+    if isinstance(var, dict):
+        for key, value in var.items():
+            var[key] = expand_vars(value)
+        return var
+    if isinstance(var, (list, set, tuple)):
+        return [expand_vars(v) for v in var]
+    if isinstance(var, (str, bytes)):
+        return os.path.expandvars(var)
+    return var
+
 
 class Config:
     def __init__(self, configfile=SETTINGS):
@@ -37,7 +32,7 @@ class Config:
                 with open(fname, "r") as f:
                     print("[-] Using config file: %s" % fname)
                     self.__config = json.load(f)
-                    self.__config = byteify(self.__config)
+                    self.__config = expand_vars(self.__config)
                 return
             except IOError as e:
                 print("[-] Failed to open %s for reading (%s)" % (fname, e))
@@ -45,7 +40,7 @@ class Config:
                 print("[-] Failed to decode json from %s (%s)" % (fname, e))
                 subprocess.call("cp -r %s /var/tmp/config-err-$(date +%%s)" % fname, shell=True)
             except Exception as e:
-                print("[-] An error occured loading %s (%s)" % (fname, e))
+                print("[-] An error occurred loading %s (%s)" % (fname, e))
         if self.__config is None:
             print('No config file found. Please create one with "opencanaryd --copyconfig"')
             sys.exit(1)
@@ -125,7 +120,7 @@ class Config:
         """Set value only if valid otherwise throw exception"""
         errs = self.setValues({key: val})
 
-        # sucessful update
+        # successful update
         if not errs:
             return
 

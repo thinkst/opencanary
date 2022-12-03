@@ -1,16 +1,28 @@
-FROM python:3.6-buster
+FROM python:3.7-buster
 
-RUN mkdir -p /opencanary
+# Download cache lists and install minimal versions
+RUN apt-get update && apt-get -yq install --no-install-recommends \
+    # Required linux dependencies
+    sudo && \
+    # Remove cache lists and clean up anything not needed to minimize image size
+    apt-get autoremove -yq && apt-get clean && rm -rf /var/lib/apt/lists/*
 
-COPY bin /opencanary/bin
-COPY data /opencanary/data
-COPY opencanary /opencanary/opencanary
-COPY docs /opencanary/docs
-COPY LICENSE /opencanary/LICENSE
-COPY requirements.txt /opencanary/requirements.txt
-COPY setup.py /opencanary/setup.py
-
+# Create and set the working directory
 WORKDIR /opencanary
 
+# Copy only the files needed to install dependencies
+COPY opencanary/__init__.py ./opencanary/__init__.py
+COPY requirements.txt setup.py ./
+COPY bin /opencanary/bin
+
+# Install the required dependencies
 RUN pip install -r requirements.txt
 
+# Copy in the latest version
+COPY opencanary ./opencanary
+
+# Set the default application we are running
+ENTRYPOINT [ "opencanaryd" ]
+
+# Set the default arguments to be used for the entrypoint
+CMD [ "--dev" ]

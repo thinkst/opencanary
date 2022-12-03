@@ -1,11 +1,11 @@
 Email Alerts
 ============
 
-To have an OpenCanary daemon directly send email alerts edit the logger section of the *~/.opencanary.conf*. The file format is JSON.
+To have an OpenCanary daemon directly send email alerts to edit the logger section of the *~/.opencanary.conf*. The file format is JSON.
 
 In the configurations below, set these configuration variables:
 
-* **mailhost** - The SMTP mailhost and port.
+* **mailhost** - The SMTP mail host and port.
 * **fromaddr** - The from address. Usually does not have to exist.
 * **toaddres** - An array of addresses that will receive the alert. Keep it short.
 * **subject** - The email's subject.
@@ -14,7 +14,7 @@ In the configurations below, set these configuration variables:
   
 More information can be found on the `PyLogger page <https://docs.python.org/2/library/logging.handlers.html#logging.handlers.SMTPHandler>`_.
 
-Send to a GMail address
+Send to a Gmail address
 -----------------------
 
 .. code-block:: json
@@ -35,7 +35,7 @@ Send to a GMail address
         }
     }
 
-Depending on your ISP and their outbound spam protection mechanisms, you may need to send to TCP port 587, set up an `app password <https://support.google.com/accounts/answer/185833?hl=en>`_ and use credentials, as well as setting an empty tuple for the **secure** parameter. Your configuration would then look like:
+Depending on your ISP and their outbound spam protection mechanisms, you may need to send to TCP port 587, set up an `app password <https://support.google.com/accounts/answer/185833?hl=en>`_ and use credentials, as well as set an empty tuple for the **secure** parameter. Your configuration would then look like this:
 
 
 .. code-block:: json
@@ -80,3 +80,10 @@ Send with SMTP authentication
             }
         }
     }
+
+Environment Variables
+---------------------
+
+You can use environment variables in the configuration file to pass confidential information such as passwords or tokens from the host machine to the application.
+
+For more information, see the [Configuration page](../starting/configuration.rst#environment-variables).

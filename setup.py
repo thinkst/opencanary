@@ -1,7 +1,25 @@
-from setuptools import setup, find_packages
-
+import codecs
+import os.path
+from setuptools import setup, find_namespace_packages
 import sys
-import opencanary
+
+
+def read(rel_path):
+    here = os.path.abspath(os.path.dirname(__file__))
+    with codecs.open(os.path.join(here, rel_path), 'r') as fp:
+        return fp.read()
+
+def get_version(rel_path):
+    """
+    Reading the package version dynamically.
+    https://packaging.python.org/en/latest/guides/single-sourcing-package-version/
+    """
+    for line in read(rel_path).splitlines():
+        if line.startswith('__version__'):
+            delim = '"' if '"' in line else "'"
+            return line.split(delim)[1]
+    else:
+        raise RuntimeError("Unable to find version string.")
 
 requirements = [
     'Twisted==19.10.0',
@@ -13,32 +31,32 @@ requirements = [
     'PyPDF2==1.26.0',
     'fpdf==1.7.2',
     'passlib==1.7.1',
-    'Jinja2==2.10.1',
+    'Jinja2==3.0.1',
     'ntlmlib==0.72',
     'bcrypt==3.1.7',
-    'setuptools==44.0.0',
+    'setuptools==63.2.0',
     'hpfeeds==3.0.0']
 
-if sys.version_info.major < 3:
-    requirements.append('wsgiref==0.1.2')
 
 setup(
     name='opencanary',
-    version=opencanary.__version__,
+    version=get_version("opencanary/__init__.py"),
     url='http://www.thinkst.com/',
     author='Thinkst Applied Research',
     author_email='info@thinkst.com',
     description='OpenCanary daemon',
     long_description='A low interaction honeypot intended to be run on internal networks.',
     install_requires=requirements,
-    setup_requires=[
-        'setuptools_git'
-    ],
     license='BSD',
-    packages=find_packages(exclude='test'),
+    packages=find_namespace_packages(
+        exclude=[
+            'docs','docs*'
+            'opencanary.test','opencanary.test*'
+        ]
+    ),
+    include_package_data = True,
     scripts=['bin/opencanaryd','bin/opencanary.tac'],
     platforms='any',
-    include_package_data=True,
     classifiers=[
         "Development Status :: 5 - Production/Stable",
         "Intended Audience :: Developers",
@@ -50,7 +68,6 @@ setup(
         "Operating System :: Unix",
         "Operating System :: POSIX :: Linux",
         "Operating System :: POSIX :: BSD :: FreeBSD",
-        "Programming Language :: Python :: 2.7",
         "Programming Language :: Python :: 3",
         "Programming Language :: Python :: 3.5",
         "Programming Language :: Python :: 3.6",
