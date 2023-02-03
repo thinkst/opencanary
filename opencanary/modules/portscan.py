@@ -2,6 +2,7 @@ from opencanary.modules import CanaryService
 from opencanary.modules import FileSystemWatcher
 import os
 import re
+import shutil
 
 class SynLogWatcher(FileSystemWatcher):
     def __init__(self, logger=None, logFile=None, ignore_localhost=False):
@@ -88,17 +89,21 @@ class CanaryPortscan(CanaryService):
         except:
             self.lorate = 3
 
+    def getIptablesPath(self):
+        return shutil.which('iptables') or '/sbin/iptables'
+
     def startYourEngines(self, reactor=None):
         # Logging rules for loopback interface.
         # This is separate from the canaryfw rule as the canary watchdog was
         # causing console-side noise in the logs.
-        os.system('sudo /sbin/iptables -t mangle -D PREROUTING -p tcp -i lo -j LOG --log-level=warning --log-prefix="canaryfw: " -m limit --limit="{0}/hour"'.format(self.lorate))
-        os.system('sudo /sbin/iptables -t mangle -A PREROUTING -p tcp -i lo -j LOG --log-level=warning --log-prefix="canaryfw: " -m limit --limit="{0}/hour"'.format(self.lorate))
+        iptables_path=self.getIptablesPath()
+        os.system('sudo {0} -t mangle -D PREROUTING -p tcp -i lo -j LOG --log-level=warning --log-prefix="canaryfw: " -m limit --limit="{1}/hour"'.format(iptables_path, self.lorate))
+        os.system('sudo {0} -t mangle -A PREROUTING -p tcp -i lo -j LOG --log-level=warning --log-prefix="canaryfw: " -m limit --limit="{1}/hour"'.format(iptables_path, self.lorate))
 
         # Logging rules for canaryfw.
         # We ignore loopback interface traffic as it is taken care of in above rule
-        os.system('sudo /sbin/iptables -t mangle -D PREROUTING -p tcp --syn -j LOG --log-level=warning --log-prefix="canaryfw: " -m limit --limit="{0}/second" ! -i lo'.format(self.synrate))
-        os.system('sudo /sbin/iptables -t mangle -A PREROUTING -p tcp --syn -j LOG --log-level=warning --log-prefix="canaryfw: " -m limit --limit="{0}/second" ! -i lo'.format(self.synrate))
+        os.system('sudo {0} -t mangle -D PREROUTING -p tcp --syn -j LOG --log-level=warning --log-prefix="canaryfw: " -m limit --limit="{1}/second" ! -i lo'.format(iptables_path, self.synrate))
+        os.system('sudo {0} -t mangle -A PREROUTING -p tcp --syn -j LOG --log-level=warning --log-prefix="canaryfw: " -m limit --limit="{1}/second" ! -i lo'.format(iptables_path, self.synrate))
 
         # os.system('sudo /sbin/iptables -t mangle -D PREROUTING -p tcp {dst} --syn -j LOG --log-level=warning --log-prefix="canaryfw: " -m limit --limit="{synrate}/second"'
         #             .format(dst=(('--destination '+self.listen_addr) if len(self.listen_addr) else ''),
@@ -108,20 +113,20 @@ class CanaryPortscan(CanaryService):
         #                 synrate=self.synrate))
 
          # Match the T3 probe of the nmap OS detection based on TCP flags and TCP options string
-        os.system('sudo /sbin/iptables -t mangle -D PREROUTING -p tcp --tcp-flags ALL URG,PSH,SYN,FIN -m u32 --u32 "40=0x03030A01 && 44=0x02040109 && 48=0x080Affff && 52=0xffff0000 && 56=0x00000402" -j LOG --log-level=warning --log-prefix="canarynmap: " -m limit --limit="{0}/second"'.format(self.nmaposrate))
-        os.system('sudo /sbin/iptables -t mangle -A PREROUTING -p tcp --tcp-flags ALL URG,PSH,SYN,FIN -m u32 --u32 "40=0x03030A01 && 44=0x02040109 && 48=0x080Affff && 52=0xffff0000 && 56=0x00000402" -j LOG --log-level=warning --log-prefix="canarynmap: " -m limit --limit="{0}/second"'.format(self.nmaposrate))
+        os.system('sudo {0} -t mangle -D PREROUTING -p tcp --tcp-flags ALL URG,PSH,SYN,FIN -m u32 --u32 "40=0x03030A01 && 44=0x02040109 && 48=0x080Affff && 52=0xffff0000 && 56=0x00000402" -j LOG --log-level=warning --log-prefix="canarynmap: " -m limit --limit="{1}/second"'.format(iptables_path, self.nmaposrate))
+        os.system('sudo {0} -t mangle -A PREROUTING -p tcp --tcp-flags ALL URG,PSH,SYN,FIN -m u32 --u32 "40=0x03030A01 && 44=0x02040109 && 48=0x080Affff && 52=0xffff0000 && 56=0x00000402" -j LOG --log-level=warning --log-prefix="canarynmap: " -m limit --limit="{1}/second"'.format(iptables_path, self.nmaposrate))
 
         # Nmap Null Scan
-        os.system('sudo /sbin/iptables -t mangle -D PREROUTING -p tcp -m u32 --u32 "6&0xFF=0x6 && 0>>22&0x3C@12=0x50000400" -j LOG --log-level=warning --log-prefix="canarynmapNULL: " -m limit --limit="{0}/second"'.format(self.nmaposrate))
-        os.system('sudo /sbin/iptables -t mangle -A PREROUTING -p tcp -m u32 --u32 "6&0xFF=0x6 && 0>>22&0x3C@12=0x50000400" -j LOG --log-level=warning --log-prefix="canarynmapNULL: " -m limit --limit="{0}/second"'.format(self.nmaposrate))
+        os.system('sudo {0} -t mangle -D PREROUTING -p tcp -m u32 --u32 "6&0xFF=0x6 && 0>>22&0x3C@12=0x50000400" -j LOG --log-level=warning --log-prefix="canarynmapNULL: " -m limit --limit="{1}/second"'.format(iptables_path, self.nmaposrate))
+        os.system('sudo {0} -t mangle -A PREROUTING -p tcp -m u32 --u32 "6&0xFF=0x6 && 0>>22&0x3C@12=0x50000400" -j LOG --log-level=warning --log-prefix="canarynmapNULL: " -m limit --limit="{1}/second"'.format(iptables_path, self.nmaposrate))
 
         # Nmap Xmas Scan
-        os.system('sudo /sbin/iptables -t mangle -D PREROUTING -p tcp -m u32 --u32 "6&0xFF=0x6 && 0>>22&0x3C@12=0x50290400" -j LOG --log-level=warning --log-prefix="canarynmapXMAS: " -m limit --limit="{0}/second"'.format(self.nmaposrate))
-        os.system('sudo /sbin/iptables -t mangle -A PREROUTING -p tcp -m u32 --u32 "6&0xFF=0x6 && 0>>22&0x3C@12=0x50290400" -j LOG --log-level=warning --log-prefix="canarynmapXMAS: " -m limit --limit="{0}/second"'.format(self.nmaposrate))
+        os.system('sudo {0} -t mangle -D PREROUTING -p tcp -m u32 --u32 "6&0xFF=0x6 && 0>>22&0x3C@12=0x50290400" -j LOG --log-level=warning --log-prefix="canarynmapXMAS: " -m limit --limit="{1}/second"'.format(iptables_path, self.nmaposrate))
+        os.system('sudo {0} -t mangle -A PREROUTING -p tcp -m u32 --u32 "6&0xFF=0x6 && 0>>22&0x3C@12=0x50290400" -j LOG --log-level=warning --log-prefix="canarynmapXMAS: " -m limit --limit="{1}/second"'.format(iptables_path, self.nmaposrate))
 
         # Nmap Fin Scan
-        os.system('sudo /sbin/iptables -t mangle -D PREROUTING -p tcp -m u32 --u32 "6&0xFF=0x6 && 0>>22&0x3C@12=0x50010400" -j LOG --log-level=warning --log-prefix="canarynmapFIN: " -m limit --limit="{0}/second"'.format(self.nmaposrate))
-        os.system('sudo /sbin/iptables -t mangle -A PREROUTING -p tcp -m u32 --u32 "6&0xFF=0x6 && 0>>22&0x3C@12=0x50010400" -j LOG --log-level=warning --log-prefix="canarynmapFIN: " -m limit --limit="{0}/second"'.format(self.nmaposrate))
+        os.system('sudo {0} -t mangle -D PREROUTING -p tcp -m u32 --u32 "6&0xFF=0x6 && 0>>22&0x3C@12=0x50010400" -j LOG --log-level=warning --log-prefix="canarynmapFIN: " -m limit --limit="{1}/second"'.format(iptables_path, self.nmaposrate))
+        os.system('sudo {0} -t mangle -A PREROUTING -p tcp -m u32 --u32 "6&0xFF=0x6 && 0>>22&0x3C@12=0x50010400" -j LOG --log-level=warning --log-prefix="canarynmapFIN: " -m limit --limit="{1}/second"'.format(iptables_path, self.nmaposrate))
 
         fs = SynLogWatcher(logFile=self.audit_file, logger=self.logger, ignore_localhost=self.ignore_localhost)
         fs.start()
