@@ -9,6 +9,8 @@ from random import randint
 
 import struct
 import re
+import string
+import random
 
 UINT_MAX = 0xFFFFFFFF
 
@@ -78,9 +80,13 @@ class MySQL(Protocol, TimeoutMixin):
     def server_greeting(self):
         # struct.pack returns a byte string
         _threadid = struct.pack('<I', self.threadid)
-        # TODO: randomize salts embedded here
-        data = b'\x0a' + self.factory.canaryservice.banner + b'\x00' + _threadid + b'\x25\x73\x36\x51\x74\x77\x75\x69\x00\xff\xf7\x08\x02\x00\x0f\x80\x15\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x2e\x47\x5c\x78\x67\x7a\x4f\x5b\x5c\x3e\x5c\x39\x00\x6d\x79\x73\x71\x6c\x5f\x6e\x61\x74\x69\x76\x65\x5f\x70\x61\x73\x73\x77\x6f\x72\x64\x00'
+        salt1, salt2 = self.gen_salt(8), self.gen_salt(12) 
+        data = b'\x0a' + self.factory.canaryservice.banner + b'\x00' + _threadid + salt1 + b'\x00\xff\xf7\x08\x02\x00\x0f\x80\x15\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00' + salt2 + b'\x00\x6d\x79\x73\x71\x6c\x5f\x6e\x61\x74\x69\x76\x65\x5f\x70\x61\x73\x73\x77\x6f\x72\x64\x00'
         return self.build_packet(0x00, data)
+
+    def gen_salt(self, length):
+        charset = string.punctuation+string.ascii_letters+string.digits
+        return b''.join(bytes(random.choice(charset), "utf-8") for _ in range(length))
 
     def access_denied(self, seq_id, user, password=None):
         Y = "YES" if password else "NO"
@@ -122,6 +128,7 @@ class MySQL(Protocol, TimeoutMixin):
             elif payload is not None:
                 # seq_id == 1 and payload has arrived
                 username, password = self.parse_auth(payload)
+                username = bytes(str(username)[2:-1], "utf-8")
                 if username:
                     logdata = {'USERNAME': username, 'PASSWORD': password}
                     self.factory.canaryservice.log(logdata, transport=self.transport)
