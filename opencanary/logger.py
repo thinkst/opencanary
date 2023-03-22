@@ -335,7 +335,11 @@ class WebhookHandler(logging.Handler):
         if self.data is None:
             data = mapping
         else:
-            data = map_string(deepcopy(self.data), mapping)
+            if isinstance(self.data, dict):
+                data = dict(self.data)
+            else:
+                data = self.data
+            data = map_string(deepcopy(data), mapping)
 
         if "application/json" in self.kwargs.get("headers", {}).values():
             response = requests.request(method=self.method, url=self.url, json=data, **self.kwargs)
