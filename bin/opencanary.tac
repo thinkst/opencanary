@@ -8,6 +8,7 @@ from pkg_resources import iter_entry_points
 from opencanary.config import config
 from opencanary.logger import getLogger
 from opencanary.modules.http import CanaryHTTP
+from opencanary.modules.https import CanaryHTTPS
 from opencanary.modules.ftp import CanaryFTP
 from opencanary.modules.ssh import CanarySSH
 from opencanary.modules.telnet import Telnet
@@ -26,9 +27,9 @@ from opencanary.modules.tcpbanner import CanaryTCPBanner
 #from opencanary.modules.example1 import CanaryExample1
 
 ENTRYPOINT = "canary.usermodule"
-MODULES = [Telnet, CanaryHTTP, CanaryFTP, CanarySSH, HTTPProxy, CanaryMySQL,
-           MSSQL, CanaryVNC, CanaryTftp, CanaryNtp, CanarySIP, CanaryGit,
-           CanaryTCPBanner, CanaryRedis]
+MODULES = [Telnet, CanaryHTTP, CanaryHTTPS, CanaryFTP, CanarySSH, HTTPProxy,
+           CanaryMySQL, MSSQL, CanaryVNC, CanaryTftp, CanaryNtp, CanarySIP,
+           CanaryGit, CanaryTCPBanner, CanaryRedis]
            #CanaryExample0, CanaryExample1]
 
 if config.moduleEnabled('rdp'):
