@@ -387,12 +387,13 @@ class TestRDPModule(unittest.TestCase):
         # Negotiation request
         packet += b"\x01\x00\x08\x00\x03\x00\x00\x00"
         self.connection.sendall(packet)
+        time.sleep(1)
 
         last_log = get_last_log()
         self.assertEqual(last_log["logdata"]["USERNAME"], "test_rdp_user")
         self.assertEqual(last_log["dst_port"], 3389)
 
-    def test_rdp_with_user_cookie(self):
+    def test_rdp_connection_with_no_user_details(self):
         """
         Login to the RDP server and pass the username in the connection request
         """
@@ -407,6 +408,7 @@ class TestRDPModule(unittest.TestCase):
         # Negotiation request
         packet += b"\x01\x00\x08\x00\x03\x00\x00\x00"
         self.connection.sendall(packet)
+        time.sleep(1)
 
         last_log = get_last_log()
         self.assertEqual(last_log["logdata"]["USERNAME"], None)
