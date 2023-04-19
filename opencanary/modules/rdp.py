@@ -8,8 +8,8 @@ from twisted.internet.protocol import Factory
 
 class RemoteDesktopProtocol(Protocol):
     """
-    A simple service that logs RDP connection attempts.
-    Does not implement Network Level Authentication (NLA)
+    A simple service that logs RDP connection attempts
+    and always responds with a negotiation failure
     """
 
     def dataReceived(self, data):
@@ -23,9 +23,21 @@ class RemoteDesktopProtocol(Protocol):
         # Log the connection attempt
         self.factory.log(logdata={"USERNAME": username}, transport=self.transport)
 
-        # Always respond with a negotiation failure
+        # Always respond with a negotiation failure, details from
         # https://learn.microsoft.com/en-us/openspecs/windows_protocols/ms-rdpbcgr/1b3920e7-0116-4345-bc45-f2c4ad012761
-        self.transport.write(b"0x3 RDP_NEG_FAILURE")
+        # type (1 byte): An 8-bit, unsigned integer that indicates the packet type.
+        # This field MUST be set to 0x03 (TYPE_RDP_NEG_FAILURE).
+        response_type = b"\x03"
+        # flags (1 byte): An 8-bit, unsigned integer that contains protocol flags.
+        # There are currently no defined flags, so the field MUST be set to 0x00.
+        flags = b"\x00"
+        # length (2 bytes): A 16-bit, unsigned integer that specifies the packet size.
+        # This field MUST be set to 0x0008 (8 bytes).
+        length = b"\x00\x08"
+        # failureCode (4 bytes): A 32-bit, unsigned integer that specifies the failure code.
+        # We use SSL_WITH_USER_AUTH_REQUIRED_BY_SERVER
+        failure_code = b"\x00\x00\x00\x06"
+        self.transport.write(response_type + flags + length + failure_code)
         self.transport.loseConnection()
 
 
