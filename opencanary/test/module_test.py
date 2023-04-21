@@ -395,7 +395,7 @@ class TestRDPModule(unittest.TestCase):
 
     def test_rdp_connection_with_no_user_details(self):
         """
-        Login to the RDP server and pass the username in the connection request
+        Connect to the RDP server, but do not pass a username (e.g. namp scan)
         """
         self.connection = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         self.connection.connect(("localhost", 3389))
