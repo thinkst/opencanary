@@ -1,6 +1,4 @@
-HTTP Webhook Alerts
-====================
-
+# HTTP Webhook Alerts
 OpenCanary includes a customizable Webhook logging handler to send data to an HTTP endpoint. The handler has a few defaults for a basic configuration but is flexible enough that it can be customized for advanced usage.
 
 The following configuration options are required for this handler:
@@ -91,5 +89,5 @@ Add query parameters. For example to add `?test=yes&redirect=no` you would use:
 ```
 Disable SSL verification
 ```json
-"verify": False
+"verify": false
 ```
