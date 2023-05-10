@@ -62,8 +62,8 @@ For example, if you use the following ignore list:
 The following logs will drop:
 
 ```json
-{"dst_host": "192.0.2.5", "dst_port": ...}
-{"src_host": "192.0.2.20", "src_port": ...}
+{"dst_host": "192.0.2.5", "dst_port": "..."}
+{"src_host": "192.0.2.20", "src_port": "..."}
 ```
 
 ### Advanced Additional Options

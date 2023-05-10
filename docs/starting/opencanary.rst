@@ -2,7 +2,7 @@ OpenCanary
 ==========
 
 Getting Started
---------------
+----------------
 
 To get started create a virtual environment to play in:
 
@@ -26,22 +26,22 @@ alerts to a file.
 
 .. code-block:: json
 
-   {
-       "device.node_id": "Your-very-own-unique-name",
-       [...]
-        "logger": {
-	    "class" : "PyLogger",
-	    "kwargs" : {
-	        "handlers": {
-	            "file": {
-		        "class": "logging.FileHandler",
-		        "filename": "/var/tmp/opencanary.log"
-			}
-	         }
-	    }
-       }
-      [...]
-   }
+    {
+      "device.node_id": "Your-very-own-unique-name",
+      // ...
+      "logger": {
+        "class": "PyLogger",
+        "kwargs": {
+          "handlers": {
+            "file": {
+              "class": "logging.FileHandler",
+              "filename": "/var/tmp/opencanary.log"
+            }
+          }
+        }
+      }
+      // ...
+    }
 
 
 With that in place, we can run the daemon and test that it logs a failed FTP login attempt to the log file.
