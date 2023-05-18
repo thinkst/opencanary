@@ -45,10 +45,12 @@ class TCPBannerProtocol(Protocol):
                 if hasattr(socket, 'TCP_KEEPIDLE'):
                     # overrides value (in seconds) of system-wide ipv4 tcp_keepalive_time
                     self.transport.getHandle().setsockopt(socket.SOL_TCP, socket.TCP_KEEPIDLE, self.keep_alive_idle)
-                # overrides value (in seconds) of system-wide ipv4 tcp_keepalive_intvl
-                self.transport.getHandle().setsockopt(socket.SOL_TCP, socket.TCP_KEEPINTVL, self.keep_alive_interval)
-                # overrides value (in seconds) of system-wide ipv4 tcp_keepalive_probes
-                self.transport.getHandle().setsockopt(socket.SOL_TCP, socket.TCP_KEEPCNT, self.keep_alive_probes)
+                if hasattr(socket, 'TCP_KEEPINTVL'):
+                    # overrides value (in seconds) of system-wide ipv4 tcp_keepalive_intvl
+                    self.transport.getHandle().setsockopt(socket.SOL_TCP, socket.TCP_KEEPINTVL, int(self.keep_alive_interval))
+                if hasattr(socket, 'TCP_KEEPCNT'):
+                    # overrides value (in seconds) of system-wide ipv4 tcp_keepalive_probes
+                    self.transport.getHandle().setsockopt(socket.SOL_TCP, socket.TCP_KEEPCNT, self.keep_alive_probes)
                 # set keep alive on socket
                 self.transport.setTcpKeepAlive(1)
 
