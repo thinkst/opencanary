@@ -27,24 +27,32 @@ from opencanary.modules.sip import CanarySIP
 from opencanary.modules.git import CanaryGit
 from opencanary.modules.redis import CanaryRedis
 from opencanary.modules.tcpbanner import CanaryTCPBanner
+from opencanary.modules.rdp import CanaryRDP
 
 #from opencanary.modules.example0 import CanaryExample0
 #from opencanary.modules.example1 import CanaryExample1
 
 ENTRYPOINT = "canary.usermodule"
-MODULES = [Telnet, CanaryHTTP, CanaryHTTPS, CanaryFTP, CanarySSH, HTTPProxy,
-           CanaryMySQL, MSSQL, CanaryVNC, CanaryTftp, CanaryNtp, CanarySIP,
-           CanaryGit, CanaryTCPBanner, CanaryRedis]
-           #CanaryExample0, CanaryExample1]
-
-if config.moduleEnabled('rdp'):
-    try:
-        #Module needs RDP, but the rest of OpenCanary doesn't
-        from opencanary.modules.rdp import CanaryRDP
-        MODULES.append(CanaryRDP)
-    except ImportError:
-        print("Can't import RDP. Please ensure you have RDP installed.")
-        pass
+MODULES = [
+    CanaryFTP,
+    CanaryGit,
+    CanaryHTTP,
+    CanaryHTTPS,
+    CanaryMySQL,
+    CanaryNtp,
+    CanaryRDP,
+    CanaryRedis,
+    CanarySIP,
+    CanarySSH,
+    CanaryTCPBanner,
+    CanaryTftp,
+    CanaryVNC,
+    HTTPProxy,
+    MSSQL,
+    Telnet,
+    # CanaryExample0,
+    # CanaryExample1,
+]
 
 if config.moduleEnabled('snmp'):
     try:
