@@ -18,6 +18,7 @@ dist/
 downloads/
 eggs/
 .eggs/
+launchctl/
 lib/
 lib64/
 parts/
@@ -121,3 +122,6 @@ dmypy.json
 
 # PyCharm user settings
 .idea/
+
+# MacOS detritus
+.DS_Store
