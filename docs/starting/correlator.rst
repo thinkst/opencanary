@@ -32,12 +32,12 @@ In the config file, fill the Twilio or mandrill details (or both), and the notif
      "console.email_notification_enable": true,
      "console.email_notification_address": ["notifications@opencanary.org"],
      "console.slack_notification_enable": true,
-     "console.slack_notification_webhook": ["https://hooks.slack.com/services/example/webhookdata"]
+     "console.slack_notification_webhook": ["https://hooks.slack.com/services/example/webhookdata"],
      "twilio.auth_token": "fae9206628714fb2ce00f72e94f2258f",
-     "twilio.from_number": ""+1201253234"",
+     "twilio.from_number": "+1201253234",
      "twilio.sid": "BD742385c0810b431fe2ddb9fc327c85ad",
      "console.mandrill_key": "9HCjwugWjibxww7kPFej",
-     "scans.network_portscan_horizon": 1000,
+     "scans.network_portscan_horizon": 1000
    }
 
 With that in place, ensure that Redis is running and then run the correlator daemon.
@@ -51,18 +51,18 @@ To configure OpenCanary daemons to send their events to the correlator, edit the
 
 .. code-block:: json
 
-   "logger": {
-	"class" : "PyLogger",
-	"kwargs" : {
-	    "handlers": {
-		"json-tcp": {
-		    "class": "opencanary.logger.SocketJSONHandler",
-		    "host": "127.0.0.1", # change to correlator IP
-		    "port": 1514
-		}
-	    }
-	}
-   }
+  "logger": {
+    "class": "PyLogger",
+    "kwargs": {
+      "handlers": {
+        "json-tcp": {
+          "class": "opencanary.logger.SocketJSONHandler",
+          "host": "127.0.0.1",  // change to correlator IP
+          "port": 1514
+        }
+      }
+    }
+  }
  
 
 Troubleshooting

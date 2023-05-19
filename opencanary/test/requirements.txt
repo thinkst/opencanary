@@ -1,5 +1,5 @@
 requests
-paramiko
+paramiko==2.12.0
 PyMySQL
 gitpython
 pytest

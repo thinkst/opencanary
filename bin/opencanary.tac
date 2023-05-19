@@ -1,5 +1,10 @@
 import traceback
-
+# import warnings
+# warnings.filterwarnings("ignore", category=DeprecationWarning)
+def warn(*args, **kwargs):
+    pass
+import warnings
+warnings.warn = warn
 from twisted.application import service
 from twisted.application import internet
 from twisted.internet.protocol import Factory
@@ -8,6 +13,7 @@ from pkg_resources import iter_entry_points
 from opencanary.config import config
 from opencanary.logger import getLogger
 from opencanary.modules.http import CanaryHTTP
+from opencanary.modules.https import CanaryHTTPS
 from opencanary.modules.ftp import CanaryFTP
 from opencanary.modules.ssh import CanarySSH
 from opencanary.modules.telnet import Telnet
@@ -21,24 +27,32 @@ from opencanary.modules.sip import CanarySIP
 from opencanary.modules.git import CanaryGit
 from opencanary.modules.redis import CanaryRedis
 from opencanary.modules.tcpbanner import CanaryTCPBanner
+from opencanary.modules.rdp import CanaryRDP
 
 #from opencanary.modules.example0 import CanaryExample0
 #from opencanary.modules.example1 import CanaryExample1
 
 ENTRYPOINT = "canary.usermodule"
-MODULES = [Telnet, CanaryHTTP, CanaryFTP, CanarySSH, HTTPProxy, CanaryMySQL,
-           MSSQL, CanaryVNC, CanaryTftp, CanaryNtp, CanarySIP, CanaryGit,
-           CanaryTCPBanner, CanaryRedis]
-           #CanaryExample0, CanaryExample1]
-
-if config.moduleEnabled('rdp'):
-    try:
-        #Module needs RDP, but the rest of OpenCanary doesn't
-        from opencanary.modules.rdp import CanaryRDP
-        MODULES.append(CanaryRDP)
-    except ImportError:
-        print("Can't import RDP. Please ensure you have RDP installed.")
-        pass
+MODULES = [
+    CanaryFTP,
+    CanaryGit,
+    CanaryHTTP,
+    CanaryHTTPS,
+    CanaryMySQL,
+    CanaryNtp,
+    CanaryRDP,
+    CanaryRedis,
+    CanarySIP,
+    CanarySSH,
+    CanaryTCPBanner,
+    CanaryTftp,
+    CanaryVNC,
+    HTTPProxy,
+    MSSQL,
+    Telnet,
+    # CanaryExample0,
+    # CanaryExample1,
+]
 
 if config.moduleEnabled('snmp'):
     try:

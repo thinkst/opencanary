@@ -184,6 +184,93 @@ class TestHTTPModule(unittest.TestCase):
         self.assertEqual(request.status_code, 200)
 
 
+class TestHTTPSModule(unittest.TestCase):
+    """
+    Tests the cases for the HTTP module.
+
+    The HTTP server should look like a NAS and present a login box, any
+    interaction with the server (GET, POST) should be logged.
+    """
+    def test_get_http_home_page(self):
+        """
+        Simply get the home page.
+        """
+        request = requests.get('https://localhost/', verify=False)
+        self.assertEqual(request.status_code, 200)
+        self.assertIn('Synology DiskStation', request.text)
+        last_log = get_last_log()
+        self.assertEqual(last_log['dst_port'], 443)
+        self.assertEqual(last_log['logdata']['HOSTNAME'], "localhost")
+        self.assertEqual(last_log['logdata']['PATH'], "/index.html")
+        self.assertIn('python-requests', last_log['logdata']['USERAGENT'])
+
+    def test_log_in_to_http_with_basic_auth(self):
+        """
+        Try to log into the site with basic auth.
+        """
+        request = requests.post('https://localhost/', auth=('user', 'pass'), verify=False)
+        # Currently the web server returns 200, but in future it should return
+        # a 403 status code.
+        self.assertEqual(request.status_code, 200)
+        self.assertIn('Synology DiskStation', request.text)
+        last_log = get_last_log()
+        self.assertEqual(last_log['dst_port'], 443)
+        self.assertEqual(last_log['logdata']['HOSTNAME'], "localhost")
+        self.assertEqual(last_log['logdata']['PATH'], "/index.html")
+        self.assertIn('python-requests', last_log['logdata']['USERAGENT'])
+        # OpenCanary doesn't currently record credentials from basic auth.
+
+    def test_log_in_to_http_with_parameters(self):
+        """
+        Try to log into the site by posting the parameters
+        """
+        login_data = {
+            'username': 'test_user',
+            'password': 'test_pass',
+            'OTPcode': '',
+            'rememberme': '',
+            '__cIpHeRtExt': '',
+            'isIframeLogin': 'yes'}
+        request = requests.post('https://localhost/index.html', data=login_data, verify=False)
+        # Currently the web server returns 200, but in future it should return
+        # a 403 status code.
+        self.assertEqual(request.status_code, 200)
+        self.assertIn('Synology DiskStation', request.text)
+        last_log = get_last_log()
+        self.assertEqual(last_log['dst_port'], 443)
+        self.assertEqual(last_log['logdata']['HOSTNAME'], "localhost")
+        self.assertEqual(last_log['logdata']['PATH'], "/index.html")
+        self.assertIn('python-requests', last_log['logdata']['USERAGENT'])
+        self.assertEqual(last_log['logdata']['USERNAME'], "test_user")
+        self.assertEqual(last_log['logdata']['PASSWORD'], "test_pass")
+
+    def test_get_directory_listing(self):
+        """
+        Try to get a directory listing should result in a 403 Forbidden message.
+        """
+        request = requests.get('https://localhost/css/', verify=False)
+        self.assertEqual(request.status_code, 403)
+        self.assertIn('Forbidden', request.text)
+        # These request are not logged at the moment. Maybe we should.
+
+    def test_get_non_existent_file(self):
+        """
+        Try to get a file that doesn't exist should give a 404 error message.
+        """
+        request = requests.get('https://localhost/this/file/doesnt_exist.txt', verify=False)
+        self.assertEqual(request.status_code, 404)
+        self.assertIn('Not Found', request.text)
+        # These request are not logged at the moment. Maybe we should.
+
+    def test_get_supporting_image_file(self):
+        """
+        Try to download a supporting image file
+        """
+        request = requests.get('https://localhost/img/synohdpack/images/Components/checkbox.png', verify=False)
+        # Just an arbitrary image
+        self.assertEqual(request.status_code, 200)
+
+
 class TestSSHModule(unittest.TestCase):
     """
     Tests the cases for the SSH server
@@ -276,6 +363,56 @@ class TestMySQLModule(unittest.TestCase):
         self.assertEqual(last_log['logdata']['USERNAME'], "test_user")
 #        self.assertEqual(last_log['logdata']['PASSWORD'], "b2e5ed6a0e59f99327399ced2009338d5c0fe237")
         self.assertEqual(last_log['dst_port'], 3306)
+
+
+class TestRDPModule(unittest.TestCase):
+    """
+    Tests the RDP Server
+    """
+
+    def test_rdp_with_user_cookie(self):
+        """
+        Login to the RDP server and pass the username in the connection request
+        """
+        self.connection = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        self.connection.connect(("localhost", 3389))
+        packet = b""
+        # https://learn.microsoft.com/en-us/openspecs/windows_protocols/ms-rdpbcgr/902b090b-9cb3-4efc-92bf-ee13373371e3
+        # TPKT details
+        packet += b"\x03\x00\x00\x33"
+        # ISO connection
+        packet += b"\x2e\xe0\x00\x00\x00\x00\x00"
+        # RDP Cookie
+        packet += b"Cookie: mstshash=test_rdp_user"
+        # Negotiation request
+        packet += b"\x01\x00\x08\x00\x03\x00\x00\x00"
+        self.connection.sendall(packet)
+        time.sleep(1)
+
+        last_log = get_last_log()
+        self.assertEqual(last_log["logdata"]["USERNAME"], "test_rdp_user")
+        self.assertEqual(last_log["dst_port"], 3389)
+
+    def test_rdp_connection_with_no_user_details(self):
+        """
+        Connect to the RDP server, but do not pass a username (e.g. namp scan)
+        """
+        self.connection = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        self.connection.connect(("localhost", 3389))
+        packet = b""
+        # https://learn.microsoft.com/en-us/openspecs/windows_protocols/ms-rdpbcgr/902b090b-9cb3-4efc-92bf-ee13373371e3
+        # TPKT details
+        packet += b"\x03\x00\x00\x13"
+        # ISO connection
+        packet += b"\x0e\xe0\x00\x00\x00\x00\x01"
+        # Negotiation request
+        packet += b"\x01\x00\x08\x00\x03\x00\x00\x00"
+        self.connection.sendall(packet)
+        time.sleep(1)
+
+        last_log = get_last_log()
+        self.assertEqual(last_log["logdata"]["USERNAME"], None)
+        self.assertEqual(last_log["dst_port"], 3389)
 
 
 if __name__ == '__main__':
