@@ -15,7 +15,7 @@ Inside ~/.opencanary.conf:
 
 Below is an example of an `smb.conf` for a Samba installation, 
 
-.. code-block:: json
+.. code-block:: dosini
 
     [global]
        workgroup = WORKGROUP
@@ -61,7 +61,7 @@ OpenCanary daemon is watching (above we set it as `/var/log/samba-audit.log`).
 In the above config, we are relying on Samba using Syslog (rsyslog in newer systems). For our Samba
 to use rsyslog, we will edit the `/etc/rsyslog.conf` file. Below are two lines we add to the bottom,
 
-.. code-block:: json
+.. code-block:: unixconfig
 
     $FileCreateMode 0644
     local7.*            /var/log/samba-audit.log

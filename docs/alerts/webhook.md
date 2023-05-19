@@ -1,6 +1,4 @@
-HTTP Webhook Alerts
-====================
-
+# HTTP Webhook Alerts
 OpenCanary includes a customizable Webhook logging handler to send data to an HTTP endpoint. The handler has a few defaults for a basic configuration but is flexible enough that it can be customized for advanced usage.
 
 The following configuration options are required for this handler:
@@ -64,8 +62,8 @@ For example, if you use the following ignore list:
 The following logs will drop:
 
 ```json
-{"dst_host": "192.0.2.5", "dst_port": ...}
-{"src_host": "192.0.2.20", "src_port": ...}
+{"dst_host": "192.0.2.5", "dst_port": "..."}
+{"src_host": "192.0.2.20", "src_port": "..."}
 ```
 
 ### Advanced Additional Options
@@ -91,5 +89,5 @@ Add query parameters. For example to add `?test=yes&redirect=no` you would use:
 ```
 Disable SSL verification
 ```json
-"verify": False
+"verify": false
 ```

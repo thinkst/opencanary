@@ -19,7 +19,7 @@ Send to a Gmail address
 
 .. code-block:: json
 
-   [..] # Services configuration
+   // [..] # Services configuration
        "logger": {
        "class" : "PyLogger",
        "kwargs" : {
@@ -40,7 +40,7 @@ Depending on your ISP and their outbound spam protection mechanisms, you may nee
 
 .. code-block:: json
 
-   [..] # Services configuration
+   // [..] # Services configuration
        "logger": {
        "class" : "PyLogger",
        "kwargs" : {
@@ -63,7 +63,7 @@ Send with SMTP authentication
 
 .. code-block:: json
 
-   [..] # Services configuration
+   // [..] # Services configuration
        "logger": {
        "class" : "PyLogger",
        "kwargs" : {
