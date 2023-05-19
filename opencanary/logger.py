@@ -1,3 +1,4 @@
+from copy import deepcopy
 import simplejson as json
 import logging.config
 import socket
@@ -334,8 +335,12 @@ class WebhookHandler(logging.Handler):
         if self.data is None:
             data = mapping
         else:
-            # Due to the recursive function, sending a shallow copy of self.data here is fine.
-            data = map_string(dict(self.data), mapping)
+            if isinstance(self.data, dict):
+                # Casting logging.config.ConvertingDict to a standard dict
+                data = dict(self.data)
+            else:
+                data = self.data
+            data = map_string(deepcopy(data), mapping)
 
         if "application/json" in self.kwargs.get("headers", {}).values():
             response = requests.request(method=self.method, url=self.url, json=data, **self.kwargs)
