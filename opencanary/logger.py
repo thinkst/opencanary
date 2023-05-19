@@ -336,6 +336,7 @@ class WebhookHandler(logging.Handler):
             data = mapping
         else:
             if isinstance(self.data, dict):
+                # Casting logging.config.ConvertingDict to a standard dict
                 data = dict(self.data)
             else:
                 data = self.data
