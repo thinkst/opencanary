@@ -16,6 +16,15 @@ jobs:
       id-token: write  # IMPORTANT: this permission is mandatory for trusted publishing
     steps:
     # retrieve your distributions here
-
+    - name: Set up Python 
+      uses: actions/setup-python@v3
+    - name: "Check out repository code"
+      uses: "actions/checkout@v3"
+    - name: Install setuptools
+      run: pip3 install setuptools>=63.2.0
+    - name: Install wheel
+      run: pip3 install wheel
+    - name: Create package
+      run: python3 setup.py sdist
     - name: Publish package distributions to PyPI
       uses: pypa/gh-action-pypi-publish@release/v1
