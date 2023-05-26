@@ -1,3 +1,10 @@
+on:
+ workflow_dispatch:
+    inputs:
+      console-branch:
+        description: "Branch of the console to pull for build. Defaults to master"
+        required: false
+
 jobs:
   pypi-publish:
     name: Upload release to PyPI
