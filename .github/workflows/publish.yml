@@ -28,5 +28,17 @@ jobs:
     - name: check version matches tag
       run: |
             python3 -m pip install dist/*
+            version_to_release = opencanaryd --version
+            tag_name = ${{ github.event.release.tag_name }}
+            if [[ "$version_to_release" == "$tag_name" ]]; then
+                echo "Versions match "
+                exit 0
+            else
+              echo "Versions do not match"
+              echo "$version_to_release"
+              echo "$tag_name" 
+              exit 1
+            fi
+    
     - name: Publish package distributions to PyPI
       uses: pypa/gh-action-pypi-publish@release/v1
