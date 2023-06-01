@@ -31,13 +31,13 @@ jobs:
             version_to_release=$(opencanaryd --version)
             tag_name="${{ github.event.release.tag_name }}"
             tag_name_without_v="${tag_name#v}"
-            if [[ "$version_to_release" == "$tag_name" ]]; then
+            if [[ "$version_to_release" == "$tag_name_without_v" ]]; then
                 echo "Versions match - may it be a great release"
                 exit 0
             else
               echo "Versions do not match - not publishing"
-              echo "$version_to_release"
-              echo "$tag_name" 
+              echo "Opencanary version is: $version_to_release"
+              echo "Git tag is: $tag_name -> $tag_name_without_v" 
               exit 1
             fi
     
