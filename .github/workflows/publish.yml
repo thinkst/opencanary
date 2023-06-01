@@ -28,8 +28,8 @@ jobs:
     - name: check version matches tag
       run: |
             python3 -m pip install dist/*
-            version_to_release = opencanaryd --version
-            tag_name = ${{ github.event.release.tag_name }}
+            version_to_release=$(opencanaryd --version)
+            tag_name="${{ github.event.release.tag_name }}"
             if [[ "$version_to_release" == "$tag_name" ]]; then
                 echo "Versions match "
                 exit 0
