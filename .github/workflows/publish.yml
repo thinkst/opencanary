@@ -25,5 +25,8 @@ jobs:
       run: pip3 install wheel
     - name: Create package
       run: python3 setup.py sdist
+    - name: check version matches tag
+      run: |
+            python3 -m pip install dist/*
     - name: Publish package distributions to PyPI
       uses: pypa/gh-action-pypi-publish@release/v1
