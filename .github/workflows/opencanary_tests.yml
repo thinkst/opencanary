@@ -1,8 +1,8 @@
 name: OpenCanary Tests
 
 on:
-  - "pull_request"
   - "push"
+  - "pull_request"
 jobs:
   opencanary_tests:
     strategy:
