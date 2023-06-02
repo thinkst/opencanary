@@ -10,7 +10,7 @@ jobs:
     runs-on: ubuntu-latest
     environment:
       name: release
-      url: https://pypi.org/p/opencanary-fork
+      url: https://pypi.org/p/opencanary
     permissions:
       id-token: write  # IMPORTANT: this permission is mandatory for trusted publishing
     steps:
