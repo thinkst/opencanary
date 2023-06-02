@@ -42,7 +42,7 @@ requirements = [
 
 
 setup(
-    name='opencanary-fork',
+    name='opencanary',
     version=get_version("opencanary/__init__.py"),
     url='http://www.thinkst.com/',
     author='Thinkst Applied Research',
