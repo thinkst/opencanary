@@ -59,7 +59,7 @@ class SynLogWatcher(FileSystemWatcher):
             data['logdata']  = kv
             if self.ignore_localhost and data.get('src_host', False) == '127.0.0.1':
                 continue
-            if data.get('dst_port', "") in self.ignore_ports:
+            if int(data.get('dst_port', -1)) in self.ignore_ports:
                 continue
 
             
