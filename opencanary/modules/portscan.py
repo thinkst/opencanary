@@ -5,9 +5,10 @@ import re
 import shutil
 
 class SynLogWatcher(FileSystemWatcher):
-    def __init__(self, logger=None, logFile=None, ignore_localhost=False):
+    def __init__(self, logger=None, logFile=None, ignore_localhost=False, ignore_ports=[]):
         self.logger = logger
         self.ignore_localhost = ignore_localhost
+        self.ignore_ports = ignore_ports
         #print ('SynLogWatcher started')
         FileSystemWatcher.__init__(self, fileName=logFile)
 
@@ -58,6 +59,9 @@ class SynLogWatcher(FileSystemWatcher):
             data['logdata']  = kv
             if self.ignore_localhost and data.get('src_host', False) == '127.0.0.1':
                 continue
+            if int(data.get('dst_port', -1)) in self.ignore_ports:
+                continue
+
             
             self.logger.log(data)
 
@@ -71,7 +75,8 @@ class CanaryPortscan(CanaryService):
         self.nmaposrate = config.getVal('portscan.nmaposrate', default='5')
         self.lorate = config.getVal('portscan.lorate', default='3')
         self.listen_addr = config.getVal('device.listen_addr', default='')
-        self.ignore_localhost =config.getVal('portscan.ignore_localhost', default=False)
+        self.ignore_localhost = config.getVal('portscan.ignore_localhost', default=False)
+        self.ignore_ports = config.getVal('portscan.ignore_ports', default=[])
         self.config = config
 
         try:
@@ -128,7 +133,7 @@ class CanaryPortscan(CanaryService):
         os.system('sudo {0} -t mangle -D PREROUTING -p tcp -m u32 --u32 "6&0xFF=0x6 && 0>>22&0x3C@12=0x50010400" -j LOG --log-level=warning --log-prefix="canarynmapFIN: " -m limit --limit="{1}/second"'.format(iptables_path, self.nmaposrate))
         os.system('sudo {0} -t mangle -A PREROUTING -p tcp -m u32 --u32 "6&0xFF=0x6 && 0>>22&0x3C@12=0x50010400" -j LOG --log-level=warning --log-prefix="canarynmapFIN: " -m limit --limit="{1}/second"'.format(iptables_path, self.nmaposrate))
 
-        fs = SynLogWatcher(logFile=self.audit_file, logger=self.logger, ignore_localhost=self.ignore_localhost)
+        fs = SynLogWatcher(logFile=self.audit_file, logger=self.logger, ignore_localhost=self.ignore_localhost, ignore_ports=self.ignore_ports)
         fs.start()
 
     def configUpdated(self,):
