@@ -5,7 +5,9 @@ import re
 import shutil
 
 class SynLogWatcher(FileSystemWatcher):
-    def __init__(self, logger=None, logFile=None, ignore_localhost=False, ignore_ports=[]):
+    def __init__(self, logger=None, logFile=None, ignore_localhost=False, ignore_ports=None):
+        if ignore_ports is None:
+            ignore_ports = []
         self.logger = logger
         self.ignore_localhost = ignore_localhost
         self.ignore_ports = ignore_ports
