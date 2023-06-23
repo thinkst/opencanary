@@ -152,7 +152,8 @@ class PyLogger(LoggerBase):
             exit(1)
 
         # Check if ignorelist is populated
-        self.ignorelist = config.getVal('ip.ignorelist', default='')
+        self.ip_ignorelist = config.getVal('ip.ignorelist', default=[])
+        self.logtype_ignorelist = config.getVal('logtype.ignorelist', default=[])
 
         self.logger = logging.getLogger(self.node_id)
 
@@ -167,10 +168,14 @@ class PyLogger(LoggerBase):
         # Log only if not in ignorelist
         notify = True
         if 'src_host' in logdata:
-            for ip in self.ignorelist:
+            for ip in self.ip_ignorelist:
                 if check_ip(logdata['src_host'], ip) == True:
                     notify = False
                     break
+
+        if 'logtype' in logdata and logdata['logtype'] in self.logtype_ignorelist:
+            notify = False
+
         if notify == True:
             self.logger.warn(json.dumps(logdata, sort_keys=True))
 
