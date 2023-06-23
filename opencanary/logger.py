@@ -152,8 +152,8 @@ class PyLogger(LoggerBase):
             exit(1)
 
         # Check if ignorelist is populated
-        self.ip_ignorelist = config.getVal('ip.ignorelist', default='')
-        self.logtype_ignorelist = config.getVal('logtype.ignorelist', default='')
+        self.ip_ignorelist = config.getVal('ip.ignorelist', default=[])
+        self.logtype_ignorelist = config.getVal('logtype.ignorelist', default=[])
 
         self.logger = logging.getLogger(self.node_id)
 
