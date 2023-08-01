@@ -1,0 +1,45 @@
+name: Publish to PyPI
+on:
+  release:
+    types:
+      - created
+
+jobs:
+  pypi-publish:
+    name: Upload release to PyPI
+    runs-on: ubuntu-latest
+    environment:
+      name: release
+      url: https://pypi.org/p/opencanary
+    permissions:
+      id-token: write  # IMPORTANT: this permission is mandatory for trusted publishing
+    steps:
+    # retrieve your distributions here
+    - name: Set up Python 
+      uses: actions/setup-python@v3
+    - name: "Check out repository code"
+      uses: "actions/checkout@v3"
+    - name: Install setuptools
+      run: pip3 install setuptools>=63.2.0
+    - name: Install wheel
+      run: pip3 install wheel
+    - name: Create package
+      run: python3 setup.py sdist
+    - name: check version matches tag
+      run: |
+            python3 -m pip install dist/*
+            version_to_release=$(opencanaryd --version)
+            tag_name="${{ github.event.release.tag_name }}"
+            tag_name_without_v="${tag_name#v}"
+            if [[ "$version_to_release" == "$tag_name_without_v" ]]; then
+                echo "Versions match - may it be a great release"
+                exit 0
+            else
+              echo "Versions do not match - not publishing"
+              echo "Opencanary version is: $version_to_release"
+              echo "Git tag is: $tag_name -> $tag_name_without_v" 
+              exit 1
+            fi
+    
+    - name: Publish package distributions to PyPI
+      uses: pypa/gh-action-pypi-publish@release/v1
