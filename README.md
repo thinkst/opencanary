@@ -1,33 +1,50 @@
-OpenCanary
-=================
+# OpenCanary
 Thinkst Applied Research
 
 ![opencanary logo](docs/logo.png)
 
-Overview
-----------
+## Overview
 
 In essence, OpenCanary creates a network honeypot allowing you to catch hackers before they fully compromise your systems. As a technical definition, OpenCanary is a daemon that runs several canary versions of services that alerts when a service is (ab)used.
 
-Features
-----------
+## Table of Contents
+- [Code of Conduct](#code-of-conduct)
+- [Prerequisites](#prerequisites)
+- [Features](#features)
+- [Installation on Ubuntu](#installation-ubuntu)
+- [Installation on OS X](#installation-os-x)
+- [Installation using Git](#installation-git)
+- [Running OpenCanary](#running-opencanary)
+- [Samba setup for SMB service](#samba-setup-optional)
+- [Docker Compose Usage](#docker-compose)
+- [Docker Usage](#docker)
+- [FAQ](#faq)
+- [Contributing](#contributing)
 
-* Receive email alerts as soon as potential threats are detected, highlighting the threat source IP address and where the breach may have taken place.
+## Code of Conduct
 
-Prerequisites
-----------------
+This project and everyone participating in it is governed by the
+[Code of Conduct](CODE_OF_CONDUCT.md).
+By participating, you are expected to uphold this code. Please report unacceptable behavior
+to github@thinkst.com.
 
-* Python 2.7, 3.7 (Recommended Python 3.7+)
+## Prerequisites
+
+* Python 3.7 (Recommended Python 3.7+)
 * [Optional] SNMP requires the Python library scapy
 * [Optional] Samba module needs a working installation of samba
+## Features
 
-Installation [UBUNTU]
-----------
+* Mimic an array of network accessible services for attackers to interact with.
+* Receive various alerts as soon as potential threats are detected, highlighting the threat source IP address and where the breach may have taken place.
+
+NOTE: new feature requests are tracked [here](/discussions/categories/feature-requests)
+
+## Installation [UBUNTU]
 
 For updated and cleaner documentation, please head over to http://opencanary.org
 
 Installation on Ubuntu 20.04:
-(Please note that although we support Python 2.7; these instructions are aimed at running the Python 3 version)
 
 ```
 $ sudo apt-get install python3-dev python3-pip python3-virtualenv python3-venv python3-scapy libssl-dev libpcap-dev
@@ -37,8 +54,7 @@ $ . env/bin/activate
 $ pip install opencanary
 $ pip install scapy pcapy # optional
 ```
-Installation [OS X]
-----------
+## Installation [OS X]
 
 Installation OS X needs an extra step, as multiple OpenSSL versions
 may exist which confounds the Python libraries using it.
@@ -73,8 +89,7 @@ Now the installation can run as usual:
 $ pip install opencanary
 $ pip install scapy pcapy # optional
 ```
-Installation [GIT]
-----------
+## Installation [GIT]
 
 To install from source, instead of running pip do the following:
 
@@ -88,8 +103,8 @@ $ pip install opencanary-<version>.tar.gz
 
 If you are looking to get OpenCanary working on OpenBSD, take a look at https://github.com/8com/opencanary.
 
-Running OpenCanary
-----
+## Running OpenCanary
+
 Please note that for the Portscan service, we have added a `portscan.ignore_localhost` setting which means the Opencanary `portscan` service will ignore (not alert on) portscans originating for the localhost IP (`127.0.0.1`). This setting is false by default.
 
 OpenCanary is started by running:
@@ -115,18 +130,13 @@ When OpenCanary starts it looks for config files in the following order:
 
 It will use the first config file that exists.
 
-Samba Setup (optional)
-----------------------
+## Samba Setup (optional)
+
 This is required for the `smb` module.
 
 Head over to our step by step wiki over [here](https://github.com/thinkst/opencanary/wiki/Opencanary-and-Samba)
 
-FAQ
----
-We have a FAQ over [here](https://github.com/thinkst/opencanary/wiki)
-
-Docker Compose
-----------------
+## Docker Compose
 
 > Requires [Docker](https://docs.docker.com/get-docker/) and [Docker Compose](https://docs.docker.com/compose/install/) installed.
 
@@ -149,15 +159,14 @@ Docker Compose
 
 > To stop the container run `docker-compose down`
 
-Docker
-----------------
+## Docker
 
 > Requires [Docker](https://docs.docker.com/get-docker/) installed.
 
 1. Edit the `data/.opencanary.conf` file to enable, disable or customize the services that will run.
 
 1. Build a Docker image to run.
-    
+
     To build the latest Docker image (based on the code on a given branch) run:
 
     ```bash
@@ -180,3 +189,13 @@ docker run --rm --detach -p 21:21 -p 80:80 -v "${PWD}/data/.opencanary.conf":"/r
 > To view the logs run `docker logs opencanary`
 
 > To stop the container run `docker stop opencanary`
+
+## FAQ
+
+We have a FAQ over [here](https://github.com/thinkst/opencanary/wiki)
+
+## Contributing
+
+Please check out our [Code of Conduct](CODE_OF_CONDUCT.md) and [Contributing](CONTRIBUTING.md) documents before submitting a pull request.
+
+We look forward to your valuable contributions.
