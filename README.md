@@ -35,8 +35,8 @@ to github@thinkst.com.
 * [Optional] Samba module needs a working installation of samba
 ## Features
 
-* Mimic an array of network accessible services for attackers to interact with.
-* Receive various alerts as soon as potential threats are detected, highlighting the threat source IP address and where the breach may have taken place.
+* Mimic an array of network-accessible services for attackers to interact with.
+* Receive various alerts as soon as potential threats are detected, highlighting the threat source IP address and where the breach may have occurred.
 
 NOTE: new feature requests are tracked [here](/discussions/categories/feature-requests)
 
@@ -57,7 +57,7 @@ $ pip install scapy pcapy # optional
 ## Installation [OS X]
 
 Installation OS X needs an extra step, as multiple OpenSSL versions
-may exist which confounds the Python libraries using it.
+may exist, which confounds the Python libraries using it.
 
 ```
 $ virtualenv env/
@@ -101,11 +101,11 @@ $ cd dist
 $ pip install opencanary-<version>.tar.gz
 ```
 
-If you are looking to get OpenCanary working on OpenBSD, take a look at https://github.com/8com/opencanary.
+If you want to get OpenCanary working on OpenBSD, look at https://github.com/8com/opencanary.
 
 ## Running OpenCanary
 
-Please note that for the Portscan service, we have added a `portscan.ignore_localhost` setting which means the Opencanary `portscan` service will ignore (not alert on) portscans originating for the localhost IP (`127.0.0.1`). This setting is false by default.
+Please note that for the Portscan service, we have added a `portscan.ignore_localhost` setting, which means the Opencanary `portscan` service will ignore (not alert on) port scans originating for the localhost IP (`127.0.0.1`). This setting is false by default.
 
 OpenCanary is started by running:
 
@@ -114,13 +114,13 @@ $ . env/bin/activate
 $ opencanaryd --start
 ```
 
-On the first run, instructions are printed that will get to a working config.
+On the first run, instructions are printed to get to a working config.
 
 ```
 $ opencanaryd --copyconfig
 ```
 
-Which will create a folder, `/etc/opencanaryd` and a config file inside that folder `opencanary.conf`. You must now edit the config file to determine which services and logging options you would like to enable.
+Which will create a folder, `/etc/opencanaryd` and a config file inside that folder, `opencanary.conf`. You must now edit the config file to determine which services and logging options you want to enable.
 
 When OpenCanary starts it looks for config files in the following order:
 
@@ -134,7 +134,7 @@ It will use the first config file that exists.
 
 This is required for the `smb` module.
 
-Head over to our step by step wiki over [here](https://github.com/thinkst/opencanary/wiki/Opencanary-and-Samba)
+Head over to our step-by-step wiki over [here](https://github.com/thinkst/opencanary/wiki/Opencanary-and-Samba)
 
 ## Docker Compose
 
@@ -188,7 +188,7 @@ docker run --rm --detach -p 21:21 -p 80:80 -v "${PWD}/data/.opencanary.conf":"/r
 
 > To view the logs run `docker logs opencanary`
 
-> To stop the container run `docker stop opencanary`
+> To stop the container, run `docker stop opencanary`
 
 ## FAQ
 
