@@ -29,9 +29,10 @@ By participating, you are expected to uphold this code. Please report unacceptab
 to github@thinkst.com.
 ## Features
 
-
 * Mimic an array of network accessible services for attackers to interact with.
 * Receive various alerts as soon as potential threats are detected, highlighting the threat source IP address and where the breach may have taken place.
+
+NOTE: new feature requests are tracked [here](/discussions/categories/feature-requests)
 
 ## Prerequisites
 
