@@ -9,16 +9,16 @@ In essence, OpenCanary creates a network honeypot allowing you to catch hackers 
 
 ## Table of Contents
 - [Code of Conduct](#code-of-conduct)
-- [Features](#features)
 - [Prerequisites](#prerequisites)
+- [Features](#features)
 - [Installation on Ubuntu](#installation-ubuntu)
 - [Installation on OS X](#installation-os-x)
 - [Installation using Git](#installation-git)
 - [Running OpenCanary](#running-opencanary)
 - [Samba setup for SMB service](#samba-setup-optional)
-- [FAQ](#faq)
 - [Docker Compose Usage](#docker-compose)
 - [Docker Usage](#docker)
+- [FAQ](#faq)
 - [Contributing](#contributing)
 
 ## Code of Conduct
@@ -27,18 +27,18 @@ This project and everyone participating in it is governed by the
 [Code of Conduct](CODE_OF_CONDUCT.md).
 By participating, you are expected to uphold this code. Please report unacceptable behavior
 to github@thinkst.com.
-## Features
-
-* Mimic an array of network accessible services for attackers to interact with.
-* Receive various alerts as soon as potential threats are detected, highlighting the threat source IP address and where the breach may have taken place.
-
-NOTE: new feature requests are tracked [here](/discussions/categories/feature-requests)
 
 ## Prerequisites
 
 * Python 3.7 (Recommended Python 3.7+)
 * [Optional] SNMP requires the Python library scapy
 * [Optional] Samba module needs a working installation of samba
+## Features
+
+* Mimic an array of network accessible services for attackers to interact with.
+* Receive various alerts as soon as potential threats are detected, highlighting the threat source IP address and where the breach may have taken place.
+
+NOTE: new feature requests are tracked [here](/discussions/categories/feature-requests)
 
 ## Installation [UBUNTU]
 
@@ -136,10 +136,6 @@ This is required for the `smb` module.
 
 Head over to our step by step wiki over [here](https://github.com/thinkst/opencanary/wiki/Opencanary-and-Samba)
 
-## FAQ
-
-We have a FAQ over [here](https://github.com/thinkst/opencanary/wiki)
-
 ## Docker Compose
 
 > Requires [Docker](https://docs.docker.com/get-docker/) and [Docker Compose](https://docs.docker.com/compose/install/) installed.
@@ -193,6 +189,10 @@ docker run --rm --detach -p 21:21 -p 80:80 -v "${PWD}/data/.opencanary.conf":"/r
 > To view the logs run `docker logs opencanary`
 
 > To stop the container run `docker stop opencanary`
+
+## FAQ
+
+We have a FAQ over [here](https://github.com/thinkst/opencanary/wiki)
 
 ## Contributing
 
