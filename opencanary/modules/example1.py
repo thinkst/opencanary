@@ -43,7 +43,7 @@ class Example1Protocol(Protocol):
         self.buffer += data
         print("Received data: ", repr(data))
 
-        # Discard inital telnet client control chars
+        # Discard initial telnet client control chars
         i = self.buffer.find("\x01")
         if i >= 0:
             self.buffer = self.buffer[i+1:]

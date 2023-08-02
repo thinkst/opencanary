@@ -46,7 +46,7 @@ Below is an example of an `smb.conf` for a Samba installation,
        path = /home/demo/share
        guest ok = yes
        read only = yes
-       browseable = yes
+       browsable = yes
 
 Please note that there are some details in the above config that you would want to change,
 

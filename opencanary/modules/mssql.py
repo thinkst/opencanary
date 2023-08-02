@@ -287,7 +287,7 @@ class MSSQLProtocol(Protocol, TimeoutMixin):
                errormsg = "Login failed for user %s." % username
 
             payload = self.buildError(errormsg, servername)
-            # extra data observered on the wire
+            # extra data observed on the wire
             payload += b"\xfd\x02\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00"
 
             rtds = TDSPacket(
@@ -321,7 +321,7 @@ class MSSQLProtocol(Protocol, TimeoutMixin):
             self.logAuth(username, None, loginData, logtype)
 
             payload = self.buildError("Login failed for user %s\\%s." % (domain,username) , hostname)
-            # extra data observered on the wire
+            # extra data observed on the wire
             payload += b"\xfd\x02\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00"
 
             rtds = TDSPacket(
