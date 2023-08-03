@@ -123,7 +123,7 @@ class TestHTTPModule(unittest.TestCase):
         """
         request = requests.post('http://localhost/', auth=('user', 'pass'))
         # Currently the web server returns 200, but in future it should return
-        # a 403 statuse code.
+        # a 403 status code.
         self.assertEqual(request.status_code, 200)
         self.assertIn('Synology DiskStation', request.text)
         last_log = get_last_log()

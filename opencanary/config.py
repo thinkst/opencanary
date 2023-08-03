@@ -131,7 +131,7 @@ class Config:
 
     def valid(self, key, val):
         """
-        Test an the validity of an invidual setting
+        Test an the validity of an individual setting
         Raise config error message on failure.
         TODO: delegate module tests to appropriate module
         """

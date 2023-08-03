@@ -248,7 +248,7 @@ class HoneyPotTransport(transport.SSHServerTransport):
         @param reason: the reason for the disconnect.  Should be one of the
                        DISCONNECT_* values.
         @type reason: C{int}
-        @param desc: a descrption of the reason for the disconnection.
+        @param desc: a description of the reason for the disconnection.
         @type desc: C{str}
         """
         if not 'bad packet length' in desc.decode():
