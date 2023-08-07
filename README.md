@@ -24,7 +24,7 @@ In essence, OpenCanary creates a network honeypot allowing you to catch hackers 
 ## Code of Conduct
 
 This project and everyone participating in it is governed by the
-[Code of Conduct](CODE_OF_CONDUCT.md).
+[Code of Conduct](https://github.com/thinkst/.github/blob/master/CODE_OF_CONDUCT.md).
 By participating, you are expected to uphold this code. Please report unacceptable behavior
 to github@thinkst.com.
 
@@ -196,6 +196,6 @@ We have a FAQ over [here](https://github.com/thinkst/opencanary/wiki)
 
 ## Contributing
 
-Please check out our [Code of Conduct](CODE_OF_CONDUCT.md) and [Contributing](CONTRIBUTING.md) documents before submitting a pull request.
+Please check out our [Code of Conduct](https://github.com/thinkst/.github/blob/master/CODE_OF_CONDUCT.md) and [Contributing](https://github.com/thinkst/.github/blob/master/CONTRIBUTING.md) documents before submitting a pull request.
 
 We look forward to your valuable contributions.
