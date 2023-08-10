@@ -101,8 +101,6 @@ $ cd dist
 $ pip install opencanary-<version>.tar.gz
 ```
 
-If you want to get OpenCanary working on OpenBSD, look at https://github.com/8com/opencanary.
-
 ## Running OpenCanary
 
 Please note that for the Portscan service, we have added a `portscan.ignore_localhost` setting, which means the Opencanary `portscan` service will ignore (not alert on) port scans originating for the localhost IP (`127.0.0.1`). This setting is false by default.
