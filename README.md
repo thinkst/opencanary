@@ -38,7 +38,7 @@ to github@thinkst.com.
 * Mimic an array of network-accessible services for attackers to interact with.
 * Receive various alerts as soon as potential threats are detected, highlighting the threat source IP address and where the breach may have occurred.
 
-NOTE: new feature requests are tracked [here](/discussions/categories/feature-requests)
+NOTE: new feature requests are tracked [here](https://github.com/thinkst/opencanary/discussions/categories/feature-requests)
 
 ## Installation [UBUNTU]
 
