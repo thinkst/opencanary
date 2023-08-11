@@ -10,7 +10,7 @@ from twisted.application import internet
 from twisted.internet.protocol import Factory
 from pkg_resources import iter_entry_points
 
-from opencanary.config import config
+from opencanary.config import config, is_docker
 from opencanary.logger import getLogger
 from opencanary.modules.http import CanaryHTTP
 from opencanary.modules.https import CanaryHTTPS
@@ -67,9 +67,14 @@ if config.moduleEnabled('snmp'):
 import sys
 if sys.platform.startswith("linux"):
     from opencanary.modules.samba import CanarySamba
-    from opencanary.modules.portscan import CanaryPortscan
     MODULES.append(CanarySamba)
-    MODULES.append(CanaryPortscan)
+    if config.moduleEnabled('portscan') and is_docker():
+        # Remove portscan if running in DOCKER (specified in Dockerfile)
+        print("Can't use portscan in Docker. Portscan module disabled.")
+    else:
+        from opencanary.modules.portscan import CanaryPortscan
+        MODULES.append(CanaryPortscan)
+
 
 logger = getLogger(config)
 

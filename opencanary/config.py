@@ -2,6 +2,7 @@ from six import iteritems
 import os, sys, json, copy, socket, itertools, string, subprocess
 from os.path import expanduser
 from pkg_resources import resource_filename
+from pathlib import Path
 
 SAMPLE_SETTINGS = resource_filename(__name__, 'data/settings.json')
 SETTINGS = 'opencanary.conf'
@@ -19,6 +20,9 @@ def expand_vars(var):
         return os.path.expandvars(var)
     return var
 
+def is_docker():
+    cgroup = Path('/proc/self/cgroup')
+    return Path('/.dockerenv').is_file() or cgroup.is_file() and 'docker' in cgroup.read_text()
 
 class Config:
     def __init__(self, configfile=SETTINGS):

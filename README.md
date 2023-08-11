@@ -138,6 +138,8 @@ Head over to our step-by-step wiki over [here](https://github.com/thinkst/openca
 
 > Requires [Docker](https://docs.docker.com/get-docker/) and [Docker Compose](https://docs.docker.com/compose/install/) installed.
 
+NOTE: The portscan module is automatically disabled for Dockerised OpenCanary.
+
 1. Edit the `data/.opencanary.conf` file to enable, disable or customize the services that will run.
 
 1. Edit the `ports` section of the `docker-compose.yml` file to enable/disable the desired ports based on the services you have enabled in the config file.
@@ -160,6 +162,8 @@ Head over to our step-by-step wiki over [here](https://github.com/thinkst/openca
 ## Docker
 
 > Requires [Docker](https://docs.docker.com/get-docker/) installed.
+
+NOTE: The portscan module is automatically disabled for Dockerised OpenCanary. 
 
 1. Edit the `data/.opencanary.conf` file to enable, disable or customize the services that will run.
 

@@ -64,7 +64,7 @@ class SynLogWatcher(FileSystemWatcher):
             if int(data.get('dst_port', -1)) in self.ignore_ports:
                 continue
 
-            
+
             self.logger.log(data)
 
 class CanaryPortscan(CanaryService):
@@ -111,13 +111,6 @@ class CanaryPortscan(CanaryService):
         # We ignore loopback interface traffic as it is taken care of in above rule
         os.system('sudo {0} -t mangle -D PREROUTING -p tcp --syn -j LOG --log-level=warning --log-prefix="canaryfw: " -m limit --limit="{1}/second" ! -i lo'.format(iptables_path, self.synrate))
         os.system('sudo {0} -t mangle -A PREROUTING -p tcp --syn -j LOG --log-level=warning --log-prefix="canaryfw: " -m limit --limit="{1}/second" ! -i lo'.format(iptables_path, self.synrate))
-
-        # os.system('sudo /sbin/iptables -t mangle -D PREROUTING -p tcp {dst} --syn -j LOG --log-level=warning --log-prefix="canaryfw: " -m limit --limit="{synrate}/second"'
-        #             .format(dst=(('--destination '+self.listen_addr) if len(self.listen_addr) else ''),
-        #                 synrate=self.synrate))
-        # os.system('sudo /sbin/iptables -t mangle -A PREROUTING -p tcp {dst} --syn -j LOG --log-level=warning --log-prefix="canaryfw: " -m limit --limit="{synrate}/second"'
-        #             .format(dst=(('--destination '+self.listen_addr) if len(self.listen_addr) else ''),
-        #                 synrate=self.synrate))
 
          # Match the T3 probe of the nmap OS detection based on TCP flags and TCP options string
         os.system('sudo {0} -t mangle -D PREROUTING -p tcp --tcp-flags ALL URG,PSH,SYN,FIN -m u32 --u32 "40=0x03030A01 && 44=0x02040109 && 48=0x080Affff && 52=0xffff0000 && 56=0x00000402" -j LOG --log-level=warning --log-prefix="canarynmap: " -m limit --limit="{1}/second"'.format(iptables_path, self.nmaposrate))
