@@ -17,9 +17,7 @@ jobs:
       - name: Install pre-commit
         run: pip install pre-commit
       - name: Check pre-commit is happy
-        run: |
-              pre-commit install
-              SKIP=no-commit-to-branch poetry run pre-commit run --all-files
+        run: pre-commit run --all-files
   opencanary_tests:
     strategy:
       matrix:
