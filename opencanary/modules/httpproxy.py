@@ -5,24 +5,9 @@ from opencanary.modules import CanaryService
 
 from base64 import b64decode
 
-try:
-    import urlparse
-except ImportError:
-    import urllib.parse as urlparse
-
-try:
-    from urllib import quote  # Python 2.X
-except ImportError:
-    from urllib.parse import quote  # Python 3+
 from twisted.application import internet
-from twisted.internet.protocol import ServerFactory
-from twisted.application.internet import TCPServer
-from twisted.internet.protocol import ClientFactory
-from twisted.internet import protocol
-
-from twisted.web.http import HTTPClient, Request, HTTPChannel
+from twisted.web.http import Request, HTTPChannel
 from twisted.web import http
-from twisted.internet import reactor
 
 from jinja2 import Template
 
@@ -86,7 +71,7 @@ class AlertProxyRequest(Request):
         if atype == "Basic":
             try:
                 username, password = b64decode(token).split(":")
-            except:
+            except:  # noqa: E722
                 pass
         elif atype == "NTLM":
             # b64decode returns bytes not str in python2
@@ -158,7 +143,7 @@ class HTTPProxy(CanaryService):
         try:
             with open(authfilename, "r") as f:
                 self.auth_template = Template(f.read())
-        except:
+        except:  # noqa: E722
             self.auth_template = Template("")
 
     def getService(self):

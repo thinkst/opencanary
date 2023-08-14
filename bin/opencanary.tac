@@ -1,17 +1,7 @@
 import traceback
-
-# import warnings
-# warnings.filterwarnings("ignore", category=DeprecationWarning)
-def warn(*args, **kwargs):
-    pass
-
-
 import warnings
-
-warnings.warn = warn
+import sys
 from twisted.application import service
-from twisted.application import internet
-from twisted.internet.protocol import Factory
 from pkg_resources import iter_entry_points
 
 from opencanary.config import config, is_docker
@@ -32,6 +22,14 @@ from opencanary.modules.git import CanaryGit
 from opencanary.modules.redis import CanaryRedis
 from opencanary.modules.tcpbanner import CanaryTCPBanner
 from opencanary.modules.rdp import CanaryRDP
+
+
+def warn(*args, **kwargs):
+    pass
+
+
+warnings.warn = warn
+
 
 # from opencanary.modules.example0 import CanaryExample0
 # from opencanary.modules.example1 import CanaryExample1
@@ -69,8 +67,6 @@ if config.moduleEnabled("snmp"):
         pass
 
 # NB: imports below depend on inotify, only available on linux
-import sys
-
 if sys.platform.startswith("linux"):
     from opencanary.modules.samba import CanarySamba
 
@@ -87,10 +83,10 @@ if sys.platform.startswith("linux"):
 logger = getLogger(config)
 
 
-def start_mod(application, klass):
+def start_mod(application, klass):  # noqa: C901
     try:
         obj = klass(config=config, logger=logger)
-    except Exception as e:
+    except Exception:
         err = "Failed to instantiate instance of class %s in %s. %s" % (
             klass.__name__,
             klass.__module__,
@@ -108,7 +104,7 @@ def start_mod(application, klass):
             )
             logMsg({"logdata": msg})
 
-        except Exception as e:
+        except Exception:
             err = "Failed to run startYourEngines on %s in %s. %s" % (
                 klass.__name__,
                 klass.__module__,
@@ -127,7 +123,7 @@ def start_mod(application, klass):
                 klass.__module__,
             )
             logMsg({"logdata": msg})
-        except Exception as e:
+        except Exception:
             err = "Failed to add service from class %s in %s. %s" % (
                 klass.__name__,
                 klass.__module__,
@@ -144,8 +140,6 @@ def start_mod(application, klass):
 
 def logMsg(msg):
     data = {}
-    #    data['src_host'] = device_name
-    #    data['dst_host'] = node_id
     data["logdata"] = {"msg": msg}
     logger.log(data, retry=False)
 
@@ -161,7 +155,7 @@ for ep in iter_entry_points(ENTRYPOINT):
     try:
         klass = ep.load(require=False)
         start_modules.append(klass)
-    except Exception as e:
+    except Exception:
         err = "Failed to load class from the entrypoint: %s. %s" % (
             str(ep),
             traceback.format_exc(),

@@ -2,7 +2,6 @@ from opencanary.modules import CanaryService
 
 from twisted.internet.protocol import Protocol
 from twisted.internet.protocol import Factory
-from twisted.application import internet
 
 
 class Example0Protocol(Protocol):

@@ -263,7 +263,7 @@ class RedisProtocol(Protocol):
             input_arg_count = len(input_args)
 
             if input_arg_count < arg_min_count or (
-                arg_max_count != None and input_arg_count > arg_max_count
+                arg_max_count is not None and input_arg_count > arg_max_count
             ):
                 raise ArgumentCountError(input_cmd)
 
@@ -299,7 +299,7 @@ class RedisProtocol(Protocol):
         logdata = {"CMD": cmd, "ARGS": args}
         self.factory.log(logdata, transport=self.transport)
 
-    def _processRedisCommand(
+    def _processRedisCommand(  # noqa: C901
         self,
     ):
         def _parseInlineCommand(cmd_string):
@@ -364,7 +364,7 @@ class RedisProtocol(Protocol):
                 raise ProtocolError("invalid bulk length")
 
             resp_str = cmd_string[
-                curr_ptr : (curr_ptr + str_length + 2)
+                curr_ptr : (curr_ptr + str_length + 2)  # noqa: E203
             ]  # string + CRLF
             if len(resp_str) + 2 < str_length or resp_str[-2:] != "\r\n":
                 raise RedisCommandAgain()

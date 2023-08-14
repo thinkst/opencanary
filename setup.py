@@ -1,7 +1,6 @@
 import codecs
 import os.path
 from setuptools import setup, find_namespace_packages
-import sys
 
 
 def read(rel_path):

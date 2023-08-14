@@ -1,7 +1,6 @@
 from opencanary.modules import CanaryService
 from opencanary.modules import FileSystemWatcher
 import os
-import re
 import shutil
 
 
@@ -14,10 +13,9 @@ class SynLogWatcher(FileSystemWatcher):
         self.logger = logger
         self.ignore_localhost = ignore_localhost
         self.ignore_ports = ignore_ports
-        # print ('SynLogWatcher started')
         FileSystemWatcher.__init__(self, fileName=logFile)
 
-    def handleLines(self, lines=None):
+    def handleLines(self, lines=None):  # noqa: C901
         for line in lines:
             try:
                 if "canaryfw: " in line:
@@ -49,11 +47,9 @@ class SynLogWatcher(FileSystemWatcher):
                     val = ""
                 kv[key] = val
 
-            try:
-                # we've seen empty tags creep in. weed them out.
+            # we've seen empty tags creep in. weed them out.
+            if "" in kv.keys():
                 kv.pop("")
-            except:
-                pass
 
             data = {}
             data["src_host"] = kv.pop("SRC")
@@ -77,29 +73,14 @@ class CanaryPortscan(CanaryService):
         CanaryService.__init__(self, config=config, logger=logger)
         self.audit_file = config.getVal("portscan.logfile", default="/var/log/kern.log")
         self.synrate = int(config.getVal("portscan.synrate", default=5))
-        self.nmaposrate = config.getVal("portscan.nmaposrate", default="5")
-        self.lorate = config.getVal("portscan.lorate", default="3")
+        self.nmaposrate = int(config.getVal("portscan.nmaposrate", default="5"))
+        self.lorate = int(config.getVal("portscan.lorate", default="3"))
         self.listen_addr = config.getVal("device.listen_addr", default="")
         self.ignore_localhost = config.getVal(
             "portscan.ignore_localhost", default=False
         )
         self.ignore_ports = config.getVal("portscan.ignore_ports", default=[])
         self.config = config
-
-        try:
-            self.synrate = int(self.synrate)
-        except:
-            self.synrate = 5
-
-        try:
-            self.nmaposrate = int(self.nmaposrate)
-        except:
-            self.nmaposrate = 5
-
-        try:
-            self.lorate = int(self.lorate)
-        except:
-            self.lorate = 3
 
     def getIptablesPath(self):
         return shutil.which("iptables") or "/sbin/iptables"

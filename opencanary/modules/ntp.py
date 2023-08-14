@@ -4,14 +4,9 @@
     and network recon.
 """
 from opencanary.modules import CanaryService
-
 from twisted.application import internet
 from twisted.internet.protocol import DatagramProtocol
-
-from twisted.application.internet import UDPServer
 from twisted.internet.address import IPv4Address
-
-from twisted.internet import protocol
 
 
 class MiniNtp(DatagramProtocol):

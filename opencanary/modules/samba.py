@@ -2,10 +2,7 @@ import sys
 
 if sys.platform.startswith("linux"):
     from opencanary.modules import CanaryService, FileSystemWatcher
-    from opencanary.config import ConfigException
-
-    import os, re, random, shutil, time
-    from datetime import datetime
+    import re
 
     class SambaLogWatcher(FileSystemWatcher):
         def __init__(self, logFile=None, logger=None):

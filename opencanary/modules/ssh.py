@@ -1,17 +1,19 @@
 from opencanary.modules import CanaryService
 import twisted
-from twisted.cred import portal, checkers, credentials, error
+import os
+import time
+import base64
+import struct
+from twisted.cred import portal, checkers, credentials
 from twisted.conch import error, avatar, interfaces as conchinterfaces
-from twisted.conch.checkers import SSHPublicKeyDatabase
 from twisted.conch.ssh import factory, userauth, connection, keys, session, transport
 from twisted.conch.openssh_compat import primes
 from twisted.conch.ssh.common import MP
-from twisted.internet import reactor, protocol, defer
+from twisted.internet import defer
 from twisted.application import internet
+from twisted.conch.ssh.common import NS, getNS
 
 from zope.interface import implementer
-import sys, os, time
-import base64, struct
 from cryptography.hazmat.backends import default_backend
 from cryptography.hazmat.primitives import serialization
 from cryptography.hazmat.primitives.asymmetric import dsa, rsa
@@ -19,7 +21,6 @@ from cryptography.hazmat.primitives.asymmetric import dsa, rsa
 SSH_PATH = "/var/tmp"
 
 # pulled from Kippo
-from twisted.conch.ssh.common import NS, getNS
 
 
 class HoneyPotSSHUserAuthServer(userauth.SSHUserAuthServer):
@@ -96,12 +97,12 @@ class HoneyPotSSHUserAuthServer(userauth.SSHUserAuthServer):
         try:
             # extract the public key blob from the SSH packet
             key_blob = getNS(getNS(packet[1:])[1])[0]
-        except:
+        except:  # noqa: E722
             key_blob = "No public key found."
         try:
             # convert blob into openssh key format
             key = keys.Key.fromString(key_blob).toString("openssh")
-        except:
+        except:  # noqa: E722
             key = "Invalid SSH Public Key Submitted: {key_blob}".format(
                 key_blob=key_blob.hex()
             )
@@ -204,7 +205,6 @@ class HoneyPotTransport(transport.SSHServerTransport):
 
         self.interactors = []
         self.logintime = time.time()
-        self.ttylog_open = False
         transport.SSHServerTransport.connectionMade(self)
 
     def sendKexInit(self):
@@ -244,24 +244,12 @@ class HoneyPotTransport(transport.SSHServerTransport):
         self.g, self.p = self.factory.getDHPrime(min)
         self.sendPacket(MSG_KEX_DH_GEX_GROUP, MP(self.p) + MP(self.g))
 
-    def lastlogExit(self):
-        starttime = time.strftime("%a %b %d %H:%M", time.localtime(self.logintime))
-        endtime = time.strftime("%H:%M", time.localtime(time.time()))
-        duration = str((time.time() - self.logintime))
-        clientIP = self.transport.getPeer().host
-        # print('root\tpts/0\t%s\t%s - %s (%s)' % \
-        #    (clientIP, starttime, endtime, duration))
-
     # this seems to be the only reliable place of catching lost connection
     def connectionLost(self, reason):
         for i in self.interactors:
             i.sessionClosed()
         if self.transport.sessionno in self.factory.sessions:
             del self.factory.sessions[self.transport.sessionno]
-        # self.lastlogExit()
-        if self.ttylog_open:
-            ttylog.ttylog_close(self.ttylog_file, time.time())
-            self.ttylog_open = False
         transport.SSHServerTransport.connectionLost(self, reason)
 
     def sendDisconnect(self, reason, desc):
@@ -274,11 +262,12 @@ class HoneyPotTransport(transport.SSHServerTransport):
         @param desc: a description of the reason for the disconnection.
         @type desc: C{str}
         """
-        if not "bad packet length" in desc.decode():
+        if "bad packet length" not in desc.decode():
             # With python >= 3 we can use super?
             transport.SSHServerTransport.sendDisconnect(self, reason, desc)
         else:
             self.transport.write("Protocol mismatch.\n")
+            log = self.transport.factory.canaryservice.log
             log.msg("Disconnecting with error, code %s\nreason: %s" % (reason, desc))
             self.transport.loseConnection()
 

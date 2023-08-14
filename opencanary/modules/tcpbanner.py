@@ -121,40 +121,37 @@ class TCPBannerProtocol(Protocol):
             except UnicodeDecodeError:
                 logdata["DATA"] = data.rstrip().decode("unicode_escape").encode("utf-8")
 
-            send_log = True
-
             if self.keep_alive_enabled:
-                if self.keep_alive_secret != "" and self.keep_alive_secret in data:
-                    self.keep_alive_disable_alerting = True
-                    self.factory.canaryservice.logtype = (
-                        self.factory.canaryservice.logger.LOG_TCP_BANNER_KEEP_ALIVE_SECRET_RECEIVED
-                    )
-                    logdata["SECRET_STRING"] = (
-                        (self.keep_alive_secret).decode().encode("utf-8")
-                    )
-                else:
-                    self.factory.canaryservice.logtype = (
-                        self.factory.canaryservice.logger.LOG_TCP_BANNER_KEEP_ALIVE_DATA_RECEIVED
-                    )
+                self.keep_alive_action(data, logdata)
             else:
-                self.factory.canaryservice.logtype = (
-                    self.factory.canaryservice.logger.LOG_TCP_BANNER_DATA_RECEIVED
-                )
-                if self.alert_string_enabled:
-                    if self.alert_string in data:
-                        logdata["ALERT_STRING"] = (
-                            (self.alert_string).decode().encode("utf-8")
-                        )
-                    else:
-                        send_log = False
-
-            if send_log:
-                self.factory.canaryservice.log(logdata, transport=self.transport)
+                self.non_keep_alive_action(data, logdata)
 
             self.transport.write(self.send_banner)
         except (UnsupportedVersion, ProtocolError):
             self.transport.loseConnection()
             return
+
+    def non_keep_alive_action(self, data, logdata):
+        self.factory.canaryservice.logtype = (
+            self.factory.canaryservice.logger.LOG_TCP_BANNER_DATA_RECEIVED
+        )
+        if self.alert_string_enabled:
+            if self.alert_string in data:
+                logdata["ALERT_STRING"] = (self.alert_string).decode().encode("utf-8")
+                self.factory.canaryservice.log(logdata, transport=self.transport)
+
+    def keep_alive_action(self, data, logdata):
+        if self.keep_alive_secret != "" and self.keep_alive_secret in data:
+            self.keep_alive_disable_alerting = True
+            self.factory.canaryservice.logtype = (
+                self.factory.canaryservice.logger.LOG_TCP_BANNER_KEEP_ALIVE_SECRET_RECEIVED
+            )
+            logdata["SECRET_STRING"] = (self.keep_alive_secret).decode().encode("utf-8")
+        else:
+            self.factory.canaryservice.logtype = (
+                self.factory.canaryservice.logger.LOG_TCP_BANNER_KEEP_ALIVE_DATA_RECEIVED
+            )
+        self.factory.canaryservice.log(logdata, transport=self.transport)
 
 
 class TCPBannerFactory(Factory):

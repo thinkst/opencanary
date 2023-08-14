@@ -10,7 +10,7 @@ from logging.handlers import SocketHandler
 from twisted.internet import reactor
 import requests
 
-from opencanary.iphelper import *
+from opencanary.iphelper import check_ip
 
 
 class Singleton(type):
@@ -25,7 +25,7 @@ class Singleton(type):
 def getLogger(config):
     try:
         d = config.getVal("logger")
-    except Exception as e:
+    except Exception:
         print("Error: config does not have 'logger' section", file=sys.stderr)
         exit(1)
 
@@ -171,14 +171,14 @@ class PyLogger(LoggerBase):
         notify = True
         if "src_host" in logdata:
             for ip in self.ip_ignorelist:
-                if check_ip(logdata["src_host"], ip) == True:
+                if check_ip(logdata["src_host"], ip) is True:
                     notify = False
                     break
 
         if "logtype" in logdata and logdata["logtype"] in self.logtype_ignorelist:
             notify = False
 
-        if notify == True:
+        if notify is True:
             self.logger.warn(json.dumps(logdata, sort_keys=True))
 
 
@@ -239,7 +239,7 @@ class HpfeedsHandler(logging.Handler):
         try:
             msg = self.format(record)
             self.hpc.publish(self.channels, msg)
-        except:
+        except:  # noqa: E722
             print("Error on publishing to server")
 
 

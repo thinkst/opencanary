@@ -6,7 +6,7 @@ from twisted.application import internet
 from twisted.internet.protocol import Factory
 from twisted.internet.protocol import DatagramProtocol
 
-from opencanary.honeycred import *
+from opencanary.honeycred import buildHoneyCredHook
 
 # Monkey-patch-replace Twisted Protocol with CanaryProtocol class
 from twisted.internet import protocol
@@ -110,12 +110,11 @@ class CanaryService(object):
         raise Exception(err)
 
 
-if sys.platform.startswith("linux"):
+if sys.platform.startswith("linux"):  # noqa: C901
     from twisted.python import filepath
     from twisted.internet import inotify
     from twisted.python._inotify import INotifyError
     from twisted.internet.inotify import IN_CREATE
-    import datetime
     import os
 
     class FileSystemWatcher(object):
@@ -132,7 +131,7 @@ if sys.platform.startswith("linux"):
                 self.f = open(self.path)
                 if skipToEnd:
                     self.f.seek(0, 2)
-            except IOError as e:
+            except IOError:
                 self.f = None
 
             self.notifier.startReading()

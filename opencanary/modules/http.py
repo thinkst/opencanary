@@ -2,7 +2,7 @@ from opencanary.modules import CanaryService
 
 from twisted.application import internet
 from twisted.web.server import Site, GzipEncoderFactory
-from twisted.web.resource import Resource, EncodingResourceWrapper, ForbiddenResource
+from twisted.web.resource import Resource, EncodingResourceWrapper
 from twisted.web.util import Redirect
 from twisted.web import static
 
@@ -76,8 +76,6 @@ class BasicLogin(Resource):
 
     def render_GET(self, request, loginFailed=False):
         if not loginFailed:
-            us = request.transport.getHost()
-            peer = request.transport.getPeer()
             useragent = request.getHeader("user-agent")
             if not useragent:
                 useragent = "<not supplied>"

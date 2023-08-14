@@ -13,7 +13,6 @@ from argparse import ArgumentDefaultsHelpFormatter, ArgumentParser
 from functools import partial
 from os import chmod, pardir, path
 from os.path import dirname, join, realpath
-from shutil import copyfile
 from subprocess import CalledProcessError, check_output
 
 from pkg_resources import resource_filename
@@ -78,7 +77,7 @@ parser.add_argument(
 parser.add_argument(
     "--canary",
     action="append",
-    help=f"enable canary service in the generated opencanary.conf file "
+    help="enable canary service in the generated opencanary.conf file "
     + "(can be supplied more than once)",
     choices=canaries,
     dest="canaries",
@@ -96,7 +95,7 @@ for dir in [LAUNCHCTL_DIR, args.log_output_dir]:
 
 # File builders
 build_launchctl_dir_path = partial(join, LAUNCHCTL_DIR)
-build_logfile_name = lambda log_name: join(
+build_logfile_name = lambda log_name: join(  # noqa: E731
     args.log_output_dir, f"opencanary.{log_name}.log"
 )
 

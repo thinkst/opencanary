@@ -29,7 +29,7 @@ def check_ip(ip, network_range):
         ripInt = ip2int(rangeIP)
         ipInt = ip2int(ip)
         result = not ((ipInt ^ ripInt) & 0xFFFFFFFF << (32 - rangeMask))
-    except:
+    except:  # noqa: E722
         result = False
 
     return result

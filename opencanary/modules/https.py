@@ -1,5 +1,4 @@
 import os
-import re
 from datetime import datetime, timedelta
 from pathlib import Path
 
@@ -8,17 +7,14 @@ from cryptography.hazmat.primitives import hashes, serialization
 from cryptography.hazmat.primitives.asymmetric import rsa
 from cryptography.x509.oid import NameOID
 from twisted.application import internet
-from twisted.web import static
-from twisted.web.resource import Resource, EncodingResourceWrapper
+from twisted.web.resource import EncodingResourceWrapper
 from twisted.web.server import Site, GzipEncoderFactory
-from twisted.web.util import Redirect
 from twisted.internet.ssl import DefaultOpenSSLContextFactory
 
 from opencanary.modules import CanaryService
 from opencanary.modules.http import (
     BasicLogin,
     CanaryHTTP,
-    Error,
     RedirectCustomHeaders,
     StaticNoDirListing,
 )

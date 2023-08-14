@@ -1,5 +1,10 @@
 from six import iteritems
-import os, sys, json, copy, socket, itertools, string, subprocess
+import os
+import sys
+import json
+import itertools
+import string
+import subprocess
 from os.path import expanduser
 from pkg_resources import resource_filename
 from pathlib import Path
@@ -80,7 +85,7 @@ class Config:
                 return default
             raise e
 
-    def setValues(self, params):
+    def setValues(self, params):  # noqa: C901
         """Set all the valid values in params and return a list of errors for invalid"""
 
         # silently ensure that node_id and mac are not modified via web
@@ -159,7 +164,7 @@ class Config:
             if e.key == key:
                 raise e
 
-    def valid(self, key, val):
+    def valid(self, key, val):  # noqa: C901
         """
         Test an the validity of an individual setting
         Raise config error message on failure.

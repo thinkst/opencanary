@@ -1,13 +1,8 @@
 from opencanary.modules import CanaryService
 
-from zope.interface import implementer
-from twisted.conch.telnet import TelnetTransport, AuthenticatingTelnetProtocol
 from twisted.application import internet
-from twisted.internet.protocol import ServerFactory
-from twisted.application.internet import TCPServer
-
+from twisted.internet.error import ConnectionDone, ConnectionLost
 from twisted.internet import protocol
-from twisted.cred import portal
 from twisted.cred import credentials
 from twisted.conch.telnet import AuthenticatingTelnetProtocol
 from twisted.conch.telnet import ITelnetProtocol
@@ -15,14 +10,19 @@ from twisted.conch.telnet import TelnetTransport
 from twisted.conch.telnet import ECHO
 
 
-@implementer(portal.IRealm)
-class Realm:
-    def requestAvatar(self, avatarId, mind, *interfaces):
-        if ITelnetProtocol in interfaces:
-            av = MyTelnet()
-            av.state = "Command"
-            return ITelnetProtocol, av, lambda: None
-        raise NotImplementedError("Not supported by this realm")
+class CanaryTelnetTransport(TelnetTransport):
+    def dataReceived(self, data):
+        try:
+            TelnetTransport.dataReceived(self, data)
+        except ValueError:
+            print("Telnet client spoke weirdly, abandoning connection")
+            self.loseConnection()
+
+    def connectionLost(self, reason):
+        # Avoids pointless logs on disconnect
+        if reason.check(ConnectionDone) or reason.check(ConnectionLost):
+            return
+        TelnetTransport.connectionLost(self, reason)
 
 
 class AlertAuthTelnetProtocol(AuthenticatingTelnetProtocol):
@@ -68,11 +68,9 @@ class Telnet(CanaryService):
             self.banner += b"\n"
 
     def getService(self):
-        r = Realm()
-        p = portal.Portal(r)
         f = protocol.ServerFactory()
         f.canaryservice = self
         f.logger = self.logger
         f.banner = self.banner
-        f.protocol = lambda: TelnetTransport(AlertAuthTelnetProtocol, p)
+        f.protocol = lambda: CanaryTelnetTransport(AlertAuthTelnetProtocol)
         return internet.TCPServer(self.port, f, interface=self.listen_addr)

@@ -1,5 +1,5 @@
 [flake8]
-ignore = E501, W503
-exclude = .git,__pycache__,docs/conf.py,build,dist
+ignore = E501, W503, E203
+exclude = .git,__pycache__,docs/conf.py,build,dist,opencanary/modules/des.py
 max-complexity = 10
 min_python_version = 3.9

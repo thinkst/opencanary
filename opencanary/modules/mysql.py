@@ -32,15 +32,15 @@ class MySQL(Protocol, TimeoutMixin):
 
     @staticmethod
     def build_packet(seq_id, data):
-        l = len(data)
-        if l > 0xFFFFFF or l <= 0:
+        data_len = len(data)
+        if data_len > 0xFFFFFF or data_len <= 0:
             return None
 
         if seq_id > 0xFF or seq_id < 0:
             return None
 
         # chop to 3 byte int
-        _length = struct.pack("<I", l)[:-1]
+        _length = struct.pack("<I", data_len)[:-1]
         _seq_id = struct.pack("B", seq_id)
 
         return _length + _seq_id + data
@@ -180,7 +180,10 @@ class CanaryMySQL(CanaryService):
         ).encode()
         self.logtype = logger.LOG_MYSQL_LOGIN_ATTEMPT
         self.listen_addr = config.getVal("device.listen_addr", default="")
-        if re.search("^[3456]\.[-_~.+\w]+$", self.banner.decode()) is None:
+        if (
+            re.search("^[3456]\.[-_~.+\w]+$", self.banner.decode())  # noqa: W605
+            is None
+        ):
             raise ConfigException("sql.banner", "Invalid MySQL Banner")
 
     def getService(self):
