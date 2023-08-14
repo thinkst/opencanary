@@ -15,7 +15,7 @@ jobs:
       id-token: write  # IMPORTANT: this permission is mandatory for trusted publishing
     steps:
     # retrieve your distributions here
-    - name: Set up Python 
+    - name: Set up Python
       uses: actions/setup-python@v3
     - name: "Check out repository code"
       uses: "actions/checkout@v3"
@@ -37,9 +37,9 @@ jobs:
             else
               echo "Versions do not match - not publishing"
               echo "Opencanary version is: $version_to_release"
-              echo "Git tag is: $tag_name -> $tag_name_without_v" 
+              echo "Git tag is: $tag_name -> $tag_name_without_v"
               exit 1
             fi
-    
+
     - name: Publish package distributions to PyPI
       uses: pypa/gh-action-pypi-publish@release/v1

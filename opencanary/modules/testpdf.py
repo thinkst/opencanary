@@ -61,33 +61,36 @@ class TestPDF:
     ABCDEFGHIJKLMNOPQRSTUVWXYZABCD
      """
 
-    def __init__(self,):
-        self.sharepath = './'
+    def __init__(
+        self,
+    ):
+        self.sharepath = "./"
 
-    def createPDF(self, name=None, size='10kb'):
+    def createPDF(self, name=None, size="10kb"):
         from PyPDF2 import PdfFileReader, PdfFileWriter
         from fpdf import FPDF
         import os
         import random
+
         name = os.path.basename(name)
-        tmp_name = '/tmp/' + name
-        output_name = self.sharepath + '/' + name
+        tmp_name = "/tmp/" + name
+        output_name = self.sharepath + "/" + name
 
-        if size == '10kb':
-            randlength = random.randint(10000,90000)
-        elif size == '100kb':
-            randlength = random.randint(100000,900000)
-        elif size == '1mb':
-            randlength = random.randint(1000000,9000000)
+        if size == "10kb":
+            randlength = random.randint(10000, 90000)
+        elif size == "100kb":
+            randlength = random.randint(100000, 900000)
+        elif size == "1mb":
+            randlength = random.randint(1000000, 9000000)
 
-        #create file
-        pdf=FPDF()
+        # create file
+        pdf = FPDF()
         pdf.add_page()
-        pdf.set_font('Arial','B',8)
-        pdf.cell(0,0,os.urandom(randlength))
+        pdf.set_font("Arial", "B", 8)
+        pdf.cell(0, 0, os.urandom(randlength))
         pdf.output(tmp_name, "F")
 
-        #encrypt it
+        # encrypt it
         output = PdfFileWriter()
         input1 = PdfFileReader(open(tmp_name, "rb"))
         output.encrypt(user_pwd="ihasapass")
@@ -99,4 +102,4 @@ class TestPDF:
 
 
 pdf = TestPDF()
-pdf.createPDF(name='exciting.pdf', size='1mb')
+pdf.createPDF(name="exciting.pdf", size="1mb")

@@ -8,6 +8,7 @@ from twisted.application import internet
 class ProtocolError(Exception):
     pass
 
+
 class GitCommandLengthMismatch(Exception):
     pass
 
@@ -20,7 +21,7 @@ class GitProtocol(Protocol):
     def _checkDataLength(self, data):
         try:
             actual_length = len(data)
-            indata_length = int(data[0:4],base=16)
+            indata_length = int(data[0:4], base=16)
             if actual_length < indata_length:
                 raise GitCommandLengthMismatch()
             elif actual_length > indata_length:
@@ -29,17 +30,16 @@ class GitProtocol(Protocol):
             return False
 
     def _buildResponseAndSend(self, command):
-        project = command[17:17 + command[17:].find('host')]
-        request = command[command.find('=')+1:]
+        project = command[17 : 17 + command[17:].find("host")]
+        request = command[command.find("=") + 1 :]
         self._logAlert(project, request)
-        pre_response = 'ERR no such repository: ' + project
-        response_size = '{:04x}'.format(int(len(pre_response) + 4))
+        pre_response = "ERR no such repository: " + project
+        response_size = "{:04x}".format(int(len(pre_response) + 4))
         response = response_size + pre_response
-        self.transport.write(response.encode() + '\n'.encode())
+        self.transport.write(response.encode() + "\n".encode())
 
     def _logAlert(self, project, request):
-        logdata = {"REPO": project[:-1],
-                   "HOST": request[:-1]}
+        logdata = {"REPO": project[:-1], "HOST": request[:-1]}
         self.factory.log(logdata, transport=self.transport)
 
     def dataReceived(self, data):
@@ -48,7 +48,7 @@ class GitProtocol(Protocol):
         """
         try:
             try:
-                if not hasattr(self, '_data'):
+                if not hasattr(self, "_data"):
                     self._data = data
                 else:
                     self._data += data
@@ -56,8 +56,8 @@ class GitProtocol(Protocol):
                 self._checkDataLength(self._data)
 
                 git_command = self._data[4:]
-                if git_command[:15] == b'git-upload-pack':
-                    self._buildResponseAndSend(git_command.decode('utf-8'))
+                if git_command[:15] == b"git-upload-pack":
+                    self._buildResponseAndSend(git_command.decode("utf-8"))
                 else:
                     raise ProtocolError()
 
@@ -70,7 +70,7 @@ class GitProtocol(Protocol):
 
 
 class CanaryGit(Factory, CanaryService):
-    NAME = 'git'
+    NAME = "git"
     protocol = GitProtocol
 
     def __init__(self, config=None, logger=None):

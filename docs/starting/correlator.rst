@@ -63,7 +63,7 @@ To configure OpenCanary daemons to send their events to the correlator, edit the
       }
     }
   }
- 
+
 
 Troubleshooting
 ---------------

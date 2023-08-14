@@ -55,7 +55,7 @@ With that in place, we can run the daemon and test that it logs a failed FTP log
    $ cat /var/tmp/opencanary.log
    [...]
    {"dst_host": "127.0.0.1", "dst_port": 21, "local_time": "2015-07-20 13:38:21.281259", "logdata": {"PASSWORD": "default", "USERNAME": "admin"}, "logtype": 2000, "node_id": "opencanary-0", "src_host": "127.0.0.1", "src_port": 49635}
-   
+
 
 Troubleshooting
 ---------------
@@ -77,4 +77,3 @@ You may also easily restart the service using,
 .. code-block:: sh
 
    $ opencanaryd --restart
-

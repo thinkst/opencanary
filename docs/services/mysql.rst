@@ -14,4 +14,3 @@ Inside ~/.opencanary.conf:
 	"ssh.version": "SSH-2.0-OpenSSH_5.1p1 Debian-4",
 	// [..] # logging configuration
    }
-

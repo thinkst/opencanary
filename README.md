@@ -163,7 +163,7 @@ NOTE: The portscan module is automatically disabled for Dockerised OpenCanary.
 
 > Requires [Docker](https://docs.docker.com/get-docker/) installed.
 
-NOTE: The portscan module is automatically disabled for Dockerised OpenCanary. 
+NOTE: The portscan module is automatically disabled for Dockerised OpenCanary.
 
 1. Edit the `data/.opencanary.conf` file to enable, disable or customize the services that will run.
 

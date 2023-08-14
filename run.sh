@@ -12,4 +12,3 @@ elif [ -f $TEMP_CONF ]; then
 else
 	opencanaryd --copyconfig && echo "A Config file was generated at /etc/opencanaryd/.opencanary.conf."
 fi
-

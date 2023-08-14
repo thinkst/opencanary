@@ -4,8 +4,8 @@ from os.path import expanduser
 from pkg_resources import resource_filename
 from pathlib import Path
 
-SAMPLE_SETTINGS = resource_filename(__name__, 'data/settings.json')
-SETTINGS = 'opencanary.conf'
+SAMPLE_SETTINGS = resource_filename(__name__, "data/settings.json")
+SETTINGS = "opencanary.conf"
 
 
 def expand_vars(var):
@@ -20,17 +20,29 @@ def expand_vars(var):
         return os.path.expandvars(var)
     return var
 
+
 def is_docker():
-    cgroup = Path('/proc/self/cgroup')
-    return Path('/.dockerenv').is_file() or cgroup.is_file() and 'docker' in cgroup.read_text()
+    cgroup = Path("/proc/self/cgroup")
+    return (
+        Path("/.dockerenv").is_file()
+        or cgroup.is_file()
+        and "docker" in cgroup.read_text()
+    )
+
 
 class Config:
     def __init__(self, configfile=SETTINGS):
         self.__config = None
         self.__configfile = configfile
 
-        files = [configfile, "%s/.%s" % (expanduser("~"), configfile), "/etc/opencanaryd/%s"%configfile]
-        print("** We hope you enjoy using OpenCanary. For more open source Canary goodness, head over to canarytokens.org. **")
+        files = [
+            configfile,
+            "%s/.%s" % (expanduser("~"), configfile),
+            "/etc/opencanaryd/%s" % configfile,
+        ]
+        print(
+            "** We hope you enjoy using OpenCanary. For more open source Canary goodness, head over to canarytokens.org. **"
+        )
         for fname in files:
             try:
                 with open(fname, "r") as f:
@@ -42,11 +54,15 @@ class Config:
                 print("[-] Failed to open %s for reading (%s)" % (fname, e))
             except ValueError as e:
                 print("[-] Failed to decode json from %s (%s)" % (fname, e))
-                subprocess.call("cp -r %s /var/tmp/config-err-$(date +%%s)" % fname, shell=True)
+                subprocess.call(
+                    "cp -r %s /var/tmp/config-err-$(date +%%s)" % fname, shell=True
+                )
             except Exception as e:
                 print("[-] An error occurred loading %s (%s)" % (fname, e))
         if self.__config is None:
-            print('No config file found. Please create one with "opencanaryd --copyconfig"')
+            print(
+                'No config file found. Please create one with "opencanaryd --copyconfig"'
+            )
             sys.exit(1)
 
     def moduleEnabled(self, module_name):
@@ -75,14 +91,24 @@ class Config:
 
         # if dhcp is enabled, ignore the static ip settings
         if params.get("device.dhcp.enabled", False):
-            static = ["device.ip_address", "device.netmask",
-                      "device.gw", "device.dns1", "device.dns2"]
+            static = [
+                "device.ip_address",
+                "device.netmask",
+                "device.gw",
+                "device.dns1",
+                "device.dns2",
+            ]
             for k in static:
                 if k in params:
                     del params[k]
 
         # for each section, if disabled, delete ignore section's settings
-        disabled_modules = tuple(filter(lambda m: not params.get("%s.enabled" % m, False), ["ftp", "ssh", "smb", "http"]))
+        disabled_modules = tuple(
+            filter(
+                lambda m: not params.get("%s.enabled" % m, False),
+                ["ftp", "ssh", "smb", "http"],
+            )
+        )
         for k in params.keys():
             if not k.endswith("enabled") and k.startswith(disabled_modules):
                 del params[k]
@@ -90,9 +116,9 @@ class Config:
 
         # test options indpenedently for validity
         errors = []
-        for key,value in iteritems(params):
+        for key, value in iteritems(params):
             try:
-                self.valid(key,value)
+                self.valid(key, value)
             except ConfigException as e:
                 errors.append(e)
 
@@ -100,7 +126,7 @@ class Config:
         ports = {k: v for k, v in iteritems(self.__config) if k.endswith(".port")}
         newports = {k: v for k, v in iteritems(params) if k.endswith(".port")}
         ports.update(newports)
-        ports = [(port,setting) for setting, port in iteritems(ports)]
+        ports = [(port, setting) for setting, port in iteritems(ports)]
         ports.sort()
 
         for port, settings in itertools.groupby(ports, lambda x: x[0]):
@@ -142,10 +168,12 @@ class Config:
 
         if key.endswith(".enabled"):
             if not ((val is True) or (val is False)):
-                raise ConfigException(key, "Boolean setting is not True or False (%s)" % val)
+                raise ConfigException(
+                    key, "Boolean setting is not True or False (%s)" % val
+                )
 
         if key.endswith(".port"):
-            if (not isinstance(val,int)) or val < 1 or val > 65535:
+            if (not isinstance(val, int)) or val < 1 or val > 65535:
                 raise ConfigException(key, "Invalid port number (%s)" % val)
 
         # Max length of SSH version string is 255 chars including trailing CR and LF
@@ -165,7 +193,9 @@ class Config:
                 if not f["type"]:
                     raise ConfigException(key, "File type cannot be empty")
                 if f["type"] not in extensions:
-                    raise ConfigException(key, "Extension %s is not supported" % f["type"])
+                    raise ConfigException(
+                        key, "Extension %s is not supported" % f["type"]
+                    )
 
         if key == "device.name":
             allowed_chars = string.ascii_letters + string.digits + "+-#_"
@@ -175,7 +205,10 @@ class Config:
             elif len(val) < 1:
                 raise ConfigException(key, "Name ought to be at least one character")
             elif any(map(lambda x: x not in allowed_chars, val)):
-                raise ConfigException(key, "Please use only characters, digits, any of the following: + - # _")
+                raise ConfigException(
+                    key,
+                    "Please use only characters, digits, any of the following: + - # _",
+                )
 
         if key == "device.desc":
             allowed_chars = string.ascii_letters + string.digits + "+-#_ "
@@ -184,7 +217,10 @@ class Config:
             elif len(val) < 1:
                 raise ConfigException(key, "Name ought to be at least one character")
             elif any(map(lambda x: x not in allowed_chars, val)):
-                raise ConfigException(key, "Please use only characters, digits, spaces and any of the following: + - # _")
+                raise ConfigException(
+                    key,
+                    "Please use only characters, digits, spaces and any of the following: + - # _",
+                )
 
         return True
 
@@ -196,12 +232,13 @@ class Config:
                 os.rename(cfg, cfg + ".bak")
 
             with open(cfg, "w") as f:
-                json.dump(self.__config, f, sort_keys=True, indent=4, separators=(',', ': '))
+                json.dump(
+                    self.__config, f, sort_keys=True, indent=4, separators=(",", ": ")
+                )
 
         except Exception as e:
             print("[-] Failed to save config file %s" % e)
             raise ConfigException("config", "%s" % e)
-
 
     def __repr__(self):
         return self.__config.__repr__()
@@ -210,14 +247,16 @@ class Config:
         return self.__config.__str__()
 
     def toDict(self):
-        """ Return all settings as a dict """
+        """Return all settings as a dict"""
         return self.__config
 
     def toJSON(self):
         """
         JSON representation of config
         """
-        return json.dumps(self.__config, sort_keys=True, indent=4, separators=(',', ': '))
+        return json.dumps(
+            self.__config, sort_keys=True, indent=4, separators=(",", ": ")
+        )
 
 
 class ConfigException(Exception):
@@ -232,5 +271,6 @@ class ConfigException(Exception):
 
     def __repr__(self):
         return "<%s %s (%s)>" % (self.__class__.__name__, self.key, self.msg)
+
 
 config = Config()
