@@ -13,4 +13,3 @@ Inside ~/.opencanary.conf:
        "rdp.port", 3389,
        // [..] # logging configuration
    }
-

@@ -8,18 +8,21 @@ from twisted.application import internet
 from ntlmlib.messages import ChallengeResponse, TargetInfo
 
 import struct
-import re
 import collections
 
-
 # Monkeypatch bug in ntmllib
-if getattr(TargetInfo, 'getData', None) is None:
+if getattr(TargetInfo, "getData", None) is None:
+
     def getData(self):
         return self.get_data()
+
     TargetInfo.getData = getData
 
-TDSPacket = collections.namedtuple('TDSPacket', 'type status spid packetid window payload')
-PreLoginOption = collections.namedtuple('PreLoginOption', 'token data')
+TDSPacket = collections.namedtuple(
+    "TDSPacket", "type status spid packetid window payload"
+)
+PreLoginOption = collections.namedtuple("PreLoginOption", "token data")
+
 
 class MSSQLProtocol(Protocol, TimeoutMixin):
     # overview https://msdn.microsoft.com/en-us/library/dd357422.aspx
@@ -44,7 +47,46 @@ class MSSQLProtocol(Protocol, TimeoutMixin):
     LOGIN7_OPT1_BYTEORDER_MASK = 0x01
     LOGIN7_OPT1_BYTEORDER_X86 = 0x01
     LOGIN7_OPT1_BYTEORDER_68000 = 0x01
-    LOGIN7_FIELDS = ["length", "TDSversion", "packetSize", "clientProgVer", "clientPID", "connID", "optFlags1", "optFlags2", "typeFlags", "optFlags3", "clientTimeZone", "clientLCID", "ibHostName", "cchHostName", "ibUserName", "cchUserName", "ibPassword", "cchPassword", "ibAppName", "cchAppName", "ibServerName", "cchServerName", "ibExtension", "cbExtension", "ibCltIntName", "cchCltIntName", "ibLanguage", "cchLanguage", "ibDatabase", "cchDatabase", "ClientID", "ibSSPI", "cbSSPI", "ibAtchDBFile", "cchAtchDBFile", "ibChangePassword", "cchChangePassword", "cbSSPILong"]
+    LOGIN7_FIELDS = [
+        "length",
+        "TDSversion",
+        "packetSize",
+        "clientProgVer",
+        "clientPID",
+        "connID",
+        "optFlags1",
+        "optFlags2",
+        "typeFlags",
+        "optFlags3",
+        "clientTimeZone",
+        "clientLCID",
+        "ibHostName",
+        "cchHostName",
+        "ibUserName",
+        "cchUserName",
+        "ibPassword",
+        "cchPassword",
+        "ibAppName",
+        "cchAppName",
+        "ibServerName",
+        "cchServerName",
+        "ibExtension",
+        "cbExtension",
+        "ibCltIntName",
+        "cchCltIntName",
+        "ibLanguage",
+        "cchLanguage",
+        "ibDatabase",
+        "cchDatabase",
+        "ClientID",
+        "ibSSPI",
+        "cbSSPI",
+        "ibAtchDBFile",
+        "cchAtchDBFile",
+        "ibChangePassword",
+        "cchChangePassword",
+        "cbSSPILong",
+    ]
 
     NMAP_PROBE_1 = TDSPacket(
         type=18,
@@ -52,12 +94,13 @@ class MSSQLProtocol(Protocol, TimeoutMixin):
         spid=0,
         packetid=0,
         window=0,
-        payload=b'\x00\x00\x15\x00\x06\x01\x00\x1b\x00\x01\x02\x00\x1c\x00\x0c\x03\x00(\x00\x04\xff\x08\x00\x01U\x00\x00\x00MSSQLServer\x00H\x0f\x00\x00')
+        payload=b"\x00\x00\x15\x00\x06\x01\x00\x1b\x00\x01\x02\x00\x1c\x00\x0c\x03\x00(\x00\x04\xff\x08\x00\x01U\x00\x00\x00MSSQLServer\x00H\x0f\x00\x00",
+    )
 
     NMAP_PROBE_1_RESP = {
-        "2008R2" : b"\x04\x01\x00.\x00\x00\x01\x00\x00\x00\x15\x00\x06\x01\x00\x1b\x00\x01\x02\x00\x1c\x00\x01\x03\x00\x1d\x00\x00\xff\x0a\x32\x10\xb4",
-        "2012" : b"\x04\x01\x00\x25\x00\x00\x01\x00\x00\x00\x15\x00\x06\x01\x00\x1b\x00\x01\x02\x00\x1c\x00\x01\x03\x00\x1d\x00\x00\xff\x0b\x00\x0c\x38",
-        "2014" : b"\x04\x01\x00\x25\x00\x00\x01\x00\x00\x00\x15\x00\x06\x01\x00\x1b\x00\x01\x02\x00\x1c\x00\x01\x03\x00\x1d\x00\x00\xff\x0c\x00\x07\xd0"
+        "2008R2": b"\x04\x01\x00.\x00\x00\x01\x00\x00\x00\x15\x00\x06\x01\x00\x1b\x00\x01\x02\x00\x1c\x00\x01\x03\x00\x1d\x00\x00\xff\x0a\x32\x10\xb4",
+        "2012": b"\x04\x01\x00\x25\x00\x00\x01\x00\x00\x00\x15\x00\x06\x01\x00\x1b\x00\x01\x02\x00\x1c\x00\x01\x03\x00\x1d\x00\x00\xff\x0b\x00\x0c\x38",
+        "2014": b"\x04\x01\x00\x25\x00\x00\x01\x00\x00\x00\x15\x00\x06\x01\x00\x1b\x00\x01\x02\x00\x1c\x00\x01\x03\x00\x1d\x00\x00\xff\x0c\x00\x07\xd0",
     }
 
     def __init__(self, factory):
@@ -68,16 +111,17 @@ class MSSQLProtocol(Protocol, TimeoutMixin):
 
     @staticmethod
     def build_packet(tds):
-        header = struct.pack('>BBHHBB',
-                             tds.type,
-                             tds.status,
-                             len(tds.payload) + MSSQLProtocol.TDS_HEADER_LEN,
-                             tds.spid,
-                             tds.packetid,
-                             tds.window
+        header = struct.pack(
+            ">BBHHBB",
+            tds.type,
+            tds.status,
+            len(tds.payload) + MSSQLProtocol.TDS_HEADER_LEN,
+            tds.spid,
+            tds.packetid,
+            tds.window,
         )
 
-        return  header + tds.payload
+        return header + tds.payload
 
     @staticmethod
     def parsePreLogin(data):
@@ -89,13 +133,13 @@ class MSSQLProtocol(Protocol, TimeoutMixin):
 
         options = data[:index]
 
-        if (len(options) % 5 != 0):
+        if len(options) % 5 != 0:
             return None
 
         def getOption(i):
-            (token, offset, length) = struct.unpack(">BHH", options[i:i+5])
-            tokendata = data[offset: offset + length]
-            assert(len(tokendata) == length)
+            (token, offset, length) = struct.unpack(">BHH", options[i : i + 5])
+            tokendata = data[offset : offset + length]
+            assert len(tokendata) == length
             return PreLoginOption._make((token, tokendata))
 
         try:
@@ -119,7 +163,7 @@ class MSSQLProtocol(Protocol, TimeoutMixin):
             header += struct.pack(">BHH", token, offset, length)
             data += opt.data
 
-        return header + b"\xff" +  data
+        return header + b"\xff" + data
 
     @staticmethod
     def parseLogin7(data):
@@ -132,12 +176,12 @@ class MSSQLProtocol(Protocol, TimeoutMixin):
         hlen = struct.calcsize(hfmt)
         try:
             htuple = struct.unpack(hfmt, data[:hlen])
-        except Exception as e:
+        except Exception:
             return None
 
         def decodePassChar(c):
             # https://msdn.microsoft.com/en-us/library/dd304019.aspx
-            c = ord(c) ^ 0xa5
+            c = ord(c) ^ 0xA5
             return chr(((c & 0x0F) << 4) | (c >> 4))
 
         fields = {}
@@ -145,23 +189,27 @@ class MSSQLProtocol(Protocol, TimeoutMixin):
             fields[fieldname] = htuple[i]
 
         loginData = {}
-        for field in "HostName UserName Password AppName ServerName Language Database CltIntName".split():
+        for (
+            field
+        ) in "HostName UserName Password AppName ServerName Language Database CltIntName".split():
             try:
                 findex = fields["ib" + field]
-                flen = fields["cch" + field] * 2 # this is character count, not count of bytes
-                _fdata = data[findex: findex + flen]
+                flen = (
+                    fields["cch" + field] * 2
+                )  # this is character count, not count of bytes
+                _fdata = data[findex : findex + flen]
                 if field == "Password":
                     _fdata = "".join(map(decodePassChar, _fdata))
-                loginData[field] = _fdata.decode('utf-16')
-            except Exception as e:
+                loginData[field] = _fdata.decode("utf-16")
+            except Exception:
                 pass
 
-        field="SSPI"
+        field = "SSPI"
         findex = fields["ib" + field]
         flen = fields["cb" + field]
         if flen == 0:
             return loginData
-        loginData["NTLM"] = data[findex: findex + flen]
+        loginData["NTLM"] = data[findex : findex + flen]
         return loginData
 
     @staticmethod
@@ -170,38 +218,65 @@ class MSSQLProtocol(Protocol, TimeoutMixin):
         number = 18456
         state = 1
         sevclass = 14
-        msgtxtlen= len(msgtxt)
-        serverNameLen=len(serverName)
-        procNameLen=len(procName)
-        lineNumber=1
+        msgtxtlen = len(msgtxt)
+        serverNameLen = len(serverName)
+        procNameLen = len(procName)
+        lineNumber = 1
 
-        msgtxt = msgtxt.encode('utf-16le')
-        procName = procName.encode('utf-16le')
-        serverName = serverName.encode('utf-16le')
+        msgtxt = msgtxt.encode("utf-16le")
+        procName = procName.encode("utf-16le")
+        serverName = serverName.encode("utf-16le")
 
         # This length works, but tests seem show mssql 2014 uses an (incorrect?) length -3 bytes shorter than this
-        length = 4 + 1 + 1 + 2 + 1 + 1 + 4 + 2 + 1 + len(msgtxt) + len(serverName) + len(procName)
+        length = (
+            4
+            + 1
+            + 1
+            + 2
+            + 1
+            + 1
+            + 4
+            + 2
+            + 1
+            + len(msgtxt)
+            + len(serverName)
+            + len(procName)
+        )
 
-        fmt="<BHlBB H%ds B%ds B%ds l" % (len(msgtxt), len(serverName), len(procName))
+        fmt = "<BHlBB H%ds B%ds B%ds l" % (len(msgtxt), len(serverName), len(procName))
 
-        data = struct.pack(fmt, tokentype, length, number, state, sevclass, msgtxtlen, msgtxt, serverNameLen, serverName, procNameLen, procName, lineNumber)
+        data = struct.pack(
+            fmt,
+            tokentype,
+            length,
+            number,
+            state,
+            sevclass,
+            msgtxtlen,
+            msgtxt,
+            serverNameLen,
+            serverName,
+            procNameLen,
+            procName,
+            lineNumber,
+        )
 
         return data
 
     def consume_packet(self):
-        """ Consume TDS packet off buffer"""
+        """Consume TDS packet off buffer"""
         hlen = MSSQLProtocol.TDS_HEADER_LEN
         if len(self._buffer) < hlen:
             return None
 
         try:
-            header = list(struct.unpack('>BBHHBB', self._buffer[:hlen]))
+            header = list(struct.unpack(">BBHHBB", self._buffer[:hlen]))
             plen = header[2]
             del header[2]
             if len(self._buffer) >= plen:
-                payload = self._buffer[hlen: plen]
+                payload = self._buffer[hlen:plen]
                 self._buffer = self._buffer[plen:]
-                tds = TDSPacket._make(header  + [payload])
+                tds = TDSPacket._make(header + [payload])
                 return tds
             else:
                 # Whole payload not yet received. Leave header in
@@ -214,7 +289,7 @@ class MSSQLProtocol(Protocol, TimeoutMixin):
 
     @staticmethod
     def buildChallengeToken():
-        spnegoheader=b'\xa1\x82\x01Y0\x82\x01U\xa0\x03\n\x01\x01\xa1\x0c\x06\n+\x06\x01\x04\x01\x827\x02\x02\n\xa2\x82\x01>\x04\x82\x01:'
+        spnegoheader = b"\xa1\x82\x01Y0\x82\x01U\xa0\x03\n\x01\x01\xa1\x0c\x06\n+\x06\x01\x04\x01\x827\x02\x02\n\xa2\x82\x01>\x04\x82\x01:"
 
         # This NTLMSSP challenge is a modified actual challenge
         # stripped using the ntlmlib:
@@ -227,28 +302,30 @@ class MSSQLProtocol(Protocol, TimeoutMixin):
         # del c['target_info'].fields[4]
         # c['target_info_len'] = ''
         # template = c.get_data()
-        old = b'NTLMSSP\x00\x02\x00\x00\x00\x1e\x00\x1e\x008\x00\x00\x00\x15\xc2\x8a\xe26Ph\x8a\xae\x84R\xbe@\xd5qt\xe4\x00\x00\x00\xe4\x00\xe4\x00V\x00\x00\x00\x06\x02\xf0#\x00\x00\x00\x0fW\x00I\x00N\x002\x00K\x001\x002\x00-\x00D\x00O\x00M\x00A\x00I\x00N\x00S\x00\x02\x00\x1e\x00W\x00I\x00N\x002\x00K\x001\x002\x00-\x00D\x00O\x00M\x00A\x00I\x00N\x00S\x00\x01\x00\x1e\x00W\x00I\x00N\x002\x00K\x001\x002\x00-\x00D\x00O\x00M\x00A\x00I\x00N\x00S\x00\x04\x00D\x00w\x00i\x00n\x002\x00k\x001\x002\x00-\x00d\x00o\x00m\x00a\x00i\x00n\x00s\x00r\x00v\x00.\x00c\x00o\x00r\x00p\x00.\x00t\x00h\x00i\x00n\x00k\x00s\x00t\x00.\x00c\x00o\x00m\x00\x03\x00D\x00w\x00i\x00n\x002\x00k\x001\x002\x00-\x00d\x00o\x00m\x00a\x00i\x00n\x00s\x00r\x00v\x00.\x00c\x00o\x00r\x00p\x00.\x00t\x00h\x00i\x00n\x00k\x00s\x00t\x00.\x00c\x00o\x00m\x00\x07\x00\x08\x00\xa2\x9e\xda\x91\x1f\xbb\xd0\x01\x00\x00\x00\x00\x06\x02\xf0#\x00\x00\x00\x0fy\x00o\x00y\x00o\x00m\x00a\x00\x00\x00\x00\x00'
-
-        template = b'NTLMSSP\x00\x02\x00\x00\x00\x1e\x00\x1e\x008\x00\x00\x00\x15\xc2\x8a\xe26Ph\x8a\xae\x84R\xbe@\xd5qt\xe4\x00\x00\x00\x06\x02\xf0#\x00\x00\x00\x0fW\x00I\x00N\x002\x00K\x001\x002\x00-\x00D\x00O\x00M\x00A\x00I\x00N\x00S\x00\x07\x00\x08\x00\xa2\x9e\xda\x91\x1f\xbb\xd0\x01\x00\x00\x00\x00'
+        old = b"NTLMSSP\x00\x02\x00\x00\x00\x1e\x00\x1e\x008\x00\x00\x00\x15\xc2\x8a\xe26Ph\x8a\xae\x84R\xbe@\xd5qt\xe4\x00\x00\x00\xe4\x00\xe4\x00V\x00\x00\x00\x06\x02\xf0#\x00\x00\x00\x0fW\x00I\x00N\x002\x00K\x001\x002\x00-\x00D\x00O\x00M\x00A\x00I\x00N\x00S\x00\x02\x00\x1e\x00W\x00I\x00N\x002\x00K\x001\x002\x00-\x00D\x00O\x00M\x00A\x00I\x00N\x00S\x00\x01\x00\x1e\x00W\x00I\x00N\x002\x00K\x001\x002\x00-\x00D\x00O\x00M\x00A\x00I\x00N\x00S\x00\x04\x00D\x00w\x00i\x00n\x002\x00k\x001\x002\x00-\x00d\x00o\x00m\x00a\x00i\x00n\x00s\x00r\x00v\x00.\x00c\x00o\x00r\x00p\x00.\x00t\x00h\x00i\x00n\x00k\x00s\x00t\x00.\x00c\x00o\x00m\x00\x03\x00D\x00w\x00i\x00n\x002\x00k\x001\x002\x00-\x00d\x00o\x00m\x00a\x00i\x00n\x00s\x00r\x00v\x00.\x00c\x00o\x00r\x00p\x00.\x00t\x00h\x00i\x00n\x00k\x00s\x00t\x00.\x00c\x00o\x00m\x00\x07\x00\x08\x00\xa2\x9e\xda\x91\x1f\xbb\xd0\x01\x00\x00\x00\x00\x06\x02\xf0#\x00\x00\x00\x0fy\x00o\x00y\x00o\x00m\x00a\x00\x00\x00\x00\x00"
 
         payload = spnegoheader + old
-        return b"\xed" + struct.pack("<H",len(payload)) + payload
+        return b"\xed" + struct.pack("<H", len(payload)) + payload
 
-    def process(self,tds):
+    def process(self, tds):
         if tds.payload is None:
             return
 
         if tds == MSSQLProtocol.NMAP_PROBE_1:
-            self.transport.write(MSSQLProtocol.NMAP_PROBE_1_RESP[self.factory.canaryservice.version])
+            self.transport.write(
+                MSSQLProtocol.NMAP_PROBE_1_RESP[self.factory.canaryservice.version]
+            )
 
         elif tds.type == MSSQLProtocol.TDS_TYPE_PRELOGIN:
             rPreLogin = [
-                PreLoginOption(MSSQLProtocol.PRELOGIN_VERSION, b'\x0c\x00\x10\x04\x00\x00'),
-                PreLoginOption(MSSQLProtocol.PRELOGIN_ENCRYPTION, b'\x02'),
-                PreLoginOption(MSSQLProtocol.PRELOGIN_INSTOPT, b'\x00'),
-                PreLoginOption(MSSQLProtocol.PRELOGIN_THREADID, b''),
-                PreLoginOption(MSSQLProtocol.PRELOGIN_MARS, b'\x00'),
-                PreLoginOption(MSSQLProtocol.PRELOGIN_TRACEID, b'')
+                PreLoginOption(
+                    MSSQLProtocol.PRELOGIN_VERSION, b"\x0c\x00\x10\x04\x00\x00"
+                ),
+                PreLoginOption(MSSQLProtocol.PRELOGIN_ENCRYPTION, b"\x02"),
+                PreLoginOption(MSSQLProtocol.PRELOGIN_INSTOPT, b"\x00"),
+                PreLoginOption(MSSQLProtocol.PRELOGIN_THREADID, b""),
+                PreLoginOption(MSSQLProtocol.PRELOGIN_MARS, b"\x00"),
+                PreLoginOption(MSSQLProtocol.PRELOGIN_TRACEID, b""),
             ]
 
             payload = self.buildPreLogin(rPreLogin)
@@ -259,7 +336,7 @@ class MSSQLProtocol(Protocol, TimeoutMixin):
                 spid=0x00,
                 packetid=0x01,
                 window=0x00,
-                payload=payload
+                payload=payload,
             )
             self.transport.write(self.build_packet(rtds))
 
@@ -270,21 +347,21 @@ class MSSQLProtocol(Protocol, TimeoutMixin):
 
             errormsg = ""
             servername = ""
-            ntlm = loginData.pop('NTLM', None)
+            ntlm = loginData.pop("NTLM", None)
             if ntlm is not None:
                 # TODO: handle NTLM challenge generation correctly
                 errormsg = "Login failed."
-                logdata = {'USERNAME': '', 'PASSWORD': ''}
+                logdata = {"USERNAME": "", "PASSWORD": ""}
                 logtype = self.factory.canaryservice.logger.LOG_MSSQL_LOGIN_WINAUTH
                 log = self.factory.canaryservice.log
                 log(logdata, transport=self.transport, logtype=logtype)
 
             else:
-               logtype = self.factory.canaryservice.logger.LOG_MSSQL_LOGIN_SQLAUTH
-               log = self.factory.canaryservice.log
-               log(loginData, transport=self.transport, logtype=logtype)
-               username = loginData.get("UserName", "")
-               errormsg = "Login failed for user %s." % username
+                logtype = self.factory.canaryservice.logger.LOG_MSSQL_LOGIN_SQLAUTH
+                log = self.factory.canaryservice.log
+                log(loginData, transport=self.transport, logtype=logtype)
+                username = loginData.get("UserName", "")
+                errormsg = "Login failed for user %s." % username
 
             payload = self.buildError(errormsg, servername)
             # extra data observed on the wire
@@ -296,31 +373,33 @@ class MSSQLProtocol(Protocol, TimeoutMixin):
                 spid=54,
                 packetid=0x01,
                 window=0x00,
-                payload=payload
+                payload=payload,
             )
 
             self.transport.write(self.build_packet(rtds))
 
         elif tds.type == MSSQLProtocol.TDS_TYPE_SSPI:
             # FIXME: parse the SNEGO header correctly to extract the NTLM message
-            i = tds.payload.find(b'NTLMSSP\x00')
+            i = tds.payload.find(b"NTLMSSP\x00")
             if i < 0:
                 self.transport.abortConnection()
             ntlmtoken = tds.payload[i:]
 
-            c = ChallengeResponse(0,0,0,'unspecified','unspecified')
+            c = ChallengeResponse(0, 0, 0, "unspecified", "unspecified")
             c.from_string(ntlmtoken)
-            username = c['user_name'].decode('utf-16le')
-            hostname = c['host_name'].decode('utf-16le')
-            domain = c['domain_name'].decode('utf-16le')
+            username = c["user_name"].decode("utf-16le")
+            hostname = c["host_name"].decode("utf-16le")
+            domain = c["domain_name"].decode("utf-16le")
             loginData = {
-                'HOSTNAME' : hostname,
-                'DOMAINNAME' : domain,
+                "HOSTNAME": hostname,
+                "DOMAINNAME": domain,
             }
             logtype = self.factory.logger.LOG_MSSQL_LOGIN_WINAUTH
             self.logAuth(username, None, loginData, logtype)
 
-            payload = self.buildError("Login failed for user %s\\%s." % (domain,username) , hostname)
+            payload = self.buildError(
+                "Login failed for user %s\\%s." % (domain, username), hostname
+            )
             # extra data observed on the wire
             payload += b"\xfd\x02\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00"
 
@@ -330,7 +409,7 @@ class MSSQLProtocol(Protocol, TimeoutMixin):
                 spid=54,
                 packetid=0x01,
                 window=0x00,
-                payload=payload
+                payload=payload,
             )
 
             self.transport.write(self.build_packet(rtds))
@@ -349,15 +428,16 @@ class MSSQLProtocol(Protocol, TimeoutMixin):
             return
 
         try:
-             self._busyReceiving = True
-             tds = self.consume_packet()
-             if tds is not None:
-                 self.process(tds)
+            self._busyReceiving = True
+            tds = self.consume_packet()
+            if tds is not None:
+                self.process(tds)
         finally:
-             self._busyReceiving = False
+            self._busyReceiving = False
 
     def timeoutConnection(self):
         self.transport.abortConnection()
+
 
 class SQLFactory(Factory):
     def __init__(self):
@@ -368,13 +448,13 @@ class SQLFactory(Factory):
 
 
 class MSSQL(CanaryService):
-    NAME = 'mssql'
+    NAME = "mssql"
 
     def __init__(self, config=None, logger=None):
         CanaryService.__init__(self, config=config, logger=logger)
         self.port = int(config.getVal("mssql.port", default=1433))
         self.version = config.getVal("mssql.version", default="2012")
-        self.listen_addr = config.getVal('device.listen_addr', default='')
+        self.listen_addr = config.getVal("device.listen_addr", default="")
         if self.version not in MSSQLProtocol.NMAP_PROBE_1_RESP:
             raise ConfigException("mssql.version", "Invalid MSSQL Version")
 

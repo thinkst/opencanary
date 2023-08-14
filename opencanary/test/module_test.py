@@ -32,7 +32,7 @@ def get_last_log():
     """
     Gets the last line from `/var/tmp/opencanary.log` as a dictionary
     """
-    with open('/var/tmp/opencanary.log', 'r') as log_file:
+    with open("/var/tmp/opencanary.log", "r") as log_file:
         return json.loads(log_file.readlines()[-1])
 
 
@@ -42,8 +42,9 @@ class TestFTPModule(unittest.TestCase):
 
     The FTP server should not allow logins and should log each attempt.
     """
+
     def setUp(self):
-        self.ftp = FTP('localhost')
+        self.ftp = FTP("localhost")
 
     def test_anonymous_ftp(self):
         """
@@ -51,22 +52,21 @@ class TestFTPModule(unittest.TestCase):
         """
         self.assertRaises(error_perm, self.ftp.login)
         log = get_last_log()
-        self.assertEqual(log['dst_port'], 21)
-        self.assertEqual(log['logdata']['USERNAME'], "anonymous")
-        self.assertEqual(log['logdata']['PASSWORD'], "anonymous@")
+        self.assertEqual(log["dst_port"], 21)
+        self.assertEqual(log["logdata"]["USERNAME"], "anonymous")
+        self.assertEqual(log["logdata"]["PASSWORD"], "anonymous@")
 
     def test_authenticated_ftp(self):
         """
         Connect to the FTP service with a test username and password.
         """
-        self.assertRaises(error_perm,
-                          self.ftp.login,
-                          user='test_user',
-                          passwd='test_pass')
+        self.assertRaises(
+            error_perm, self.ftp.login, user="test_user", passwd="test_pass"
+        )
         last_log = get_last_log()
-        self.assertEqual(last_log['dst_port'], 21)
-        self.assertEqual(last_log['logdata']['USERNAME'], "test_user")
-        self.assertEqual(last_log['logdata']['PASSWORD'], "test_pass")
+        self.assertEqual(last_log["dst_port"], 21)
+        self.assertEqual(last_log["logdata"]["USERNAME"], "test_user")
+        self.assertEqual(last_log["logdata"]["PASSWORD"], "test_pass")
 
     def tearDown(self):
         self.ftp.close()
@@ -81,10 +81,12 @@ class TestGitModule(unittest.TestCase):
         self.repository = git.Repo
 
     def test_clone_a_repository(self):
-        self.assertRaises(git.exc.GitCommandError,
-                          self.repository.clone_from,
-                          'git://localhost/test.git',
-                          '/tmp/git_test')
+        self.assertRaises(
+            git.exc.GitCommandError,
+            self.repository.clone_from,
+            "git://localhost/test.git",
+            "/tmp/git_test",
+        )
 
     def test_log_git_clone(self):
         """
@@ -93,8 +95,8 @@ class TestGitModule(unittest.TestCase):
         # This test must be run after the test_clone_a_repository.
         # Unless we add an attempt to clone into this test, or the setup.
         last_log = get_last_log()
-        self.assertIn("localhost", last_log['logdata']['HOST'])
-        self.assertEqual(last_log['logdata']['REPO'], "test.git")
+        self.assertIn("localhost", last_log["logdata"]["HOST"])
+        self.assertEqual(last_log["logdata"]["REPO"], "test.git")
 
 
 class TestHTTPModule(unittest.TestCase):
@@ -104,33 +106,34 @@ class TestHTTPModule(unittest.TestCase):
     The HTTP server should look like a NAS and present a login box, any
     interaction with the server (GET, POST) should be logged.
     """
+
     def test_get_http_home_page(self):
         """
         Simply get the home page.
         """
-        request = requests.get('http://localhost/')
+        request = requests.get("http://localhost/")
         self.assertEqual(request.status_code, 200)
-        self.assertIn('Synology DiskStation', request.text)
+        self.assertIn("Synology DiskStation", request.text)
         last_log = get_last_log()
-        self.assertEqual(last_log['dst_port'], 80)
-        self.assertEqual(last_log['logdata']['HOSTNAME'], "localhost")
-        self.assertEqual(last_log['logdata']['PATH'], "/index.html")
-        self.assertIn('python-requests', last_log['logdata']['USERAGENT'])
+        self.assertEqual(last_log["dst_port"], 80)
+        self.assertEqual(last_log["logdata"]["HOSTNAME"], "localhost")
+        self.assertEqual(last_log["logdata"]["PATH"], "/index.html")
+        self.assertIn("python-requests", last_log["logdata"]["USERAGENT"])
 
     def test_log_in_to_http_with_basic_auth(self):
         """
         Try to log into the site with basic auth.
         """
-        request = requests.post('http://localhost/', auth=('user', 'pass'))
+        request = requests.post("http://localhost/", auth=("user", "pass"))
         # Currently the web server returns 200, but in future it should return
         # a 403 status code.
         self.assertEqual(request.status_code, 200)
-        self.assertIn('Synology DiskStation', request.text)
+        self.assertIn("Synology DiskStation", request.text)
         last_log = get_last_log()
-        self.assertEqual(last_log['dst_port'], 80)
-        self.assertEqual(last_log['logdata']['HOSTNAME'], "localhost")
-        self.assertEqual(last_log['logdata']['PATH'], "/index.html")
-        self.assertIn('python-requests', last_log['logdata']['USERAGENT'])
+        self.assertEqual(last_log["dst_port"], 80)
+        self.assertEqual(last_log["logdata"]["HOSTNAME"], "localhost")
+        self.assertEqual(last_log["logdata"]["PATH"], "/index.html")
+        self.assertIn("python-requests", last_log["logdata"]["USERAGENT"])
         # OpenCanary doesn't currently record credentials from basic auth.
 
     def test_log_in_to_http_with_parameters(self):
@@ -138,48 +141,51 @@ class TestHTTPModule(unittest.TestCase):
         Try to log into the site by posting the parameters
         """
         login_data = {
-            'username': 'test_user',
-            'password': 'test_pass',
-            'OTPcode': '',
-            'rememberme': '',
-            '__cIpHeRtExt': '',
-            'isIframeLogin': 'yes'}
-        request = requests.post('http://localhost/index.html', data=login_data)
+            "username": "test_user",
+            "password": "test_pass",
+            "OTPcode": "",
+            "rememberme": "",
+            "__cIpHeRtExt": "",
+            "isIframeLogin": "yes",
+        }
+        request = requests.post("http://localhost/index.html", data=login_data)
         # Currently the web server returns 200, but in future it should return
         # a 403 status code.
         self.assertEqual(request.status_code, 200)
-        self.assertIn('Synology DiskStation', request.text)
+        self.assertIn("Synology DiskStation", request.text)
         last_log = get_last_log()
-        self.assertEqual(last_log['dst_port'], 80)
-        self.assertEqual(last_log['logdata']['HOSTNAME'], "localhost")
-        self.assertEqual(last_log['logdata']['PATH'], "/index.html")
-        self.assertIn('python-requests', last_log['logdata']['USERAGENT'])
-        self.assertEqual(last_log['logdata']['USERNAME'], "test_user")
-        self.assertEqual(last_log['logdata']['PASSWORD'], "test_pass")
+        self.assertEqual(last_log["dst_port"], 80)
+        self.assertEqual(last_log["logdata"]["HOSTNAME"], "localhost")
+        self.assertEqual(last_log["logdata"]["PATH"], "/index.html")
+        self.assertIn("python-requests", last_log["logdata"]["USERAGENT"])
+        self.assertEqual(last_log["logdata"]["USERNAME"], "test_user")
+        self.assertEqual(last_log["logdata"]["PASSWORD"], "test_pass")
 
     def test_get_directory_listing(self):
         """
         Try to get a directory listing should result in a 403 Forbidden message.
         """
-        request = requests.get('http://localhost/css/')
+        request = requests.get("http://localhost/css/")
         self.assertEqual(request.status_code, 403)
-        self.assertIn('Forbidden', request.text)
+        self.assertIn("Forbidden", request.text)
         # These request are not logged at the moment. Maybe we should.
 
     def test_get_non_existent_file(self):
         """
         Try to get a file that doesn't exist should give a 404 error message.
         """
-        request = requests.get('http://localhost/this/file/doesnt_exist.txt')
+        request = requests.get("http://localhost/this/file/doesnt_exist.txt")
         self.assertEqual(request.status_code, 404)
-        self.assertIn('Not Found', request.text)
+        self.assertIn("Not Found", request.text)
         # These request are not logged at the moment. Maybe we should.
 
     def test_get_supporting_image_file(self):
         """
         Try to download a supporting image file
         """
-        request = requests.get('http://localhost/img/synohdpack/images/Components/checkbox.png')
+        request = requests.get(
+            "http://localhost/img/synohdpack/images/Components/checkbox.png"
+        )
         # Just an arbitrary image
         self.assertEqual(request.status_code, 200)
 
@@ -191,33 +197,36 @@ class TestHTTPSModule(unittest.TestCase):
     The HTTP server should look like a NAS and present a login box, any
     interaction with the server (GET, POST) should be logged.
     """
+
     def test_get_http_home_page(self):
         """
         Simply get the home page.
         """
-        request = requests.get('https://localhost/', verify=False)
+        request = requests.get("https://localhost/", verify=False)
         self.assertEqual(request.status_code, 200)
-        self.assertIn('Synology DiskStation', request.text)
+        self.assertIn("Synology DiskStation", request.text)
         last_log = get_last_log()
-        self.assertEqual(last_log['dst_port'], 443)
-        self.assertEqual(last_log['logdata']['HOSTNAME'], "localhost")
-        self.assertEqual(last_log['logdata']['PATH'], "/index.html")
-        self.assertIn('python-requests', last_log['logdata']['USERAGENT'])
+        self.assertEqual(last_log["dst_port"], 443)
+        self.assertEqual(last_log["logdata"]["HOSTNAME"], "localhost")
+        self.assertEqual(last_log["logdata"]["PATH"], "/index.html")
+        self.assertIn("python-requests", last_log["logdata"]["USERAGENT"])
 
     def test_log_in_to_http_with_basic_auth(self):
         """
         Try to log into the site with basic auth.
         """
-        request = requests.post('https://localhost/', auth=('user', 'pass'), verify=False)
+        request = requests.post(
+            "https://localhost/", auth=("user", "pass"), verify=False
+        )
         # Currently the web server returns 200, but in future it should return
         # a 403 status code.
         self.assertEqual(request.status_code, 200)
-        self.assertIn('Synology DiskStation', request.text)
+        self.assertIn("Synology DiskStation", request.text)
         last_log = get_last_log()
-        self.assertEqual(last_log['dst_port'], 443)
-        self.assertEqual(last_log['logdata']['HOSTNAME'], "localhost")
-        self.assertEqual(last_log['logdata']['PATH'], "/index.html")
-        self.assertIn('python-requests', last_log['logdata']['USERAGENT'])
+        self.assertEqual(last_log["dst_port"], 443)
+        self.assertEqual(last_log["logdata"]["HOSTNAME"], "localhost")
+        self.assertEqual(last_log["logdata"]["PATH"], "/index.html")
+        self.assertIn("python-requests", last_log["logdata"]["USERAGENT"])
         # OpenCanary doesn't currently record credentials from basic auth.
 
     def test_log_in_to_http_with_parameters(self):
@@ -225,48 +234,56 @@ class TestHTTPSModule(unittest.TestCase):
         Try to log into the site by posting the parameters
         """
         login_data = {
-            'username': 'test_user',
-            'password': 'test_pass',
-            'OTPcode': '',
-            'rememberme': '',
-            '__cIpHeRtExt': '',
-            'isIframeLogin': 'yes'}
-        request = requests.post('https://localhost/index.html', data=login_data, verify=False)
+            "username": "test_user",
+            "password": "test_pass",
+            "OTPcode": "",
+            "rememberme": "",
+            "__cIpHeRtExt": "",
+            "isIframeLogin": "yes",
+        }
+        request = requests.post(
+            "https://localhost/index.html", data=login_data, verify=False
+        )
         # Currently the web server returns 200, but in future it should return
         # a 403 status code.
         self.assertEqual(request.status_code, 200)
-        self.assertIn('Synology DiskStation', request.text)
+        self.assertIn("Synology DiskStation", request.text)
         last_log = get_last_log()
-        self.assertEqual(last_log['dst_port'], 443)
-        self.assertEqual(last_log['logdata']['HOSTNAME'], "localhost")
-        self.assertEqual(last_log['logdata']['PATH'], "/index.html")
-        self.assertIn('python-requests', last_log['logdata']['USERAGENT'])
-        self.assertEqual(last_log['logdata']['USERNAME'], "test_user")
-        self.assertEqual(last_log['logdata']['PASSWORD'], "test_pass")
+        self.assertEqual(last_log["dst_port"], 443)
+        self.assertEqual(last_log["logdata"]["HOSTNAME"], "localhost")
+        self.assertEqual(last_log["logdata"]["PATH"], "/index.html")
+        self.assertIn("python-requests", last_log["logdata"]["USERAGENT"])
+        self.assertEqual(last_log["logdata"]["USERNAME"], "test_user")
+        self.assertEqual(last_log["logdata"]["PASSWORD"], "test_pass")
 
     def test_get_directory_listing(self):
         """
         Try to get a directory listing should result in a 403 Forbidden message.
         """
-        request = requests.get('https://localhost/css/', verify=False)
+        request = requests.get("https://localhost/css/", verify=False)
         self.assertEqual(request.status_code, 403)
-        self.assertIn('Forbidden', request.text)
+        self.assertIn("Forbidden", request.text)
         # These request are not logged at the moment. Maybe we should.
 
     def test_get_non_existent_file(self):
         """
         Try to get a file that doesn't exist should give a 404 error message.
         """
-        request = requests.get('https://localhost/this/file/doesnt_exist.txt', verify=False)
+        request = requests.get(
+            "https://localhost/this/file/doesnt_exist.txt", verify=False
+        )
         self.assertEqual(request.status_code, 404)
-        self.assertIn('Not Found', request.text)
+        self.assertIn("Not Found", request.text)
         # These request are not logged at the moment. Maybe we should.
 
     def test_get_supporting_image_file(self):
         """
         Try to download a supporting image file
         """
-        request = requests.get('https://localhost/img/synohdpack/images/Components/checkbox.png', verify=False)
+        request = requests.get(
+            "https://localhost/img/synohdpack/images/Components/checkbox.png",
+            verify=False,
+        )
         # Just an arbitrary image
         self.assertEqual(request.status_code, 200)
 
@@ -275,6 +292,7 @@ class TestSSHModule(unittest.TestCase):
     """
     Tests the cases for the SSH server
     """
+
     def setUp(self):
         self.connection = paramiko.SSHClient()
         self.connection.set_missing_host_key_policy(paramiko.AutoAddPolicy())
@@ -290,17 +308,19 @@ class TestSSHModule(unittest.TestCase):
         # and remove the import warnings and the warnings.catch.
         with warnings.catch_warnings():
             warnings.simplefilter("ignore")
-            self.assertRaises(paramiko.ssh_exception.AuthenticationException,
-                              self.connection.connect,
-                              hostname="localhost",
-                              port=2222,
-                              username="test_user",
-                              password="test_pass")
+            self.assertRaises(
+                paramiko.ssh_exception.AuthenticationException,
+                self.connection.connect,
+                hostname="localhost",
+                port=2222,
+                username="test_user",
+                password="test_pass",
+            )
         last_log = get_last_log()
-        self.assertEqual(last_log['dst_port'], 2222)
-        self.assertIn('paramiko', last_log['logdata']['REMOTEVERSION'])
-        self.assertEqual(last_log['logdata']['USERNAME'], "test_user")
-        self.assertEqual(last_log['logdata']['PASSWORD'], "test_pass")
+        self.assertEqual(last_log["dst_port"], 2222)
+        self.assertIn("paramiko", last_log["logdata"]["REMOTEVERSION"])
+        self.assertEqual(last_log["logdata"]["USERNAME"], "test_user")
+        self.assertEqual(last_log["logdata"]["PASSWORD"], "test_pass")
 
     def tearDown(self):
         self.connection.close()
@@ -311,18 +331,19 @@ class TestNTPModule(unittest.TestCase):
     Tests the NTP server. The server doesn't respond, but it will log attempts
     to trigger the MON_GETLIST_1 NTP commands, which is used for DDOS attacks.
     """
+
     def setUp(self):
         packet = (
-            b'\x17' +  # response more version mode
-            b'\x00' +  # sequence number
-            b'\x03' +  # implementation (NTPv3)
-            b'\x2a' +  # request (MON_GETLIST_1)
-            b'\x00' +  # error number / number of data items
-            b'\x00' +  # item_size
-            b'\x00'    # data
+            b"\x17"
+            + b"\x00"  # response more version mode
+            + b"\x03"  # sequence number
+            + b"\x2a"  # implementation (NTPv3)
+            + b"\x00"  # request (MON_GETLIST_1)
+            + b"\x00"  # error number / number of data items
+            + b"\x00"  # item_size  # data
         )
         self.sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-        self.sock.sendto(packet, ('localhost', 123))
+        self.sock.sendto(packet, ("localhost", 123))
 
     def test_ntp_server_monlist(self):
         """
@@ -335,8 +356,8 @@ class TestNTPModule(unittest.TestCase):
         time.sleep(1)
 
         last_log = get_last_log()
-        self.assertEqual(last_log['logdata']['NTP CMD'], "monlist")
-        self.assertEqual(last_log['dst_port'], 123)
+        self.assertEqual(last_log["logdata"]["NTP CMD"], "monlist")
+        self.assertEqual(last_log["dst_port"], 123)
 
     def tearDown(self):
         self.sock.close()
@@ -351,18 +372,20 @@ class TestMySQLModule(unittest.TestCase):
         """
         Login to the mysql server
         """
-        self.assertRaises(pymysql.err.OperationalError,
-                          pymysql.connect,
-                          host="localhost",
-                          user="test_user",
-                          password="test_pass",
-                          db='db',
-                          charset='utf8mb4',
-                          cursorclass=pymysql.cursors.DictCursor)
+        self.assertRaises(
+            pymysql.err.OperationalError,
+            pymysql.connect,
+            host="localhost",
+            user="test_user",
+            password="test_pass",
+            db="db",
+            charset="utf8mb4",
+            cursorclass=pymysql.cursors.DictCursor,
+        )
         last_log = get_last_log()
-        self.assertEqual(last_log['logdata']['USERNAME'], "test_user")
-#        self.assertEqual(last_log['logdata']['PASSWORD'], "b2e5ed6a0e59f99327399ced2009338d5c0fe237")
-        self.assertEqual(last_log['dst_port'], 3306)
+        self.assertEqual(last_log["logdata"]["USERNAME"], "test_user")
+        #        self.assertEqual(last_log['logdata']['PASSWORD'], "b2e5ed6a0e59f99327399ced2009338d5c0fe237")
+        self.assertEqual(last_log["dst_port"], 3306)
 
 
 class TestRDPModule(unittest.TestCase):
@@ -415,5 +438,5 @@ class TestRDPModule(unittest.TestCase):
         self.assertEqual(last_log["dst_port"], 3389)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     unittest.main()

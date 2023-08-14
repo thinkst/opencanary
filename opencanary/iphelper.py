@@ -1,12 +1,14 @@
 import struct
 import socket
 
+
 def ip2int(addr):
     """
     Convert an IP in string format to decimal format
     """
 
     return struct.unpack("!I", socket.inet_aton(addr))[0]
+
 
 def check_ip(ip, network_range):
     """
@@ -16,7 +18,7 @@ def check_ip(ip, network_range):
     given /32 is used. It return True if the IP is in the range.
     """
 
-    netItem = str(network_range).split('/')
+    netItem = str(network_range).split("/")
     rangeIP = netItem[0]
     if len(netItem) == 2:
         rangeMask = int(netItem[1])
@@ -26,8 +28,8 @@ def check_ip(ip, network_range):
     try:
         ripInt = ip2int(rangeIP)
         ipInt = ip2int(ip)
-        result = not ((ipInt ^ ripInt) & 0xFFFFFFFF << (32 - rangeMask));
-    except:
+        result = not ((ipInt ^ ripInt) & 0xFFFFFFFF << (32 - rangeMask))
+    except:  # noqa: E722
         result = False
 
     return result

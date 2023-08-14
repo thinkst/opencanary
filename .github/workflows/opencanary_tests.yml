@@ -5,6 +5,19 @@ on:
   - "pull_request"
 
 jobs:
+  precommit_tests:
+    runs-on: "ubuntu-20.04"
+    steps:
+      - name: "Check out repository code"
+        uses: "actions/checkout@v3"
+      - name: Set up Python 3.10
+        uses: actions/setup-python@v3
+        with:
+          python-version: "3.10"
+      - name: Install pre-commit
+        run: pip install pre-commit
+      - name: Check pre-commit is happy
+        run: pre-commit run --all-files
   opencanary_tests:
     strategy:
       matrix:
