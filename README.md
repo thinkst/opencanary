@@ -33,6 +33,7 @@ to github@thinkst.com.
 * Python 3.7 (Recommended Python 3.7+)
 * [Optional] SNMP requires the Python library scapy
 * [Optional] Samba module needs a working installation of samba
+* [Optional] Portscan uses iptables (not nftables) and is only supported on Linux based operating systems
 ## Features
 
 * Mimic an array of network-accessible services for attackers to interact with.

@@ -2,6 +2,7 @@ from opencanary.modules import CanaryService
 from opencanary.modules import FileSystemWatcher
 import os
 import shutil
+import subprocess
 
 
 class SynLogWatcher(FileSystemWatcher):
@@ -66,6 +67,10 @@ class SynLogWatcher(FileSystemWatcher):
             self.logger.log(data)
 
 
+def detectNFTables():
+    return b"nf_tables" in subprocess.check_output(["iptables", "--version"])
+
+
 class CanaryPortscan(CanaryService):
     NAME = "portscan"
 
@@ -80,15 +85,38 @@ class CanaryPortscan(CanaryService):
             "portscan.ignore_localhost", default=False
         )
         self.ignore_ports = config.getVal("portscan.ignore_ports", default=[])
+        self.iptables_path = self.config.getVal("portscan.iptables_path", False)
         self.config = config
 
     def getIptablesPath(self):
+        if self.iptables_path:
+            return self.iptables_path
+
+        if detectNFTables():
+            return shutil.which("iptables-legacy")
+
         return shutil.which("iptables") or "/sbin/iptables"
 
     def startYourEngines(self, reactor=None):
         # Logging rules for loopback interface.
         # This is separate from the canaryfw rule as the canary watchdog was
         # causing console-side noise in the logs.
+        self.set_iptables_rules()
+
+        fs = SynLogWatcher(
+            logFile=self.audit_file,
+            logger=self.logger,
+            ignore_localhost=self.ignore_localhost,
+            ignore_ports=self.ignore_ports,
+        )
+        fs.start()
+
+    def configUpdated(
+        self,
+    ):
+        pass
+
+    def set_iptables_rules(self):
         iptables_path = self.getIptablesPath()
         os.system(
             'sudo {0} -t mangle -D PREROUTING -p tcp -i lo -j LOG --log-level=warning --log-prefix="canaryfw: " -m limit --limit="{1}/hour"'.format(
@@ -161,16 +189,3 @@ class CanaryPortscan(CanaryService):
                 iptables_path, self.nmaposrate
             )
         )
-
-        fs = SynLogWatcher(
-            logFile=self.audit_file,
-            logger=self.logger,
-            ignore_localhost=self.ignore_localhost,
-            ignore_ports=self.ignore_ports,
-        )
-        fs.start()
-
-    def configUpdated(
-        self,
-    ):
-        pass
