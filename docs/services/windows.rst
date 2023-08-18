@@ -69,4 +69,4 @@ to use rsyslog, we will edit the `/etc/rsyslog.conf` file. Below are two lines w
 This will redirect any message of facility local7 to your `/var/log/samba-audit.log` file, which will be
 watched by our OpenCanary daemon.
 
-Please note this is all written up in the GitHub README.md
+Please note this is all written up in the GitHub Wiki.

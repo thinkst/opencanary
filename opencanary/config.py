@@ -5,6 +5,7 @@ import json
 import itertools
 import string
 import subprocess
+import shutil
 from os.path import expanduser
 from pkg_resources import resource_filename
 from pathlib import Path
@@ -33,6 +34,13 @@ def is_docker():
         or cgroup.is_file()
         and "docker" in cgroup.read_text()
     )
+
+
+def detectIPTables():
+    if shutil.which("iptables"):
+        return True
+    else:
+        return False
 
 
 class Config:

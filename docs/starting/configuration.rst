@@ -37,16 +37,11 @@ You may also want to fiddle with some of our other services which require a bit 
 
 `smb` - a log watcher for Samba logging files which allows Opencanary to alert on files being opened in a Windows File Share.
 
-For this configuration, you will need to set up your own Windows File Share, and point Opencanary at it using the following configuration,
-
-.. code-block:: json
-
-    "smb.auditfile": "/var/log/samba-audit.log",
-
-which is where your Windows File Share will be logging any activity happening on that share.
+For this configuration, you will need to set up your own Windows File Share. Please read the steps over `here <https://github.com/thinkst/opencanary/wiki/Opencanary-and-Samba>`_.
 
 `portscan` - a log watcher that works with iptables to monitor when your Opencanary is being scanned.
 At this stage, the portscan module supports the detection of Nmap OS, Nmap FIN, Nmap OS, Nmap NULL, and normal port scans.
+`portscan.iptables_path` is available for you to specify the path to your `iptables` binary.
 
 Logger Configuration
 --------------------
