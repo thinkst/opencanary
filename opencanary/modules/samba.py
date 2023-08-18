@@ -10,7 +10,7 @@ if sys.platform.startswith("linux"):
             FileSystemWatcher.__init__(self, fileName=logFile)
 
         def handleLines(self, lines=None):
-            audit_re = re.compile(r"^.*smbd_audit:.*$")
+            audit_re = re.compile(r"^.*smbd_audit.*: (.*$)")
 
             for line in lines:
                 matches = audit_re.match(line)
@@ -19,7 +19,7 @@ if sys.platform.startswith("linux"):
                 if matches is None:
                     continue
 
-                data = line.split("smbd_audit:", 1)[-1].strip().split("|")
+                data = matches.groups()[0].split('|')
 
                 user = data[0]
                 srcHost = data[1]
