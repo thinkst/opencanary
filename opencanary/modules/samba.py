@@ -19,7 +19,7 @@ if sys.platform.startswith("linux"):
                 if matches is None:
                     continue
 
-                data = matches.groups()[0].split('|')
+                data = matches.groups()[0].split("|")
 
                 user = data[0]
                 srcHost = data[1]
