@@ -1,4 +1,4 @@
-name: Close inactive issues
+name: Close inactive issues/PRs
 on:
   schedule:
     - cron: "0 12 * * *"
@@ -17,4 +17,7 @@ jobs:
           stale-issue-message: "This issue is stale because it has been open for 14 days with no activity."
           close-issue-message: "This issue was closed because it has been inactive for 14 days since being marked as stale."
           days-before-pr-close: -1
+          exempt-all-pr-assignees: true
+          exempt-issue-labels: "exempt"
+          exempt-pr-labels: "exempt"
           repo-token: ${{ secrets.GITHUB_TOKEN }}
