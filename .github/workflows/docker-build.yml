@@ -3,6 +3,7 @@ on:
   push:
     branches:
       - master
+      - move_to_pcapyng
   release:
     types: [published]
 
