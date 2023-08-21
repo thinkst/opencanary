@@ -1,0 +1,24 @@
+name: Close inactive issues/PRs
+on:
+  schedule:
+    - cron: "0 12 * * *"
+
+jobs:
+  stale:
+    runs-on: ubuntu-latest
+    permissions:
+      issues: write
+    steps:
+      - uses: actions/stale@v5
+        with:
+          days-before-issue-stale: 14
+          days-before-issue-close: 14
+          stale-issue-label: "stale"
+          stale-issue-message: "This issue is stale because it has been open for 14 days with no activity."
+          close-issue-message: "This issue was closed because it has been inactive for 14 days since being marked as stale."
+          days-before-pr-close: -1
+          exempt-all-pr-assignees: true
+          exempt-issue-labels: "exempt"
+          exempt-pr-labels: "exempt"
+          start-date: '2023-08-21T00:00:00Z'
+          repo-token: ${{ secrets.GITHUB_TOKEN }}
