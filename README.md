@@ -88,7 +88,7 @@ $ env ARCHFLAGS="-arch arm64" LDFLAGS="-L/opt/homebrew/opt/openssl@1.1/lib" CFLA
 Now the installation can run as usual:
 ```
 $ pip install opencanary
-$ pip install scapy -ng # optional
+$ pip install scapy pcapy-ng # optional
 ```
 ## Installation [GIT]
 
