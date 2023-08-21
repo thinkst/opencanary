@@ -1,4 +1,4 @@
-FROM python:3.7-buster
+FROM python:3.10-buster
 
 # Download cache lists and install minimal versions
 RUN apt-get update && apt-get -yq install --no-install-recommends \
@@ -9,7 +9,7 @@ RUN apt-get update && apt-get -yq install --no-install-recommends \
 
 # Install required pip dependencies
 RUN pip install opencanary
-RUN pip install scapy pcapy
+RUN pip install scapy pcapy-ng
 
 # Set the default application we are running
 ENTRYPOINT [ "opencanaryd" ]

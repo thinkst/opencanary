@@ -53,7 +53,7 @@ $ sudo apt install samba # if you plan to use the smb module
 $ virtualenv env/
 $ . env/bin/activate
 $ pip install opencanary
-$ pip install scapy pcapy # optional
+$ pip install scapy pcapy-ng # optional
 ```
 ## Installation [OS X]
 
@@ -88,7 +88,7 @@ $ env ARCHFLAGS="-arch arm64" LDFLAGS="-L/opt/homebrew/opt/openssl@1.1/lib" CFLA
 Now the installation can run as usual:
 ```
 $ pip install opencanary
-$ pip install scapy pcapy # optional
+$ pip install scapy -ng # optional
 ```
 ## Installation [GIT]
 
