@@ -45,6 +45,7 @@ services:
   latest: # docker-compose up --build -d latest
     <<: *common
     container_name: opencanary_latest
+    image: thinkst/opencanary
     build:
       context: .
       dockerfile: Dockerfile.latest
