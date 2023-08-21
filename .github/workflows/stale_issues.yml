@@ -20,4 +20,5 @@ jobs:
           exempt-all-pr-assignees: true
           exempt-issue-labels: "exempt"
           exempt-pr-labels: "exempt"
+          start-date: '2023-08-21T00:00:00Z'
           repo-token: ${{ secrets.GITHUB_TOKEN }}
