@@ -38,6 +38,15 @@ jobs:
         with:
           images: |
             thinkst/opencanary
+          tags: |
+            type=raw,value=latest,enable=${{ endsWith(github.ref, github.event.repository.default_branch) }}
+            type=schedule
+            type=ref,event=branch
+            type=ref,event=pr
+            type=semver,pattern={{version}}
+            type=semver,pattern={{major}}.{{minor}}
+            type=semver,pattern={{major}}
+            type=sha
 
       - name: Build and push
         uses: docker/build-push-action@v4
