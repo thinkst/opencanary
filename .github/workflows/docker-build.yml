@@ -39,7 +39,7 @@ jobs:
           images: |
             thinkst/opencanary
           tags: |
-            type=raw,value=latest,enable=true
+            type=raw,value=latest
             type=schedule
             type=ref,event=branch
             type=ref,event=pr
