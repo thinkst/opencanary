@@ -17,6 +17,7 @@ COPY bin /opencanary/bin
 
 # Install the required dependencies
 RUN pip install -r requirements.txt
+RUN pip install scapy pcapy-ng
 
 # Copy in the latest version
 COPY opencanary ./opencanary
