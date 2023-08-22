@@ -14,7 +14,7 @@ OpenCanary is implemented in Python and so the core honeypot is cross-platform, 
 
 This README describes how to install and configure OpenCanary on Ubuntu Linux and MacOS.
 
-OpenCanary is the Open Source version of our commercial [Thinkst Canary](https://canary.tools) honeypot. 
+OpenCanary is the Open Source version of our commercial [Thinkst Canary](https://canary.tools) honeypot.
 
 ## Table of Contents
 - **[Prerequisites](#prerequisites)**
@@ -256,7 +256,7 @@ Please file bug reports on [Github](https://github.com/thinkst/opencanary/issues
 
 ### Feature Requests
 
-Feature requests are tracked [here](https://github.com/thinkst/opencanary/discussions/categories/feature-requests). 
+Feature requests are tracked [here](https://github.com/thinkst/opencanary/discussions/categories/feature-requests).
 
 ### Code of Conduct
 
