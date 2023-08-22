@@ -246,6 +246,16 @@ To stop the container, run `docker stop opencanary`.
 
 We welcome PRs to this project. Please read our [Code of Conduct](https://github.com/thinkst/.github/blob/master/CODE_OF_CONDUCT.md) and [Contributing](https://github.com/thinkst/.github/blob/master/CONTRIBUTING.md) documents before submitting a pull request.
 
+At a minimum you should run `pre-commit` before submitting the PR. Install and run in the same Python environment that OpenCanary is installed into:
+```
+$ pip install pre-commit
+# Do work
+$ git add file
+$ pre-commit
+$ git add file # only run this if pre-commit auto-fixed the file
+$ git commit
+```
+
 ### Security Vulnerability Reports
 
 See our [Security Policy](https://github.com/thinkst/opencanary/security/policy) for details on how to report security vulnerabilities.
