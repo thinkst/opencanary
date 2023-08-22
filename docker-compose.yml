@@ -5,6 +5,7 @@ x-common: &common
   volumes:
     - ./data/.opencanary.conf:/root/.opencanary.conf
   image: "opencanary"
+  network_mode: "host"
   ports:
     # Comment/un-comment the port lines below to disable/enable the services you are using
     # FTP
@@ -44,6 +45,7 @@ services:
   latest: # docker-compose up --build -d latest
     <<: *common
     container_name: opencanary_latest
+    image: thinkst/opencanary
     build:
       context: .
       dockerfile: Dockerfile.latest
