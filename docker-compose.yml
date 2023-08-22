@@ -4,6 +4,8 @@ x-common: &common
   restart: unless-stopped
   volumes:
     - ./data/.opencanary.conf:/root/.opencanary.conf
+    # uncomment below if running Samba
+    # - /var/log/samba-audit.log:/var/log/samba-audit.log
   image: "opencanary"
   network_mode: "host"
   ports:
