@@ -246,7 +246,7 @@ To stop the container, run `docker stop opencanary`.
 
 We welcome PRs to this project. Please read our [Code of Conduct](https://github.com/thinkst/.github/blob/master/CODE_OF_CONDUCT.md) and [Contributing](https://github.com/thinkst/.github/blob/master/CONTRIBUTING.md) documents before submitting a pull request.
 
-At a minimum you should run `pre-commit` before submitting the PR. Install and run in the same Python environment that OpenCanary is installed into:
+At a minimum you should run `pre-commit` before submitting the PR. Install and run it in the same Python environment that OpenCanary is installed into:
 ```
 $ pip install pre-commit
 # Do work
