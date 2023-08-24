@@ -203,6 +203,10 @@ To build your own Docker OpenCanary using `docker compose`, head over to our [wi
 ### With Docker
 
 Please head over our dedicated Docker [wiki](https://github.com/thinkst/opencanary/wiki/Using-Dockerised-OpenCanary#building-and-running-your-own-docker-opencanary-image-with-docker) for everything Dockerised OpenCanary.
+
+### With Ansible
+
+Please head over to our forked repository for an Ansible OpenCanary role over [here](https://github.com/thinkst/ansible-role-opencanary).
 ## Documentation
 
 * The [Wiki](https://github.com/thinkst/opencanary/wiki) contains our FAQ.
