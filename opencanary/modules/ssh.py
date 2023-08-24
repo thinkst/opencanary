@@ -157,11 +157,6 @@ class HoneyPotTransport(transport.SSHServerTransport):
 
         self.interactors = []
         self.logintime = time.time()
-        self.ourVersionString = 'BOBS-SERVER'
-        # self.transport.write(self.ourVersionString + b"\r\n")
-        # self.currentEncryptions = SSHCiphers(b"none", b"none", b"none", b"none")
-        # self.currentEncryptions.setKeys(b"", b"", b"", b"", b"", b"")
-        # self.sendKexInit()
         transport.SSHServerTransport.connectionMade(self)
 
     def sendKexInit(self):
@@ -248,6 +243,7 @@ class HoneyPotSSHFactory(factory.SSHFactory):
         self.sessions = {}
         self.logger = logger
         self.version = version
+        self.protocol.ourVersionString = version
         self.preauth_banner = preauth_banner
         rsa_pubKeyString, rsa_privKeyString = getRSAKeys(path)
         dsa_pubKeyString, dsa_privKeyString = getDSAKeys(path)
@@ -418,6 +414,7 @@ class CanarySSH(CanaryService):
         self.version = config.getVal(
             "ssh.version", default="SSH-2.0-OpenSSH_5.1p1 Debian-5"
         ).encode("utf8")
+
         self.preauth_banner = config.getVal("ssh.preauth_banner", default="")\
             .replace("\\r", "\r").replace("\\n", "\n")\
             .encode("utf8")
