@@ -139,10 +139,14 @@ class Config:
                 )
 
         if key.endswith(".port"):
-            if (not isinstance(val, int)):
-                raise ConfigException(key, "Invalid port number (%s). Must be an integer." % val)
+            if not isinstance(val, int):
+                raise ConfigException(
+                    key, "Invalid port number (%s). Must be an integer." % val
+                )
             if val < 1 or val > 65535:
-                raise ConfigException(key, "Invalid port number (%s). Must be between 1 and 65535." % val)
+                raise ConfigException(
+                    key, "Invalid port number (%s). Must be between 1 and 65535." % val
+                )
         # Max length of SSH version string is 255 chars including trailing CR and LF
         # https://tools.ietf.org/html/rfc4253
         if key == "ssh.version" and len(val) > 253:
@@ -175,10 +179,7 @@ class Config:
 
         if key in SERVICE_REGEXES.keys():
             if not re.match(SERVICE_REGEXES[key], val):
-                raise ConfigException(
-                    key,
-                    f"{val} is not valid."
-                )
+                raise ConfigException(key, f"{val} is not valid.")
 
         return True
 

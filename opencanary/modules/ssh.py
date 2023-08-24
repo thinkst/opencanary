@@ -415,13 +415,16 @@ class CanarySSH(CanaryService):
             "ssh.version", default="SSH-2.0-OpenSSH_5.1p1 Debian-5"
         ).encode("utf8")
 
-        self.preauth_banner = config.getVal("ssh.preauth_banner", default="")\
-            .replace("\\r", "\r").replace("\\n", "\n")\
+        self.preauth_banner = (
+            config.getVal("ssh.preauth_banner", default="")
+            .replace("\\r", "\r")
+            .replace("\\n", "\n")
             .encode("utf8")
+        )
 
         # need to ensure there's a trailing CRLF
-        if self.preauth_banner and not self.preauth_banner.endswith('\r\n'):
-            self.preauth_banner += '\r\n'
+        if self.preauth_banner and not self.preauth_banner.endswith("\r\n"):
+            self.preauth_banner += "\r\n"
 
         self.ssh_keys_path = config.getVal("ssh.key_path", default=SSH_PATH)
         self.listen_addr = config.getVal("device.listen_addr", default="")
@@ -431,7 +434,8 @@ class CanarySSH(CanaryService):
             version=self.version,
             logger=self.logger,
             path=self.ssh_keys_path,
-            preauth_banner=self.preauth_banner)
+            preauth_banner=self.preauth_banner,
+        )
         factory.canaryservice = self
         factory.portal = portal.Portal(HoneyPotRealm())
         factory.portal.registerChecker(HoneypotPasswordChecker(logger=factory.logger))
