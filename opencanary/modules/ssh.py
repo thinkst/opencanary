@@ -421,9 +421,13 @@ class CanarySSH(CanaryService):
         factory.publicKeys = {
             b"ssh-rsa": keys.Key.fromString(data=rsa_pubKeyString),
             b"ssh-dss": keys.Key.fromString(data=dsa_pubKeyString),
+            b"rsa-sha2-512": keys.Key.fromString(data=rsa_pubKeyString),
+            b"rsa-sha2-256": keys.Key.fromString(data=rsa_pubKeyString),
         }
         factory.privateKeys = {
             b"ssh-rsa": keys.Key.fromString(data=rsa_privKeyString),
             b"ssh-dss": keys.Key.fromString(data=dsa_privKeyString),
+            b"rsa-sha2-512": keys.Key.fromString(data=rsa_privKeyString),
+            b"rsa-sha2-256": keys.Key.fromString(data=rsa_privKeyString),
         }
         return internet.TCPServer(self.port, factory, interface=self.listen_addr)
