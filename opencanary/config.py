@@ -1,4 +1,3 @@
-from six import iteritems
 import os
 import sys
 import json
@@ -45,7 +44,7 @@ def detectIPTables():
 
 
 SERVICE_REGEXES = {
-    "ssh.version": r"SSH-(2.0|1.5|1.99|1.0)-([!-,\-./0-~]+(:?$|\s))(?:[ -~]*)$",
+    "ssh.version": r"(SSH-(2.0|1.5|1.99|1.0)-([!-,\-./0-~]+(:?$|\s))(?:[ -~]*)){1,253}$",
 }
 
 
@@ -111,8 +110,8 @@ class Config:
                 errors.append(e)
 
         # Test that no ports overlap
-        ports = {k: int(v) for k, v in iteritems(params) if k.endswith(".port")}
-        ports = [(port, setting) for setting, port in iteritems(ports)]
+        ports = {k: int(v) for k, v in params.items() if k.endswith(".port")}
+        ports = [(port, setting) for setting, port in ports.items()]
         ports.sort()
 
         for port, settings in itertools.groupby(ports, lambda x: x[0]):
