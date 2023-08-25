@@ -1,4 +1,3 @@
-from six import iteritems
 import os
 import sys
 import json
@@ -6,6 +5,7 @@ import itertools
 import string
 import subprocess
 import shutil
+import re
 from os.path import expanduser
 from pkg_resources import resource_filename
 from pathlib import Path
@@ -41,6 +41,11 @@ def detectIPTables():
         return True
     else:
         return False
+
+
+SERVICE_REGEXES = {
+    "ssh.version": r"(SSH-(2.0|1.5|1.99|1.0)-([!-,\-./0-~]+(:?$|\s))(?:[ -~]*)){1,253}$",
+}
 
 
 class Config:
@@ -93,53 +98,20 @@ class Config:
                 return default
             raise e
 
-    def setValues(self, params):  # noqa: C901
+    def checkValues(self):  # noqa: C901
         """Set all the valid values in params and return a list of errors for invalid"""
-
-        # silently ensure that node_id and mac are not modified via web
-        sacred = ["device.node_id", "device.mac"]
-        for k in sacred:
-            if k in params:
-                del params[k]
-
-        # if dhcp is enabled, ignore the static ip settings
-        if params.get("device.dhcp.enabled", False):
-            static = [
-                "device.ip_address",
-                "device.netmask",
-                "device.gw",
-                "device.dns1",
-                "device.dns2",
-            ]
-            for k in static:
-                if k in params:
-                    del params[k]
-
-        # for each section, if disabled, delete ignore section's settings
-        disabled_modules = tuple(
-            filter(
-                lambda m: not params.get("%s.enabled" % m, False),
-                ["ftp", "ssh", "smb", "http"],
-            )
-        )
-        for k in params.keys():
-            if not k.endswith("enabled") and k.startswith(disabled_modules):
-                del params[k]
-                continue
-
+        params = self.__config
         # test options indpenedently for validity
         errors = []
-        for key, value in iteritems(params):
+        for key, value in params.items():
             try:
-                self.valid(key, value)
+                self.is_valid(key, value)
             except ConfigException as e:
                 errors.append(e)
 
         # Test that no ports overlap
-        ports = {k: v for k, v in iteritems(self.__config) if k.endswith(".port")}
-        newports = {k: v for k, v in iteritems(params) if k.endswith(".port")}
-        ports.update(newports)
-        ports = [(port, setting) for setting, port in iteritems(ports)]
+        ports = {k: int(v) for k, v in params.items() if k.endswith(".port")}
+        ports = [(port, setting) for setting, port in ports.items()]
         ports.sort()
 
         for port, settings in itertools.groupby(ports, lambda x: x[0]):
@@ -150,29 +122,9 @@ class Config:
                 for (port, setting) in settings:
                     errors.append(ConfigException(setting, errmsg))
 
-        # Delete invalid settings for which an error is reported
-        for err in errors:
-            if err.key in params:
-                del params[err.key]
-
-        # Update current settings
-        self.__config.update(params)
         return errors
 
-    def setVal(self, key, val):
-        """Set value only if valid otherwise throw exception"""
-        errs = self.setValues({key: val})
-
-        # successful update
-        if not errs:
-            return
-
-        # raise first error reported on the update key
-        for e in errs:
-            if e.key == key:
-                raise e
-
-    def valid(self, key, val):  # noqa: C901
+    def is_valid(self, key, val):  # noqa: C901
         """
         Test an the validity of an individual setting
         Raise config error message on failure.
@@ -186,29 +138,18 @@ class Config:
                 )
 
         if key.endswith(".port"):
-            if (not isinstance(val, int)) or val < 1 or val > 65535:
-                raise ConfigException(key, "Invalid port number (%s)" % val)
-
+            if not isinstance(val, int):
+                raise ConfigException(
+                    key, "Invalid port number (%s). Must be an integer." % val
+                )
+            if val < 1 or val > 65535:
+                raise ConfigException(
+                    key, "Invalid port number (%s). Must be between 1 and 65535." % val
+                )
         # Max length of SSH version string is 255 chars including trailing CR and LF
         # https://tools.ietf.org/html/rfc4253
         if key == "ssh.version" and len(val) > 253:
             raise ConfigException(key, "SSH version string too long (%s..)" % val[:5])
-
-        if key == "smb.filelist":
-            extensions = ["PDF", "DOC", "DOCX"]
-            for f in val:
-                if "name" not in f:
-                    raise ConfigException(key, "No filename specified for %s" % f)
-                if "type" not in f:
-                    raise ConfigException(key, "No filetype specified for %s" % f)
-                if not f["name"]:
-                    raise ConfigException(key, "Filename cannot be empty")
-                if not f["type"]:
-                    raise ConfigException(key, "File type cannot be empty")
-                if f["type"] not in extensions:
-                    raise ConfigException(
-                        key, "Extension %s is not supported" % f["type"]
-                    )
 
         if key == "device.name":
             allowed_chars = string.ascii_letters + string.digits + "+-#_"
@@ -235,23 +176,11 @@ class Config:
                     "Please use only characters, digits, spaces and any of the following: + - # _",
                 )
 
+        if key in SERVICE_REGEXES.keys():
+            if not re.match(SERVICE_REGEXES[key], val):
+                raise ConfigException(key, f"{val} is not valid.")
+
         return True
-
-    def saveSettings(self):
-        """Backup config file to older version and save to new file"""
-        try:
-            cfg = self.__configfile
-            if os.path.isfile(cfg):
-                os.rename(cfg, cfg + ".bak")
-
-            with open(cfg, "w") as f:
-                json.dump(
-                    self.__config, f, sort_keys=True, indent=4, separators=(",", ": ")
-                )
-
-        except Exception as e:
-            print("[-] Failed to save config file %s" % e)
-            raise ConfigException("config", "%s" % e)
 
     def __repr__(self):
         return self.__config.__repr__()
@@ -287,3 +216,8 @@ class ConfigException(Exception):
 
 
 config = Config()
+errors = config.checkValues()
+if errors:
+    for error in errors:
+        print(error)
+    sys.exit(1)

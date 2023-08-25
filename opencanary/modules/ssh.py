@@ -50,11 +50,14 @@ class HoneyPotSSHUserAuthServer(userauth.SSHUserAuthServer):
         self.bannerSent = False
 
     def sendBanner(self):
-        if self.bannerSent:
+        banner = self.transport.factory.preauth_banner
+
+        if self.bannerSent or not banner:
             return
-        data = ""
-        data = "\r\n".join(data.splitlines() + [""])
-        self.transport.sendPacket(userauth.MSG_USERAUTH_BANNER, NS(data) + NS("en"))
+
+        # data = ""
+        # data = "\r\n".join(data.splitlines() + [""])
+        self.transport.sendPacket(userauth.MSG_USERAUTH_BANNER, NS(banner) + NS("en"))
         self.bannerSent = True
 
     def auth_password(self, packet):
@@ -121,8 +124,6 @@ class HoneyPotSSHUserAuthServer(userauth.SSHUserAuthServer):
 
         c = credentials.SSHPrivateKey(None, None, None, None, None)
 
-        # self.log(key=key)
-
         return self.portal.login(c, None, conchinterfaces.IConchUser).addErrback(
             self._ebPassword
         )
@@ -130,55 +131,6 @@ class HoneyPotSSHUserAuthServer(userauth.SSHUserAuthServer):
     def ssh_USERAUTH_REQUEST(self, packet):
         self.sendBanner()
         return userauth.SSHUserAuthServer.ssh_USERAUTH_REQUEST(self, packet)
-
-
-# As implemented by Kojoney
-class HoneyPotSSHFactory(factory.SSHFactory):
-    services = {
-        b"ssh-userauth": HoneyPotSSHUserAuthServer,
-        b"ssh-connection": connection.SSHConnection,
-    }
-
-    # Special delivery to the loggers to avoid scope problems
-    def logDispatch(self, sessionid, msg):
-        data = {}
-        data["logdata"] = msg
-        self.logger.log(data)
-        # for dblog in self.dbloggers:
-        #    dblog.logDispatch(sessionid, msg)
-
-    def __init__(self, logger=None, version=None):
-        # protocol^Wwhatever instances are kept here for the interact feature
-        self.sessions = {}
-        self.logger = logger
-        self.version = version
-
-    def buildProtocol(self, addr):
-        # FIXME: try to mimic something real 100%
-        t = HoneyPotTransport()
-        _modulis = "/etc/ssh/moduli", "/private/etc/moduli"
-
-        if self.version:
-            t.ourVersionString = self.version
-        else:
-            t.ourVersionString = "empty"
-
-        t.supportedPublicKeys = self.privateKeys.keys()
-        for _moduli in _modulis:
-            try:
-                self.primes = primes.parseModuliFile(_moduli)
-                break
-            except IOError:
-                pass
-
-        if not self.primes:
-            ske = t.supportedKeyExchanges[:]
-            if "diffie-hellman-group-exchange-sha1" in ske:
-                ske.remove("diffie-hellman-group-exchange-sha1")
-            t.supportedKeyExchanges = ske
-
-        t.factory = self
-        return t
 
 
 @implementer(portal.IRealm)
@@ -272,6 +224,61 @@ class HoneyPotTransport(transport.SSHServerTransport):
             self.transport.loseConnection()
 
 
+class HoneyPotSSHFactory(factory.SSHFactory):
+
+    protocol = HoneyPotTransport
+    services = {
+        b"ssh-userauth": HoneyPotSSHUserAuthServer,
+        b"ssh-connection": connection.SSHConnection,
+    }
+
+    # Special delivery to the loggers to avoid scope problems
+    def logDispatch(self, sessionid, msg):
+        data = {}
+        data["logdata"] = msg
+        self.logger.log(data)
+
+    def __init__(self, logger=None, version=None, path=SSH_PATH, preauth_banner=None):
+        # protocol^Wwhatever instances are kept here for the interact feature
+        self.sessions = {}
+        self.logger = logger
+        self.version = version
+        self.protocol.ourVersionString = version
+        self.preauth_banner = preauth_banner
+        rsa_pubKeyString, rsa_privKeyString = getRSAKeys(path)
+        dsa_pubKeyString, dsa_privKeyString = getDSAKeys(path)
+        self.publicKeys = {
+            b"ssh-rsa": keys.Key.fromString(data=rsa_pubKeyString),
+            b"ssh-dss": keys.Key.fromString(data=dsa_pubKeyString),
+            b"rsa-sha2-512": keys.Key.fromString(data=rsa_pubKeyString),
+            b"rsa-sha2-256": keys.Key.fromString(data=rsa_pubKeyString),
+        }
+        self.privateKeys = {
+            b"ssh-rsa": keys.Key.fromString(data=rsa_privKeyString),
+            b"ssh-dss": keys.Key.fromString(data=dsa_privKeyString),
+            b"rsa-sha2-512": keys.Key.fromString(data=rsa_privKeyString),
+            b"rsa-sha2-256": keys.Key.fromString(data=rsa_privKeyString),
+        }
+
+    def getPrimes(self):
+        """
+        Called when the factory is started to get Diffie-Hellman generators and
+        primes to use.  Returns a dictionary mapping number of bits to lists
+        of tuple of (generator, prime).
+
+        @rtype: L{dict}
+        """
+        _modulis = ["/etc/ssh/moduli", "/private/etc/moduli"]
+        _primes = None
+        for _moduli in _modulis:
+            try:
+                _primes = primes.parseModuliFile(_moduli)
+                break
+            except IOError:
+                pass
+        return _primes
+
+
 class HoneyPotSSHSession(session.SSHSession):
     def request_env(self, data):
         # print('request_env: %s' % (repr(data)))
@@ -305,14 +312,14 @@ class HoneyPotAvatar(avatar.ConchUser):
         self.windowSize = windowSize
 
 
-def getRSAKeys():
+def getRSAKeys(path):
     """
     Checks for existing RSA Keys, if there are none, generates a 2048 bit
     RSA key pair, saves them to a temporary location and returns the keys
     formatted as OpenSSH keys.
     """
-    public_key = os.path.join(SSH_PATH, "id_rsa.pub")
-    private_key = os.path.join(SSH_PATH, "id_rsa")
+    public_key = os.path.join(path, "id_rsa.pub")
+    private_key = os.path.join(path, "id_rsa")
 
     if not (os.path.exists(public_key) and os.path.exists(private_key)):
         ssh_key = rsa.generate_private_key(
@@ -340,14 +347,14 @@ def getRSAKeys():
     return public_key_string, private_key_string
 
 
-def getDSAKeys():
+def getDSAKeys(path):
     """
     Checks for existing DSA Keys, if there are none, generates a 2048 bit
     DSA key pair, saves them to a temporary location and returns the keys
     formatted as OpenSSH keys.
     """
-    public_key = os.path.join(SSH_PATH, "id_dsa.pub")
-    private_key = os.path.join(SSH_PATH, "id_dsa")
+    public_key = os.path.join(path, "id_dsa.pub")
+    private_key = os.path.join(path, "id_dsa")
 
     if not (os.path.exists(public_key) and os.path.exists(private_key)):
         ssh_key = dsa.generate_private_key(key_size=1024, backend=default_backend())
@@ -407,27 +414,30 @@ class CanarySSH(CanaryService):
         self.version = config.getVal(
             "ssh.version", default="SSH-2.0-OpenSSH_5.1p1 Debian-5"
         ).encode("utf8")
+
+        self.preauth_banner = (
+            config.getVal("ssh.preauth_banner", default="")
+            .replace("\\r", "\r")
+            .replace("\\n", "\n")
+            .encode("utf8")
+        )
+
+        # need to ensure there's a trailing CRLF
+        if self.preauth_banner and not self.preauth_banner.endswith("\r\n"):
+            self.preauth_banner += "\r\n"
+
+        self.ssh_keys_path = config.getVal("ssh.key_path", default=SSH_PATH)
         self.listen_addr = config.getVal("device.listen_addr", default="")
 
     def getService(self):
-        factory = HoneyPotSSHFactory(version=self.version, logger=self.logger)
+        factory = HoneyPotSSHFactory(
+            version=self.version,
+            logger=self.logger,
+            path=self.ssh_keys_path,
+            preauth_banner=self.preauth_banner,
+        )
         factory.canaryservice = self
         factory.portal = portal.Portal(HoneyPotRealm())
-
-        rsa_pubKeyString, rsa_privKeyString = getRSAKeys()
-        dsa_pubKeyString, dsa_privKeyString = getDSAKeys()
         factory.portal.registerChecker(HoneypotPasswordChecker(logger=factory.logger))
         factory.portal.registerChecker(CanaryPublicKeyChecker(logger=factory.logger))
-        factory.publicKeys = {
-            b"ssh-rsa": keys.Key.fromString(data=rsa_pubKeyString),
-            b"ssh-dss": keys.Key.fromString(data=dsa_pubKeyString),
-            b"rsa-sha2-512": keys.Key.fromString(data=rsa_pubKeyString),
-            b"rsa-sha2-256": keys.Key.fromString(data=rsa_pubKeyString),
-        }
-        factory.privateKeys = {
-            b"ssh-rsa": keys.Key.fromString(data=rsa_privKeyString),
-            b"ssh-dss": keys.Key.fromString(data=dsa_privKeyString),
-            b"rsa-sha2-512": keys.Key.fromString(data=rsa_privKeyString),
-            b"rsa-sha2-256": keys.Key.fromString(data=rsa_privKeyString),
-        }
         return internet.TCPServer(self.port, factory, interface=self.listen_addr)
