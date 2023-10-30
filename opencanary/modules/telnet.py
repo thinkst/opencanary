@@ -11,14 +11,16 @@ from twisted.conch.telnet import ITelnetProtocol
 from twisted.conch.telnet import TelnetTransport
 from twisted.conch.telnet import ECHO
 
+
 @implementer(portal.IRealm)
 class Realm:
     def requestAvatar(self, avatarId, mind, *interfaces):
         if ITelnetProtocol in interfaces:
             av = MyTelnet()
-            av.state = 'Command'
-            return ITelnetProtocol, av, lambda:None
+            av.state = "Command"
+            return ITelnetProtocol, av, lambda: None
         raise NotImplementedError("Not supported by this realm")
+
 
 class CanaryTelnetTransport(TelnetTransport):
     def dataReceived(self, data):
@@ -33,6 +35,7 @@ class CanaryTelnetTransport(TelnetTransport):
         if reason.check(ConnectionDone) or reason.check(ConnectionLost):
             return
         TelnetTransport.connectionLost(self, reason)
+
 
 class AlertAuthTelnetProtocol(AuthenticatingTelnetProtocol):
     def connectionMade(self):
