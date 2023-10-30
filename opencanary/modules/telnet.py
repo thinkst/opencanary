@@ -10,6 +10,12 @@ from twisted.conch.telnet import AuthenticatingTelnetProtocol
 from twisted.conch.telnet import ITelnetProtocol
 from twisted.conch.telnet import TelnetTransport
 from twisted.conch.telnet import ECHO
+from twisted.spread.pb import Avatar
+
+
+class MyTelnet(Avatar):
+    def __init__(self, name):
+        self.name = name
 
 
 @implementer(portal.IRealm)
