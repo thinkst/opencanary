@@ -1,13 +1,31 @@
 from opencanary.modules import CanaryService
 
+from zope.interface import implementer
 from twisted.application import internet
 from twisted.internet.error import ConnectionDone, ConnectionLost
 from twisted.internet import protocol
+from twisted.cred import portal
 from twisted.cred import credentials
 from twisted.conch.telnet import AuthenticatingTelnetProtocol
 from twisted.conch.telnet import ITelnetProtocol
 from twisted.conch.telnet import TelnetTransport
 from twisted.conch.telnet import ECHO
+from twisted.spread.pb import Avatar
+
+
+class MyTelnet(Avatar):
+    def __init__(self, name):
+        self.name = name
+
+
+@implementer(portal.IRealm)
+class Realm:
+    def requestAvatar(self, avatarId, mind, *interfaces):
+        if ITelnetProtocol in interfaces:
+            av = MyTelnet()
+            av.state = "Command"
+            return ITelnetProtocol, av, lambda: None
+        raise NotImplementedError("Not supported by this realm")
 
 
 class CanaryTelnetTransport(TelnetTransport):
@@ -68,9 +86,11 @@ class Telnet(CanaryService):
             self.banner += b"\n"
 
     def getService(self):
+        r = Realm()
+        p = portal.Portal(r)
         f = protocol.ServerFactory()
         f.canaryservice = self
         f.logger = self.logger
         f.banner = self.banner
-        f.protocol = lambda: CanaryTelnetTransport(AlertAuthTelnetProtocol)
+        f.protocol = lambda: CanaryTelnetTransport(AlertAuthTelnetProtocol, p)
         return internet.TCPServer(self.port, f, interface=self.listen_addr)
