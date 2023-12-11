@@ -2,7 +2,6 @@ name: OpenCanary Tests
 
 on:
   - "push"
-  - "pull_request"
 
 jobs:
   precommit_tests:
