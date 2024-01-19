@@ -76,7 +76,8 @@ class CanaryGit(Factory, CanaryService):
     def __init__(self, config=None, logger=None):
         CanaryService.__init__(self, config=config, logger=logger)
         self.port = config.getVal("git.port", default=9418)
+        self.listen_addr = config.getVal("device.listen_addr", default="")
         self.logtype = logger.LOG_GIT_CLONE_REQUEST
 
     def getService(self):
-        return internet.TCPServer(self.port, self)
+        return internet.TCPServer(self.port, self, interface=self.listen_addr)

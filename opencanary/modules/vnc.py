@@ -2,6 +2,7 @@ from opencanary.modules import CanaryService
 
 from twisted.internet.protocol import Protocol
 from twisted.internet.protocol import Factory
+from twisted.application import internet
 
 from opencanary.modules.des import des
 
@@ -172,7 +173,11 @@ class CanaryVNC(Factory, CanaryService):
     def __init__(self, config=None, logger=None):
         CanaryService.__init__(self, config, logger)
         self.port = config.getVal("vnc.port", 5900)
+        self.listen_addr = config.getVal("device.listen_addr", default="")
         self.logtype = logger.LOG_VNC
+
+    def getService(self):
+        return internet.TCPServer(self.port, self, interface=self.listen_addr)
 
 
 CanaryServiceFactory = CanaryVNC
