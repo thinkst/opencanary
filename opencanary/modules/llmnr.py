@@ -21,7 +21,7 @@ class LLMNR(DatagramProtocol):
         llmnr_packet = IP(dst=target_ip, ttl=1) / UDP(dport=target_port) / LLMNRQuery(qd=DNSQR(qname=self.factory.query_hostname))
 
         # Send the packet, set verbose to False to suppress "Sent 1 packet" std-out
-        send(llmnr_packet, verbose=True)
+        send(llmnr_packet, verbose=False)
 
     def datagramReceived(self, data, host_and_port):
         try:
@@ -49,6 +49,7 @@ class CanaryLLMNR(CanaryService):
         self.port = int(config.getVal('llmnr.port', default=5355))
         self.query_interval = int(config.getVal('llmnr.query_interval', default=60))  # Interval in seconds
         self.query_splay = int(config.getVal('llmnr.query_splay', default=5))  # Default splay in seconds
+        self.listen_addr = config.getVal('device.listen_addr', default='')
 
     def getService(self):
         f = LLMNR()
