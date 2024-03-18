@@ -228,7 +228,7 @@ Please head over to our forked repository for an Ansible OpenCanary role over [h
 ## Documentation
 
 * The [Wiki](https://github.com/thinkst/opencanary/wiki) contains our FAQ.
-* Additional documentation is available on our [main site](https://opencanary.org).
+* Additional documentation is available on our [main site](http://opencanary.org).
 
 ## Project Participation
 
