@@ -19,6 +19,11 @@
     "httpproxy.enabled" : false,
     "httpproxy.port": 8080,
     "httpproxy.skin": "squid",
+    "llmnr.enabled": false,
+    "llmnr.query_interval": 60,
+    "llmnr.query_splay": 5,
+    "llmnr.hostname": "DC03",
+    "llmnr.port": 5355,
     "logger": {
         "class": "PyLogger",
         "kwargs": {

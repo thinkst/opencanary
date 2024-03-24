@@ -22,7 +22,7 @@ from opencanary.modules.git import CanaryGit
 from opencanary.modules.redis import CanaryRedis
 from opencanary.modules.tcpbanner import CanaryTCPBanner
 from opencanary.modules.rdp import CanaryRDP
-
+from opencanary.modules.llmnr import CanaryLLMNR
 
 def warn(*args, **kwargs):
     pass
@@ -49,6 +49,7 @@ MODULES = [
     CanaryTCPBanner,
     CanaryTftp,
     CanaryVNC,
+    CanaryLLMNR,
     HTTPProxy,
     MSSQL,
     Telnet,
