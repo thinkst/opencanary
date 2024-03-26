@@ -118,7 +118,7 @@ You may want to look through some other python logging options over at `PyLogger
 
 We have provided you with two different formatters. One is the plain message with incident information; the other is the Syslog RFC format. We have already added it to the `syslog-unix` handler for your convenience.
 
-The Twisted Web server `twistd` that OpenCanary uses to provide HTTP services is not affected by these logging options and will log HTTP requests regardless of your configuration, as it is launched with the `--syslog` parameter in `bin/opencanaryd`. This can be undesirable 
+The Twisted Web server `twistd` that OpenCanary uses to provide HTTP services is not affected by these logging options and will log HTTP requests regardless of your configuration, as it is launched with the `--syslog` parameter in `bin/opencanaryd`. This can be undesirable
 in some scenarios like when a SIEM is collecting the syslog *and* a ``RotatingFileHandler`` output by OpenCanary and can be mitigated with an rsyslog config like ``if $programname == 'opencanaryd' and ($msg contains 'GET ' or $msg contains 'POST ') then stop``
 
 Environment Variables
