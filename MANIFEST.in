@@ -1,0 +1,11 @@
+recursive-include opencanary/data *
+recursive-include opencanary/modules/data *
+
+recursive-exclude opencanary/test *
+recursive-exclude .github *
+recursive-exclude docs *
+
+exclude Dockerfile.latest
+exclude Dockerfile.*
+exclude docker-compose.yml
+exclude .gitignore

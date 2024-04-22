@@ -2,8 +2,7 @@ from opencanary.modules import CanaryService
 
 from twisted.internet.protocol import Protocol
 from twisted.internet.protocol import Factory
-from twisted.application import internet
-from __future__ import print_function
+
 
 class Example1Protocol(Protocol):
     """
@@ -29,6 +28,7 @@ class Example1Protocol(Protocol):
     8025/tcp open  telnet  D-Link ADSL router telnetd
     Service Info: Device: router
     """
+
     def __init__(self):
         self.prompts = 0
         self.buffer = ""
@@ -39,20 +39,20 @@ class Example1Protocol(Protocol):
 
     def dataReceived(self, data):
         """
-        Recieved data is unbuffered so we buffer it for telnet.
+        Received data is unbuffered so we buffer it for telnet.
         """
         self.buffer += data
-        print("Recieved data: ", repr(data))
+        print("Received data: ", repr(data))
 
-        # Discard inital telnet client control chars
+        # Discard initial telnet client control chars
         i = self.buffer.find("\x01")
         if i >= 0:
-            self.buffer = self.buffer[i+1:]
+            self.buffer = self.buffer[i + 1 :]
             return
 
         if self.buffer.find("\x00") >= 0:
             password = self.buffer.strip("\r\n\x00")
-            logdata = {"PASSWORD" : password}
+            logdata = {"PASSWORD": password}
             self.factory.log(logdata, transport=self.transport)
             self.buffer = ""
 
@@ -63,13 +63,15 @@ class Example1Protocol(Protocol):
                 self.transport.write("\r\n% Bad passwords\r\n")
                 self.transport.loseConnection()
 
+
 class CanaryExample1(Factory, CanaryService):
-    NAME = 'example1'
+    NAME = "example1"
     protocol = Example1Protocol
 
     def __init__(self, config=None, logger=None):
         CanaryService.__init__(self, config, logger)
         self.port = config.getVal("example1.port", 8025)
         self.logtype = logger.LOG_BASE_EXAMPLE
+
 
 CanaryServiceFactory = CanaryExample1

@@ -11,7 +11,7 @@ In the configurations below, set these configuration variables:
 * **subject** - The email's subject.
 * **credentials** - Optional parameter, if the SMTP server requires authentication.
 * **secure** - Optional parameter if TLS support is mandatory or wanted.
-  
+
 More information can be found on the `PyLogger page <https://docs.python.org/2/library/logging.handlers.html#logging.handlers.SMTPHandler>`_.
 
 Send to a Gmail address
@@ -19,7 +19,7 @@ Send to a Gmail address
 
 .. code-block:: json
 
-   [..] # Services configuration
+   // [..] # Services configuration
        "logger": {
        "class" : "PyLogger",
        "kwargs" : {
@@ -40,7 +40,7 @@ Depending on your ISP and their outbound spam protection mechanisms, you may nee
 
 .. code-block:: json
 
-   [..] # Services configuration
+   // [..] # Services configuration
        "logger": {
        "class" : "PyLogger",
        "kwargs" : {
@@ -63,7 +63,7 @@ Send with SMTP authentication
 
 .. code-block:: json
 
-   [..] # Services configuration
+   // [..] # Services configuration
        "logger": {
        "class" : "PyLogger",
        "kwargs" : {

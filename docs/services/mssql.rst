@@ -11,6 +11,5 @@ Inside ~/.opencanary.conf:
        "mssql.version": "2012",
        "rdp.enabled": true,
        "rdp.port", 3389,
-   [..] # logging configuration
+       // [..] # logging configuration
    }
-

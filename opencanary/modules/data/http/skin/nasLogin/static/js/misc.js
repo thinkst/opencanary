@@ -51,4 +51,3 @@ document.getElementById('ext-comp-1008').innerHTML = wkday + ", " + month + " " 
 
 updateTime();
 window.setInterval(updateTime, 2000);
-

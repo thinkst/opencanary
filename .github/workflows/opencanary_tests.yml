@@ -2,36 +2,45 @@ name: OpenCanary Tests
 
 on:
   - "push"
-  - "pull_request"
 
 jobs:
+  precommit_tests:
+    runs-on: "ubuntu-20.04"
+    steps:
+      - name: "Check out repository code"
+        uses: "actions/checkout@v3"
+      - name: Set up Python 3.10
+        uses: actions/setup-python@v3
+        with:
+          python-version: "3.10"
+      - name: Install pre-commit
+        run: pip install pre-commit
+      - name: Check pre-commit is happy
+        run: pre-commit run --all-files
   opencanary_tests:
     strategy:
       matrix:
-        python-version: ["3.7", "3.8", "3.9", "3.10"]
-        os: ["ubuntu-18.04", "ubuntu-20.04", "macos-11"]
+        python-version: ["3.7", "3.8", "3.9", "3.10", "3.11", "3.12"]
+        os: ["ubuntu-20.04", "ubuntu-22.04", "macos-11", "macos-12"]
       fail-fast: false
     runs-on: ${{ matrix.os }}
     steps:
       - name: "Check out repository code"
-        uses: "actions/checkout@v2"
+        uses: "actions/checkout@v3"
       - name: Set up Python ${{ matrix.python-version }}
-        uses: actions/setup-python@v2
+        uses: actions/setup-python@v3
         with:
           python-version: "${{ matrix.python-version }}"
-      - name: Install required linux dependencies
-        if: ${{ contains(matrix.os, 'ubuntu') }}
-        run: |
-          sudo apt-get update
-          sudo apt-get install python3-setuptools
+      - name: Install setuptools
+        run: pip3 install setuptools>=63.2.0
       - name: Install wheel
-        run: sudo pip3 install wheel
+        run: pip3 install wheel
       - name: Create package
-        run: sudo python3 setup.py sdist
+        run: python3 setup.py sdist
       - name: Install package
-        run: sudo pip3 install dist/opencanary-*.tar.gz
+        run: pip3 install dist/opencanary-*.tar.gz
       - name: Install test dependencies
-        run: sudo pip3 install -r opencanary/test/requirements.txt
+        run: pip3 install -r opencanary/test/requirements.txt
       - name: Copy config file
         run: cp opencanary/test/opencanary.conf .
       - name: Start OpenCanary

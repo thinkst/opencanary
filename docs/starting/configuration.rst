@@ -37,16 +37,11 @@ You may also want to fiddle with some of our other services which require a bit 
 
 `smb` - a log watcher for Samba logging files which allows Opencanary to alert on files being opened in a Windows File Share.
 
-For this configuration, you will need to set up your own Windows File Share, and point Opencanary at it using the following configuration,
-
-.. code-block:: json
-
-    "smb.auditfile": "/var/log/samba-audit.log",
-
-which is where your Windows File Share will be logging any activity happening on that share.
+For this configuration, you will need to set up your own Windows File Share. Please read the steps over `here <https://github.com/thinkst/opencanary/wiki/Opencanary-and-Samba>`_.
 
 `portscan` - a log watcher that works with iptables to monitor when your Opencanary is being scanned.
 At this stage, the portscan module supports the detection of Nmap OS, Nmap FIN, Nmap OS, Nmap NULL, and normal port scans.
+`portscan.iptables_path` is available for you to specify the path to your `iptables` binary.
 
 Logger Configuration
 --------------------
@@ -121,8 +116,10 @@ You can also head over to Email Alerts for more **SMTP** options that require au
 
 You may want to look through some other python logging options over at `PyLogger page <https://docs.python.org/2/library/logging.handlers.html>`_.
 
-We have provided you with two different formatters. One is the plain message with incident information; the other is the Syslog RFC format. We have
-already added it to the `syslog-unix` handler for your convenience.
+We have provided you with two different formatters. One is the plain message with incident information; the other is the Syslog RFC format. We have already added it to the `syslog-unix` handler for your convenience.
+
+The Twisted Web server `twistd` that OpenCanary uses to provide HTTP services is not affected by these logging options and will log HTTP requests regardless of your configuration, as it is launched with the `--syslog` parameter in `bin/opencanaryd`. This can be undesirable
+in some scenarios like when a SIEM is collecting the syslog *and* a ``RotatingFileHandler`` output by OpenCanary and can be mitigated with an rsyslog config like ``if $programname == 'opencanaryd' and ($msg contains 'GET ' or $msg contains 'POST ') then stop``
 
 Environment Variables
 ---------------------
@@ -290,5 +287,16 @@ you will receive a json formatted config file at `/etc/opencanary/opencanary.con
         "vnc.enabled": false,
         "vnc.port":5000
     }
+
+Other Configuration Options
+---------------------------
+
+These configuration options aren't present in the default config file but may be added.
+
++------------------------+-----------+---------------------------------------------------------------------------+
+| Option Key             | Default   |  Description                                                              |
++========================+===========+===========================================================================+
+| device.listen_addr     | ""        | Controls which IP interface the Git, RDP, Redis, and VNC modules bind to. |
++------------------------+-----------+---------------------------------------------------------------------------+
 
 Should you have any other questions regarding configuration or setup, please do not hesitate to contact us on `GitHub <https://github.com/thinkst/opencanary>`_.
