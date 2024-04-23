@@ -120,6 +120,8 @@ fi
 echo_log "Activating virtual env in subshell..."
 . "$VENV_PATH/bin/activate"
 
+echo_log "Installing setuptools..."
+pip3 install setuptools >> "$BUILD_LOG"
 echo_log "Installing cryptography package..."
 pip3 install cryptography >> "$BUILD_LOG"
 
@@ -128,7 +130,7 @@ python3 setup.py sdist >> "$BUILD_LOG" 2>&1
 BUILT_PKG=$(ls dist/opencanary*.tar.gz)
 
 echo_log "Installing built package '$BUILT_PKG'..."
-pip install dist/opencanary-0.7.1.tar.gz >> "$BUILD_LOG"
+pip install "$BUILT_PKG" >> "$BUILD_LOG" 2>&1
 
 echo_log "Install complete.\n"
 

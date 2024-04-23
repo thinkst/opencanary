@@ -3,6 +3,7 @@
 # as well as bootstrap and bootout scripts to get the service up and running.
 # NOTE: Requires homebrew.
 
+import importlib.resources
 import json
 import pathlib
 import plistlib
@@ -15,13 +16,27 @@ from os import chmod, pardir, path
 from os.path import dirname, join, realpath
 from subprocess import CalledProcessError, check_output
 
-from pkg_resources import resource_filename
-
 OPENCANARY = "opencanary"
 LAUNCH_DAEMONS_DIR = "/Library/LaunchDaemons"
 DEFAULT_SERVICE_NAME = "com.thinkst.opencanary"
 CONFIG_FILE_BASENAME = "opencanary.conf"
-DEFAULT_CONFIG_FILE = resource_filename("opencanary", "data/settings.json")
+DEFAULT_CONFIG_DIR = importlib.resources.files(OPENCANARY).joinpath('data')
+USER_CONFIG_FILE = DEFAULT_CONFIG_DIR.joinpath('settings.json')
+DEFAULT_CONFIG_FILE = DEFAULT_CONFIG_DIR.joinpath('.opencanary.conf')
+
+if USER_CONFIG_FILE.exists():
+    opencanary_config_file = USER_CONFIG_FILE
+else:
+    if not DEFAULT_CONFIG_FILE.exists():
+        print(f"Neither a user 'settings.json' nor a default '.opencanary.conf' found in {DEFAULT_CONFIG_DIR}!")
+        print("Exiting...")
+        sys.exit()
+
+    opencanary_config_file = DEFAULT_CONFIG_FILE
+    print(f"Using default config file......")
+    print(f"(Create a file at '{USER_CONFIG_FILE}' for individual settings beyond the command line arguments)")
+
+print(f"\nUsing configuration file: '{opencanary_config_file}'")
 
 # opencanary dirs
 OPENCANARY_DIR = realpath(join(dirname(__file__), pardir))
@@ -47,11 +62,12 @@ except CalledProcessError as e:
     sys.exit()
 
 # Load opencanary.conf default config
-with open(DEFAULT_CONFIG_FILE, "r") as file:
-    config = json.load(file)
-    canaries = [
-        k.split(".")[0] for k in config.keys() if re.match("[a-z]+\\.enabled", k)
-    ]
+with importlib.resources.as_file(opencanary_config_file) as default_config_file:
+    with open(default_config_file, "r") as file:
+        config = json.load(file)
+        canaries = [
+            k.split(".")[0] for k in config.keys() if re.match("[a-z]+\\.enabled", k)
+        ]
 
 
 # Parse arguments.
