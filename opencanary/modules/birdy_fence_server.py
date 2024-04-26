@@ -55,7 +55,7 @@ class RedirectCustomHeaders(Redirect):
 
 
 class BirdyFenceServer(CanaryService):
-    NAME = "http"
+    NAME = "birdy_fence_server"
 
     def __init__(self, config=None, logger=None):
         CanaryService.__init__(self, config=config, logger=logger)
