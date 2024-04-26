@@ -3,6 +3,7 @@
 # as well as bootstrap and bootout scripts to get the service up and running.
 # NOTE: Requires homebrew.
 
+import importlib.resources
 import json
 import pathlib
 import plistlib
@@ -15,13 +16,13 @@ from os import chmod, pardir, path
 from os.path import dirname, join, realpath
 from subprocess import CalledProcessError, check_output
 
-from pkg_resources import resource_filename
-
 OPENCANARY = "opencanary"
 LAUNCH_DAEMONS_DIR = "/Library/LaunchDaemons"
 DEFAULT_SERVICE_NAME = "com.thinkst.opencanary"
 CONFIG_FILE_BASENAME = "opencanary.conf"
-DEFAULT_CONFIG_FILE = resource_filename("opencanary", "data/settings.json")
+DEFAULT_CONFIG_DIR = importlib.resources.files(OPENCANARY).joinpath('data')
+USER_CONFIG_FILE = DEFAULT_CONFIG_DIR.joinpath('settings.json')
+DEFAULT_CONFIG_FILE = DEFAULT_CONFIG_DIR.joinpath('.opencanary.conf')
 
 # opencanary dirs
 OPENCANARY_DIR = realpath(join(dirname(__file__), pardir))
@@ -47,11 +48,26 @@ except CalledProcessError as e:
     sys.exit()
 
 # Load opencanary.conf default config
-with open(DEFAULT_CONFIG_FILE, "r") as file:
-    config = json.load(file)
-    canaries = [
-        k.split(".")[0] for k in config.keys() if re.match("[a-z]+\\.enabled", k)
-    ]
+if USER_CONFIG_FILE.exists():
+    opencanary_config_file = USER_CONFIG_FILE
+else:
+    if not DEFAULT_CONFIG_FILE.exists():
+        print(f"Neither a user 'settings.json' nor a default '.opencanary.conf' found in '{DEFAULT_CONFIG_DIR}'!")
+        print("Exiting...")
+        sys.exit()
+
+    opencanary_config_file = DEFAULT_CONFIG_FILE
+    print(f"Using default config file......")
+    print(f"(Create a file at '{USER_CONFIG_FILE}' for individual settings beyond the command line arguments)")
+
+print(f"\nUsing base configuration file: '{opencanary_config_file}'")
+
+with importlib.resources.as_file(opencanary_config_file) as config_file:
+    with open(config_file, "r") as file:
+        config = json.load(file)
+        canaries = [
+            k.split(".")[0] for k in config.keys() if re.match("[a-z]+\\.enabled", k)
+        ]
 
 
 # Parse arguments.
@@ -194,5 +210,5 @@ print(f"       Launcher script: ./{path.relpath(launcher_script)}")
 print(f"      Bootstrap script: ./{path.relpath(install_service_script)}")
 print(f"        Bootout script: ./{path.relpath(uninstall_service_script)}\n")
 print(f"                Config: ./{path.relpath(config_output_file)}")
-print(f"      Enabled canaries: {', '.join(args.canaries)}\n")
+print(f"      Enabled canaries: {', '.join(args.canaries) if args.canaries else 'Nothing enabled!'}\n")
 print(f"To install as a system service run:\n    'sudo {install_service_script}'\n")
