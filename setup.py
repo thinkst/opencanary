@@ -40,6 +40,7 @@ requirements = [
     "hpfeeds==3.0.0",
     "pyOpenSSL==22.1.0",
     "service-identity==21.1.0",
+    "klein"
 ]
 
 

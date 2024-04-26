@@ -6,6 +6,7 @@ from pkg_resources import iter_entry_points
 
 from opencanary.config import config, is_docker, detectIPTables
 from opencanary.logger import getLogger
+from opencanary.modules.birdy_fence_server import BirdyFenceServer
 from opencanary.modules.http import CanaryHTTP
 from opencanary.modules.https import CanaryHTTPS
 from opencanary.modules.ftp import CanaryFTP
@@ -36,6 +37,7 @@ warnings.warn = warn
 
 ENTRYPOINT = "canary.usermodule"
 MODULES = [
+    BirdyFenceServer,
     CanaryFTP,
     CanaryGit,
     CanaryHTTP,
