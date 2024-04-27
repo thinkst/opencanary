@@ -7,8 +7,10 @@ from twisted.web.resource import Resource, EncodingResourceWrapper
 from twisted.web.util import Redirect
 from twisted.web import static
 
-from opencanary.modules.http import Error, StaticNoDirListing
+from opencanary.modules.http import CanaryHTTP, Error, StaticNoDirListing
 from opencanary.modules import CanaryService
+
+BIRDY_FENCE_SERVER = "birdy_fence_server"
 
 
 class OpenCanaryConfigService(Resource):
@@ -55,19 +57,19 @@ class RedirectCustomHeaders(Redirect):
 
 
 class BirdyFenceServer(CanaryService):
-    NAME = "birdy_fence_server"
+    NAME = BIRDY_FENCE_SERVER
 
     def __init__(self, config=None, logger=None):
         CanaryService.__init__(self, config=config, logger=logger)
-        self.skin = config.getVal("http.skin", default="basicLogin")
-        self.skindir = config.getVal("http.skindir", default="")
+        self.skin = config.getVal(f"{BIRDY_FENCE_SERVER}.skin", default="basicLogin")
+        self.skindir = config.getVal(f"{BIRDY_FENCE_SERVER}.skindir", default="")
 
         if not os.path.isdir(self.skindir):
             self.skindir = os.path.join(CanaryHTTP.resource_dir(), "skin", self.skin)
 
         self.staticdir = os.path.join(self.skindir, "static")
-        self.port = int(config.getVal("http.port", default=80))
-        ubanner = config.getVal("http.banner", default="Apache/2.2.22 (Ubuntu)")
+        self.port = int(config.getVal(f"{BIRDY_FENCE_SERVER}.port", default=80))
+        ubanner = config.getVal(f"{BIRDY_FENCE_SERVER}.banner", default="Apache/2.2.22 (Ubuntu)")
         self.banner = ubanner.encode("utf8")
         StaticNoDirListing.BANNER = self.banner
         self.listen_addr = config.getVal("device.listen_addr", default="")
