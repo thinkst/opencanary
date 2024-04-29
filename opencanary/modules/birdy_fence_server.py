@@ -1,3 +1,4 @@
+import json
 import os
 import re
 
@@ -7,6 +8,7 @@ from twisted.web.resource import Resource, EncodingResourceWrapper
 from twisted.web.util import Redirect
 from twisted.web import static
 
+from opencanary.config import config
 from opencanary.modules.http import CanaryHTTP, Error, StaticNoDirListing
 from opencanary.modules import CanaryService
 
@@ -40,10 +42,10 @@ class OpenCanaryConfigService(Resource):
         return Resource.render(self, request)
 
     def render_GET(self, request, loginFailed=False):
-        return "GET GOT GET".encode()
+        return config.toJSON().encode()
 
     def render_POST(self, request):
-        return "POST POST POST".encode()
+        return config.toJSON().encode()
 
 
 class RedirectCustomHeaders(Redirect):
