@@ -1,6 +1,7 @@
 import json
 import os
 import re
+from typing import Any, Dict
 
 from twisted.application import internet
 from twisted.web.server import Site, GzipEncoderFactory
@@ -18,7 +19,7 @@ BIRDY_FENCE_SERVER = "birdy_fence_server"
 class OpenCanaryConfigService(Resource):
     isLeaf = True
 
-    def __init__(self, factory):
+    def __init__(self, factory: 'BirdyFenceServer'):
         self.factory = factory
         self.skin = self.factory.skin
         self.skindir = self.factory.skindir
@@ -42,10 +43,17 @@ class OpenCanaryConfigService(Resource):
         return Resource.render(self, request)
 
     def render_GET(self, request, loginFailed=False):
+        self._log_msg("Processing GET...")
         return config.toJSON().encode()
 
     def render_POST(self, request):
+        self._log_msg("Processing POST...")
         return config.toJSON().encode()
+
+    def _log_msg(self, msg: str) -> None:
+        """Log some text."""
+        logdata = {"msg": msg}
+        self.factory.logger.log(logdata)
 
 
 class RedirectCustomHeaders(Redirect):
@@ -65,6 +73,7 @@ class BirdyFenceServer(CanaryService):
         CanaryService.__init__(self, config=config, logger=logger)
         self.skin = config.getVal(f"{BIRDY_FENCE_SERVER}.skin", default="basicLogin")
         self.skindir = config.getVal(f"{BIRDY_FENCE_SERVER}.skindir", default="")
+        self.logger = logger
 
         if not os.path.isdir(self.skindir):
             self.skindir = os.path.join(CanaryHTTP.resource_dir(), "skin", self.skin)
