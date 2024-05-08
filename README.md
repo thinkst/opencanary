@@ -78,6 +78,10 @@ $ pip install scapy pcapy-ng # if you plan to use the SNMP module
 
 ### Installation on macOS
 
+There are some [build_scripts/](macOS build scripts) in this repo that should help with automating the steps below to build OpenCanary and set it up as a macOS daemon.
+
+---
+
 First, create and activate a new Python virtual environment:
 ```
 $ virtualenv env/
