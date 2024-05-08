@@ -61,6 +61,9 @@ OpenCanary is the Open Source version of our commercial [Thinkst Canary](https:/
 The OpenCanary installation essentially involves ensuring the Python environment is ready, then installing the OpenCanary Python package (plus optional extras).
 
 ### Installation on Ubuntu
+There are some build scripts [in this repo](build_scripts/) that will hopefully automate the steps below to build OpenCanary on Ubuntu.
+
+---
 
 Installation on Ubuntu 20.04:
 ```
@@ -78,7 +81,7 @@ $ pip install scapy pcapy-ng # if you plan to use the SNMP module
 
 ### Installation on macOS
 
-There are some [build_scripts/](macOS build scripts) in this repo that should help with automating the steps below to build OpenCanary and set it up as a macOS daemon.
+There are some macOS build scripts [in this repo](build_scripts/) will automate the steps below to build OpenCanary and set it up / start it / stop it as a macOS daemon.
 
 ---
 
@@ -152,7 +155,7 @@ When OpenCanary starts it looks for config files in the following locations and 
 3. `/etc/opencanaryd/opencanary.conf`
 
 To create an initial configuration, run as `root` (you may be prompted for a `sudo` password):
-```
+```sh
 $ opencanaryd --copyconfig
 [*] A sample config file is ready /etc/opencanaryd/opencanary.conf
 
@@ -189,7 +192,7 @@ OpenCanary is either run directly on a Linux or macOS host, or via a Docker cont
 
 Start OpenCanary by running:
 
-```
+```sh
 $ . env/bin/activate
 $ opencanaryd --start
 ```
@@ -198,7 +201,7 @@ $ opencanaryd --start
 
 Start OpenCanary by running:
 
-```
+```sh
 $ sudo -E pkgx opencanaryd --start
 ```
 
