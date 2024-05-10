@@ -89,7 +89,7 @@ class CanaryService(object):
             if username or password:
                 data["honeycred"] = self.honeyCredHook(username, password)
 
-        self.logger.log(data)
+        self.logger.log(data, service=self.NAME)
 
     def getService(self):
         """Return service to be run
