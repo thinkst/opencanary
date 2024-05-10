@@ -144,8 +144,6 @@ class PyLogger(LoggerBase):
             # initialise all defined logger handlers
             "loggers": {self.node_id: {"handlers": set(handlers.keys())}},
         }
-        print("per_service_log")
-        print(per_service_logs)
         for psl in per_service_logs:
             logconfig["handlers"][psl] = {
                 "class": "logging.FileHandler",
