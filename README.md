@@ -232,6 +232,15 @@ Please head over our dedicated Docker [wiki](https://github.com/thinkst/opencana
 ### With Ansible
 
 Please head over to our forked repository for an Ansible OpenCanary role over [here](https://github.com/thinkst/ansible-role-opencanary).
+
+### Launching With `twistd`
+
+```sh
+cp opencanary/data/settings.json ./opencanary.conf
+(edit as needed)
+twistd -noy bin/opencanary.tac
+```
+
 ## Documentation
 
 * The [Wiki](https://github.com/thinkst/opencanary/wiki) contains our FAQ.
