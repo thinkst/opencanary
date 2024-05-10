@@ -129,7 +129,7 @@ class PyLogger(LoggerBase):
 
     __metaclass__ = Singleton
 
-    def __init__(self, config, handlers, formatters={}):
+    def __init__(self, config, handlers, formatters={}, per_service_logs={}):
         self.node_id = config.getVal("device.node_id")
 
         # Build config dict to initialise
@@ -142,9 +142,14 @@ class PyLogger(LoggerBase):
             "formatters": formatters,
             "handlers": handlers,
             # initialise all defined logger handlers
-            "loggers": {self.node_id: {"handlers": handlers.keys()}},
+            "loggers": {self.node_id: {"handlers": set(handlers.keys())}},
         }
-
+        for psl in per_service_logs:
+            logconfig["handlers"][psl] = {
+                "class": "logging.FileHandler",
+                "filename": per_service_logs[psl]
+            }
+            logconfig["loggers"][psl] = {"handlers": [psl]}
         try:
             logging.config.dictConfig(logconfig)
         except Exception as e:
@@ -158,6 +163,9 @@ class PyLogger(LoggerBase):
         self.logtype_ignorelist = config.getVal("logtype.ignorelist", default=[])
 
         self.logger = logging.getLogger(self.node_id)
+        self.per_service_loggers = {}
+        for psl in per_service_logs:
+          self.per_service_loggers[psl] = logging.getLogger(psl)
 
     def error(self, data):
         data["local_time"] = datetime.utcnow().strftime("%Y-%m-%d %H:%M:%S.%f")
@@ -165,7 +173,7 @@ class PyLogger(LoggerBase):
         print(msg, file=sys.stderr)
         self.logger.warn(msg)
 
-    def log(self, logdata, retry=True):
+    def log(self, logdata, retry=True, service=None):
         logdata = self.sanitizeLog(logdata)
         # Log only if not in ignorelist
         notify = True
@@ -178,9 +186,11 @@ class PyLogger(LoggerBase):
         if "logtype" in logdata and logdata["logtype"] in self.logtype_ignorelist:
             notify = False
 
+        log_string = json.dumps(logdata, sort_keys=True)
         if notify is True:
-            self.logger.warn(json.dumps(logdata, sort_keys=True))
-
+            self.logger.warn(log_string)
+            if service and service in self.per_service_loggers:
+                self.per_service_loggers[service].warn(log_string)
 
 class SocketJSONHandler(SocketHandler):
     """Emits JSON messages over TCP delimited by newlines ('\n')"""
