@@ -9,7 +9,7 @@ from twisted.web.resource import Resource, EncodingResourceWrapper
 from twisted.web.util import Redirect
 from twisted.web import static
 
-from opencanary.config import config
+from opencanary import config
 from opencanary.modules.http import CanaryHTTP, Error, StaticNoDirListing
 from opencanary.modules import CanaryService
 
@@ -42,18 +42,23 @@ class OpenCanaryConfigService(Resource):
         request.setHeader("Server", self.factory.banner)
         return Resource.render(self, request)
 
-    def render_GET(self, request, loginFailed=False):
+    def render_GET(self, request, loginFailed=False) -> bytes:
         self._log_msg("Processing GET...")
-        return config.toJSON().encode()
+        return self._reload_config()
 
-    def render_POST(self, request):
+    def render_POST(self, request) -> bytes:
         self._log_msg("Processing POST...")
-        return config.toJSON().encode()
+        return self._reload_config()
 
     def _log_msg(self, msg: str) -> None:
         """Log some text."""
         logdata = {"msg": msg}
         self.factory.logger.log(logdata)
+
+    def _reload_config(self) -> bytes:
+        """Reload the appropriate opencanary.conf into an in-memory Config object."""
+        config.config = config.load_config()
+        return config.config.toJSON().encode()
 
 
 class RedirectCustomHeaders(Redirect):

@@ -64,9 +64,13 @@ class Config:
         for fname in files:
             try:
                 with open(fname, "r") as f:
-                    print("[-] Using config file: %s" % fname)
+                    source_file_path = Path(fname).resolve()
+                    print("[-] Attempting to load config file at '%s'..." % source_file_path)
                     self.__config = json.load(f)
                     self.__config = expand_vars(self.__config)
+                    # Store the path to source data that was loaded
+                    self.source_file_path = source_file_path
+                    print("[-]    Load successful!")
                 return
             except IOError as e:
                 print("[-] Failed to open %s for reading (%s)" % (fname, e))
@@ -215,9 +219,19 @@ class ConfigException(Exception):
         return "<%s %s (%s)>" % (self.__class__.__name__, self.key, self.msg)
 
 
-config = Config()
-errors = config.checkValues()
-if errors:
-    for error in errors:
-        print(error)
-    sys.exit(1)
+# TODO: this only changes what's in memory and does *NOT* restart the services
+def load_config() -> Config:
+    """Load opencanary.conf into memory."""
+    print("Loading opencanary configuration...")
+    _config = Config()
+    errors = _config.checkValues()
+
+    if errors:
+        for error in errors:  # TODO: this should be an error level log message
+            print(error)
+        sys.exit(1)
+
+    return _config
+
+# Initial load
+config = load_config()
