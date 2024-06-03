@@ -66,6 +66,16 @@ if config.moduleEnabled("snmp"):
         print("Can't import SNMP. Please ensure you have Scapy installed.")
         pass
 
+if config.moduleEnabled("llmnr"):
+    try:
+        # Module needs Scapy, but the rest of OpenCanary doesn't
+        from opencanary.modules.llmnr import CanaryLLMNR
+
+        MODULES.append(CanaryLLMNR)
+    except ImportError:
+        print("Can't import LLMNR. Please ensure you have Scapy installed.")
+        pass
+
 # NB: imports below depend on inotify, only available on linux
 if sys.platform.startswith("linux"):
     from opencanary.modules.samba import CanarySamba
