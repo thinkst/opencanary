@@ -22,7 +22,6 @@ from opencanary.modules.git import CanaryGit
 from opencanary.modules.redis import CanaryRedis
 from opencanary.modules.tcpbanner import CanaryTCPBanner
 from opencanary.modules.rdp import CanaryRDP
-from opencanary.modules.llmnr import CanaryLLMNR
 
 def warn(*args, **kwargs):
     pass
@@ -65,6 +64,16 @@ if config.moduleEnabled("snmp"):
         MODULES.append(CanarySNMP)
     except ImportError:
         print("Can't import SNMP. Please ensure you have Scapy installed.")
+        pass
+
+if config.moduleEnabled("llmnr"):
+    try:
+        # Module needs Scapy, but the rest of OpenCanary doesn't
+        from opencanary.modules.llmnr import CanaryLLMNR
+
+        MODULES.append(CanaryLLMNR)
+    except ImportError:
+        print("Can't import LLMNR. Please ensure you have Scapy installed.")
         pass
 
 # NB: imports below depend on inotify, only available on linux
