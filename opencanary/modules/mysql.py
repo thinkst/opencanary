@@ -122,6 +122,14 @@ class MySQL(Protocol, TimeoutMixin):
         return self.build_packet(0x02, data)
 
     def connectionMade(self):
+        if self.factory.canaryservice.config.getVal(
+            "mysql.log_connection_made", default=False
+        ):
+            logtype = self.factory.canaryservice.logger.LOG_MYSQL_CONNECTION_MADE
+            self.factory.canaryservice.log(
+                {}, transport=self.transport, logtype=logtype
+            )
+
         self.transport.write(self.server_greeting())
 
     def dataReceived(self, data):

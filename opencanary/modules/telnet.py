@@ -47,6 +47,14 @@ class AlertAuthTelnetProtocol(AuthenticatingTelnetProtocol):
     def connectionMade(self):
         # p/Cisco telnetd/ d/router/ o/IOS/ cpe:/a:cisco:telnet/ cpe:/o:cisco:ios/a
         # NB _write() is for raw data and write() handles telnet special bytes
+        if self.factory.canaryservice.config.getVal(
+            "telnet.log_tcp_connection", default=False
+        ):
+            logtype = self.factory.canaryservice.logger.LOG_TELNET_CONNECTION_MADE
+            self.factory.canaryservice.log(
+                {}, transport=self.transport, logtype=logtype
+            )
+
         self.transport._write(
             b"\xff\xfb\x01\xff\xfb\x03\xff\xfb\0\xff\xfd\0\xff\xfd\x1f\r\n"
         )

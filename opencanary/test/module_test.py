@@ -32,8 +32,19 @@ def get_last_log():
     """
     Gets the last line from `/var/tmp/opencanary.log` as a dictionary
     """
-    with open("/var/tmp/opencanary.log", "r") as log_file:
-        return json.loads(log_file.readlines()[-1])
+    return get_last_n_logs(1)[0]
+
+
+def get_last_n_logs(n):
+    """
+    Reads the last 'n' lines from a file and returns them as a list of dictionaries.
+    """
+    with open("/var/tmp/opencanary.log", "r") as file:
+        lines = file.readlines()
+
+    last_n_lines = lines[-n:]
+    deserialized_data = [json.loads(line) for line in last_n_lines]
+    return deserialized_data
 
 
 class TestFTPModule(unittest.TestCase):
@@ -45,6 +56,16 @@ class TestFTPModule(unittest.TestCase):
 
     def setUp(self):
         self.ftp = FTP("localhost")
+
+    def test_attempted_ftp_connection(self):
+        """
+        Try to connect to the FTP service should log the connection attempt.
+        """
+        self.assertRaises(error_perm, self.ftp.login)
+        log = get_last_n_logs(2)[0]
+        self.assertEqual(log["logtype"], 2001)
+        self.assertEqual(log["dst_port"], 21)
+        self.assertEqual(log["logdata"], {})
 
     def test_anonymous_ftp(self):
         """
@@ -386,6 +407,25 @@ class TestMySQLModule(unittest.TestCase):
         self.assertEqual(last_log["logdata"]["USERNAME"], "test_user")
         #        self.assertEqual(last_log['logdata']['PASSWORD'], "b2e5ed6a0e59f99327399ced2009338d5c0fe237")
         self.assertEqual(last_log["dst_port"], 3306)
+
+    def test_attempted_mysql_login(self):
+        """
+        Try to connect to the FTP service should log the connection attempt.
+        """
+        self.assertRaises(
+            pymysql.err.OperationalError,
+            pymysql.connect,
+            host="localhost",
+            user="anyone",
+            password="AsDAS9d103294",
+            db="invaliddb",
+            charset="utf8mb4",
+            cursorclass=pymysql.cursors.DictCursor,
+        )
+        log = get_last_n_logs(2)[0]
+        self.assertEqual(log["logtype"], 9003)
+        self.assertEqual(log["dst_port"], 3306)
+        self.assertEqual(log["logdata"], {})
 
 
 class TestRDPModule(unittest.TestCase):

@@ -34,6 +34,14 @@ class LoggingFTP(FTP):
         Second part of login.  Get the password the peer wants to
         authenticate with.
         """
+        if self.factory.canaryservice.config.getVal(
+            "ftp.log_auth_attempt_initiated", default=False
+        ):
+            logtype = self.factory.canaryservice.logger.LOG_FTP_AUTH_ATTEMPT_INITIATED
+            self.factory.canaryservice.log(
+                {}, transport=self.transport, logtype=logtype
+            )
+
         if self.factory.allowAnonymous and self._user == self.factory.userAnonymous:
             # anonymous login
             creds = credentials.Anonymous()
