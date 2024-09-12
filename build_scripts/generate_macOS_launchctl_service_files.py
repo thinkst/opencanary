@@ -59,7 +59,7 @@ else:
         sys.exit()
 
     opencanary_config_file = DEFAULT_CONFIG_FILE
-    print(f"Using default config file......")
+    print("Using default config file......")
     print(
         f"(Create a file at '{USER_CONFIG_FILE}' for individual settings beyond the command line arguments)"
     )
