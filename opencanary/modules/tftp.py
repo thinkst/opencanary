@@ -2,6 +2,7 @@
     A log-only Tftp server. It won't respond, but it will log attempts
     to either read or write files.
 """
+
 from opencanary.modules import CanaryService
 
 from twisted.application import internet

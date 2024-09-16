@@ -1,6 +1,7 @@
 """
     A log-only SNMP server. It won't respond, but it will log SNMP queries.
 """
+
 from opencanary.modules import CanaryService
 
 from twisted.application import internet

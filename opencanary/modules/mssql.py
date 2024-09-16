@@ -185,7 +185,7 @@ class MSSQLProtocol(Protocol, TimeoutMixin):
             return chr(((c & 0x0F) << 4) | (c >> 4))
 
         fields = {}
-        for (i, fieldname) in enumerate(MSSQLProtocol.LOGIN7_FIELDS):
+        for i, fieldname in enumerate(MSSQLProtocol.LOGIN7_FIELDS):
             fields[fieldname] = htuple[i]
 
         loginData = {}

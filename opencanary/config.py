@@ -119,7 +119,7 @@ class Config:
             if len(settings) > 1:
                 services = ", ".join([s[1].split(".")[0] for s in settings])
                 errmsg = "More than one service uses this port (%s)" % services
-                for (port, setting) in settings:
+                for port, setting in settings:
                     errors.append(ConfigException(setting, errmsg))
 
         return errors

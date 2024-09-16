@@ -103,6 +103,7 @@ PAD_PKCS5 = 2
 # For a good description of the PKCS5 padding technique, see:
 # http://www.faqs.org/rfcs/rfc1423.html
 
+
 # The base class shared by des and triple des.
 class _baseDes(object):
     def __init__(self, mode=ECB, IV=None, pad=None, padmode=PAD_NORMAL):

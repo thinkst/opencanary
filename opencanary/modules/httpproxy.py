@@ -105,7 +105,7 @@ class AlertProxyRequest(Request):
 
         # match http-proxy m|^HTTP/1\.[01] \d\d\d .*\r\nServer: [sS]quid/([-.\w+]+)\r\n|s
         self.setResponseCode(407, profile["status_reason"])
-        for (name, value) in profile["headers"]:
+        for name, value in profile["headers"]:
             self.responseHeaders.addRawHeader(name, value)
 
         self.responseHeaders.addRawHeader("Content-Type", "text/html")

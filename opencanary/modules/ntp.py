@@ -3,6 +3,7 @@
     to trigger the MON_GETLIST_1 NTP commands, which is used for DDOS
     and network recon.
 """
+
 from opencanary.modules import CanaryService
 from twisted.application import internet
 from twisted.internet.protocol import DatagramProtocol
