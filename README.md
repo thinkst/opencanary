@@ -62,7 +62,7 @@ The OpenCanary installation essentially involves ensuring the Python environment
 
 ### Installation on Ubuntu
 
-Installation on Ubuntu 20.04:
+Installation on Ubuntu 22.04 LTS or 24.04 LTS:
 ```
 $ sudo apt-get install python3-dev python3-pip python3-virtualenv python3-venv python3-scapy libssl-dev libpcap-dev
 $ virtualenv env/
