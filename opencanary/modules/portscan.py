@@ -1,8 +1,8 @@
 from opencanary.modules import CanaryService
 from opencanary.modules import FileSystemWatcher
+from opencanary import safe_exec
 import os
 import shutil
-import subprocess
 
 
 class SynLogWatcher(FileSystemWatcher):
@@ -68,7 +68,7 @@ class SynLogWatcher(FileSystemWatcher):
 
 
 def detectNFTables():
-    return b"nf_tables" in subprocess.check_output(["iptables", "--version"])
+    return b"nf_tables" in safe_exec("iptables", ["--version"])
 
 
 class CanaryPortscan(CanaryService):

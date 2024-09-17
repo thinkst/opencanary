@@ -3,12 +3,12 @@ import sys
 import json
 import itertools
 import string
-import subprocess
 import shutil
 import re
 from os.path import expanduser
 from pkg_resources import resource_filename
 from pathlib import Path
+from . import safe_exec
 
 SAMPLE_SETTINGS = resource_filename(__name__, "data/settings.json")
 SETTINGS = "opencanary.conf"
@@ -54,9 +54,9 @@ class Config:
         self.__configfile = configfile
 
         files = [
-            configfile,
-            "%s/.%s" % (expanduser("~"), configfile),
             "/etc/opencanaryd/%s" % configfile,
+            "%s/.%s" % (expanduser("~"), configfile),
+            configfile,
         ]
         print(
             "** We hope you enjoy using OpenCanary. For more open source Canary goodness, head over to canarytokens.org. **"
@@ -67,14 +67,17 @@ class Config:
                     print("[-] Using config file: %s" % fname)
                     self.__config = json.load(f)
                     self.__config = expand_vars(self.__config)
+                if fname is configfile:
+                    print(
+                        "[-] Warning, making use of the configuration file in the immediate directory is not recommended! Suggested locations: %s"
+                        % ", ".join(files[:2])
+                    )
                 return
             except IOError as e:
                 print("[-] Failed to open %s for reading (%s)" % (fname, e))
             except ValueError as e:
                 print("[-] Failed to decode json from %s (%s)" % (fname, e))
-                subprocess.call(
-                    "cp -r %s /var/tmp/config-err-$(date +%%s)" % fname, shell=True
-                )
+                safe_exec("cp", ["-r", fname, "/var/tmp/config-err-$(date +%%s)"])
             except Exception as e:
                 print("[-] An error occurred loading %s (%s)" % (fname, e))
         if self.__config is None:
