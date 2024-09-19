@@ -157,6 +157,43 @@ $ opencanaryd --copyconfig
 
 This creates the path and file `/etc/opencanaryd/opencanary.conf`. You must now edit the config file to determine which services and logging options you want to enable.
 
+### Setting privileges
+
+OpenCanary requires root to bind to privileged ports, after which it attempts to drop to a less privileged
+user and group ID (default is `opencanary/nogroup`).
+
+If this behaviour is not desired, one can use the `--allow-run-as-root` flag, e.g.,
+
+```
+$ opencanaryd start --allow-run-as-root
+```
+
+Creating the `opencanary` user and giving necessary privileges, run `./bin/opencanaryd --createuser`. To drop to a
+custom user or group, simply use the `--uid` and `--gid` options respectively:
+
+```
+$ opencanaryd start --uid username --gid groupname
+```
+
+By default, the `uid:gid` is `opencanary:nogroup`.
+
+#### Installing and running OpenCanary on an isolated `opencanary` user
+
+The recommended installation process would be as follows:
+
+1. Obtain an installation candidate `opencanary-<version>.tar.gz` e.g., via [Installation via Git](#installation-via-git)
+2. Make sure all users can read this file, e.g, `sudo chmod 744 /path/to/opencanary-<version>.tar.gz`.
+3. Run the following commands as `opencanary`, i.e., `sudo su - opencanary`:
+   1. Create virtual environment `pip3 install virtualenv && python3 -m virtualenv .venv`.
+   2. Install Opencanary distribution `pip3 install /path/to/opencanary-<version>.tar.gz`.
+4. Activate the `opencanary` virtual environment from a user that is able to use `sudo`
+   (necessary to bind to privileged ports), e.g., `source /home/opencanary/.venv/bin/activate`
+5. Navigate back to `opencanary`'s home, e.g., `cd /home/opencanary` or `cd /Users/opencanary`. If this step is not done,
+   there may be issues when the `opencanary` user tries to navigate from this (possibly more privileged) directory.
+6. Run the `opencanaryd` binary as usual , e.g., `opencanaryd --start`.
+
+This should drop to the `opencanary` user once bound to privileged ports, and safely operate in an isolated environment.
+
 ### Enabling protocol modules and alerting
 
 Configuration is performed via the JSON config file. Edit the file, and when happy save and exit.
@@ -187,7 +224,7 @@ Start OpenCanary by running:
 
 ```
 $ . env/bin/activate
-$ opencanaryd --start
+$ opencanaryd --start --allow-run-as-root
 ```
 
 ### With pkgx
