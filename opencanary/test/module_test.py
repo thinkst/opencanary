@@ -210,6 +210,82 @@ class TestHTTPModule(unittest.TestCase):
         # Just an arbitrary image
         self.assertEqual(request.status_code, 200)
 
+    def test_unimplemented_delete_http_method(self):
+        """
+        Try sending a request with an unimplemented HTTP type (DELETE)
+        """
+        request = requests.delete("http://localhost/index.html")
+        last_log = get_last_log()
+        self.assertEqual(last_log["logtype"], 3002)
+        self.assertEqual(last_log["logdata"]["REQUEST_TYPE"], "DELETE")
+        self.assertEqual(request.status_code, 405)
+
+    def test_unimplemented_patch_http_method(self):
+        """
+        Try sending a request with an unimplemented HTTP type (PATCH)
+        """
+        request = requests.patch("http://localhost/index.html", {})
+        last_log = get_last_log()
+        self.assertEqual(last_log["logtype"], 3002)
+        self.assertEqual(last_log["logdata"]["REQUEST_TYPE"], "PATCH")
+        self.assertEqual(request.status_code, 405)
+
+    def test_unimplemented_put_http_method(self):
+        """
+        Try sending a request with an unimplemented HTTP type (PUT)
+        """
+        request = requests.put("http://localhost/index.html")
+        last_log = get_last_log()
+        self.assertEqual(last_log["logtype"], 3002)
+        self.assertEqual(last_log["logdata"]["REQUEST_TYPE"], "PUT")
+        self.assertEqual(request.status_code, 405)
+
+    def test_unimplemented_connect_http_method(self):
+        """
+        Try sending a request with an unimplemented HTTP type (CONNECT)
+        """
+        request = requests.request("CONNECT", "http://localhost/index.html")
+        last_log = get_last_log()
+        self.assertEqual(last_log["logtype"], 3002)
+        self.assertEqual(last_log["logdata"]["REQUEST_TYPE"], "CONNECT")
+        self.assertEqual(request.status_code, 405)
+
+    def test_unimplemented_trace_http_method(self):
+        """
+        Try sending a request with an unimplemented HTTP type (TRACE)
+        """
+        request = requests.request("TRACE", "http://localhost/index.html")
+        last_log = get_last_log()
+        self.assertEqual(last_log["logtype"], 3002)
+        self.assertEqual(last_log["logdata"]["REQUEST_TYPE"], "TRACE")
+        self.assertEqual(request.status_code, 405)
+
+    def test_unimplemented_head_http_method(self):
+        """
+        Try sending a request with an unimplemented HTTP type (HEAD)
+        """
+        request = requests.head("http://localhost/index.html")
+        last_log = get_last_log()
+        self.assertEqual(last_log["logtype"], 3002)
+        self.assertEqual(last_log["logdata"]["REQUEST_TYPE"], "HEAD")
+        self.assertEqual(request.status_code, 405)
+
+    def test_invalid_http_request(self):
+        """
+        Try sending a request with an invalid HTTP verb
+        """
+        request = requests.request("INVALID", "http://localhost/index.html")
+        self.assertEqual(request.status_code, 405)
+
+    def test_redirect(self):
+        """
+        Send a POST request to root to receive redirect.
+        """
+        request = requests.post("http://localhost", allow_redirects=False)
+        last_log = get_last_log()
+        self.assertEqual(request.status_code, 302)
+        self.assertEqual(last_log["logtype"], 3003)
+
 
 class TestHTTPSModule(unittest.TestCase):
     """

@@ -12,6 +12,8 @@
     "http.enabled": false,
     "http.port": 80,
     "http.skin": "nasLogin",
+    "http.log_unimplemented_method_requests": false,
+    "http.log_redirect_request": false,
     "https.enabled": false,
     "https.port": 443,
     "https.skin": "nasLogin",
