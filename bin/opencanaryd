@@ -70,7 +70,7 @@ fi
 if [[ "${cmd}" != "--help" && "${cmd}" != "--version" && "${cmd}" != "--createuser" && $(id $uid_ &>/dev/null; echo $?) -eq 0 ]]; then
   # Ensure logging file and HTTP static content perms are correct
   sudo touch /var/tmp/opencanary.log && sudo chmod 755 /var/tmp/opencanary.log
-  sudo chown -R ${uid_}:${gid_} /etc/opencanaryd
+  sudo mkdir -p /etc/opencanaryd && sudo chown -R ${uid_}:${gid_} /etc/opencanaryd
 fi
 
 if [ "${cmd}" == "--start" ]; then
