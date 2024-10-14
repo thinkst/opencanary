@@ -2,7 +2,9 @@ name: Publish to PyPI
 on:
   release:
     types:
-      - created
+      - published
+
+  workflow_dispatch:
 
 jobs:
   pypi-publish:
