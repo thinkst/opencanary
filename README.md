@@ -165,14 +165,14 @@ user and group ID (default is `opencanary/nogroup`).
 If this behaviour is not desired, one can use the `--allow-run-as-root` flag, e.g.,
 
 ```
-$ opencanaryd start --allow-run-as-root
+$ opencanaryd --start --allow-run-as-root
 ```
 
 Creating the `opencanary` user and giving necessary privileges, run `./bin/opencanaryd --createuser`. To drop to a
 custom user or group, simply use the `--uid` and `--gid` options respectively:
 
 ```
-$ opencanaryd start --uid username --gid groupname
+$ opencanaryd --start --uid username --gid groupname
 ```
 
 By default, the `uid:gid` is `opencanary:nogroup`.
