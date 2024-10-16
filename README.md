@@ -152,7 +152,7 @@ To create an initial configuration, run as `root` (you may be prompted for a `su
 $ opencanaryd --copyconfig
 [*] A sample config file is ready /etc/opencanaryd/opencanary.conf
 
-[*] Edit your configuration, then launch with "opencanaryd --start"
+[*] Edit your configuration, then launch with "opencanaryd --start --uid=nobody --gid=nogroup"
 ```
 
 This creates the path and file `/etc/opencanaryd/opencanary.conf`. You must now edit the config file to determine which services and logging options you want to enable.
@@ -187,16 +187,21 @@ Start OpenCanary by running:
 
 ```
 $ . env/bin/activate
-$ opencanaryd --start
+$ opencanaryd --start --uid=nobody --gid=nogroup
 ```
+
+With the `uid` and `gid` flags, OpenCanary drops root privileges after binding to its ports. This can be changed to other low-privileged user/group or omitted to keep running with root privileges.
 
 ### With pkgx
 
 Start OpenCanary by running:
 
 ```
-$ sudo -E pkgx opencanaryd --start
+$ sudo -E pkgx opencanaryd --start --uid=nobody --gid=nogroup
 ```
+
+With the `uid` and `gid` flags, OpenCanary drops root privileges after binding to its ports. This can be changed to other low-privileged user/group or omitted to keep running with root privileges.
+
 
 ### With docker-compose
 
