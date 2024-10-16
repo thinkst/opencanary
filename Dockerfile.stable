@@ -15,4 +15,4 @@ RUN pip install scapy pcapy-ng
 ENTRYPOINT [ "opencanaryd" ]
 
 # Set the default arguments to be used for the entrypoint
-CMD [ "--dev" ]
+CMD [ "--dev", "--uid=nobody", "--gid=nogroup" ]

@@ -47,6 +47,6 @@ jobs:
       - name: Copy config file
         run: cp opencanary/test/opencanary.conf .
       - name: Start OpenCanary
-        run: opencanaryd --start --allow-run-as-root
+        run: opencanaryd --start
       - name: Run Pytest
         run: pytest -s
