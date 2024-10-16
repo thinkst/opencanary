@@ -3,26 +3,18 @@ DIR=$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )
 PIDFILE="${DIR}/opencanaryd.pid"
 
 cmd=$1
-allow_run_as_root=false
-uid_=""
-gid_=""
 
 function usage() {
     echo -e "\n  OpenCanary\n"
-    echo -e "\topencanaryd [ --start | --dev | --stop | --restart | --copyconfig | --usermodule | --createuser | --version | --help ] [--allow-run-as-root | --uid=opencanary --gid=nogroup]\n\n"
+    echo -e "\topencanaryd [ --start | --dev | --stop | --restart | --copyconfig | --usermodule | --version | --help ]\n\n"
     echo -e "\t\t--start\tStarts the opencanaryd process"
     echo -e "\t\t--dev\tRun the opencanaryd process in the foreground"
     echo -e "\t\t--stop\tStops the opencanaryd process"
     echo -e "\t\t--usermodule\tRun opencanaryd in foreground with only usermodules enabled"
     echo -e "\t\t--copyconfig\tCreates a default config file at /etc/opencanaryd/opencanary.conf"
-    echo -e "\t\t--createuser\tCreate the 'opencanary' user and respective home directory for isolation purposes"
     echo -e "\t\t--version\tDisplays the current opencanary version."
     echo -e "\t\t--"
     echo -e "\t\t--help\tThis help\n"
-    echo -e "\toptions"
-    echo -e "\t\t--allow-run-as-root\tDo not drop privileges of the opencanary once process starts"
-    echo -e "\t\t--uid\tSpecify a user ID to drop privileges to"
-    echo -e "\t\t--gid\tSpecify a group ID to drop privileges to"
 
 }
 
@@ -36,47 +28,10 @@ function sudo() {
   fi
 }
 
-# Set options if supplied
-for arg in "$@"; do
-    case $arg in
-        --uid=*)
-            uid_="${arg#*=}"
-            ;;
-        --gid=*)
-            gid_="${arg#*=}"
-            ;;
-        --allow-run-as-root)
-            allow_run_as_root=true
-            ;;
-    esac
-done
-
-# Build twistd command suffix based on options
-twist_permissions_opts=""
-
-if [ "$allow_run_as_root" = false ]; then
-    if [ -z "$uid_" ]; then
-      uid_="opencanary"
-    fi
-    twist_permissions_opts="${twist_permissions_opts} --uid ${uid_}"
-
-    if [ -z "$gid_" ]; then
-      gid_="nogroup"
-    fi
-    twist_permissions_opts="${twist_permissions_opts} --gid ${gid_}"
-fi
-
-# Only run the following if we expect to run a sudoers command later
-if [[ "${cmd}" != "--help" && "${cmd}" != "--version" && "${cmd}" != "--createuser" && $(id $uid_ &>/dev/null; echo $?) -eq 0 ]]; then
-  # Ensure logging file and HTTP static content perms are correct
-  sudo touch /var/tmp/opencanary.log && sudo chmod 755 /var/tmp/opencanary.log
-  sudo mkdir -p /etc/opencanaryd && sudo chown -R ${uid_}:${gid_} /etc/opencanaryd
-fi
-
 if [ "${cmd}" == "--start" ]; then
-    sudo -E "${DIR}/twistd" -y "${DIR}/opencanary.tac" --pidfile "${PIDFILE}" --syslog --prefix=opencanaryd $twist_permissions_opts
+    sudo -E "${DIR}/twistd" -y "${DIR}/opencanary.tac" --pidfile "${PIDFILE}" --syslog --prefix=opencanaryd
 elif [ "${cmd}" == "--dev" ]; then
-    sudo -E "${DIR}/twistd" -noy "${DIR}/opencanary.tac" $twist_permissions_opts
+    sudo -E "${DIR}/twistd" -noy "${DIR}/opencanary.tac"
 elif [ "${cmd}" == "--usermodule" ]; then
   usermodconf=$(python -c "from pkg_resources import resource_filename; print(resource_filename('opencanary', 'data/settings-usermodule.json'))")
 
@@ -93,7 +48,7 @@ elif [ "${cmd}" == "--usermodule" ]; then
 elif [ "${cmd}" == "--restart" ]; then
     pid=`sudo -E cat "${PIDFILE}"`
     sudo -E kill "$pid"
-    sudo -E "${DIR}/twistd" -y "${DIR}/opencanary.tac" --pidfile "${PIDFILE}" --syslog --prefix=opencanaryd $twist_permissions_opts
+    sudo -E "${DIR}/twistd" -y "${DIR}/opencanary.tac" --pidfile "${PIDFILE}" --syslog --prefix=opencanaryd
 elif [ "${cmd}" == "--stop" ]; then
     pid=`sudo -E cat "${PIDFILE}"`
     sudo -E kill "$pid"
@@ -105,29 +60,8 @@ elif [ "${cmd}" == "--copyconfig" ]; then
     defaultconf=$(python3 -c "from pkg_resources import resource_filename; print(resource_filename('opencanary', 'data/settings.json'))")
     sudo -E mkdir -p /etc/opencanaryd
     sudo -E cp "${defaultconf}" /etc/opencanaryd/opencanary.conf
-    sudo chown ${uid_}:${gid_} /etc/opencanaryd && sudo chmod -R 600 /etc/opencanaryd
     echo -e "[*] A sample config file is ready /etc/opencanaryd/opencanary.conf\n"
     echo    "[*] Edit your configuration, then launch with \"opencanaryd --start\""
-elif [ "${cmd}" == "--createuser" ]; then
-  if id opencanary &>/dev/null; then
-    echo "User 'opencanary' already exists."
-    exit 1
-  fi
-  if [[ "$(uname)" == "Darwin" ]]; then # macos
-    sudo dscl . -create /Users/opencanary
-    sudo dscl . -create /Users/opencanary UserShell /bin/bash
-    sudo dscl . -create /Users/opencanary RealName "OpenCanary"
-    next_uid=$(($(dscl . -list /Users UniqueID | awk '$2 >= 1000 {print $2}' | sort -n | tail -n 1) + 2))
-    sudo dscl . -create /Users/opencanary UniqueID "${next_uid}"
-    sudo dscl . -create /Users/opencanary PrimaryGroupID $(dscl . -read /Groups/nogroup | awk '/PrimaryGroupID: / {print $2}')
-    sudo dscl . -create /Users/opencanary NFSHomeDirectory /Users/opencanary
-    sudo mkdir -p /Users/opencanary
-    sudo chown opencanary:nogroup /Users/opencanary
-    sudo chmod 755 /Users/opencanary
-  else # other, e.g., Linux
-    sudo useradd -m -s /bin/bash -c "OpenCanary" --gid nogroup opencanary
-    sudo chown -R opencanary:nogroup /home/opencanary
-  fi
 elif [ "${cmd}" == "--version" ]; then
     python -c "from opencanary import __version__; print(__version__);"
 else
