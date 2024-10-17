@@ -67,6 +67,7 @@ class SynLogWatcher(FileSystemWatcher):
 
             self.logger.log(data)
 
+
 class CanaryPortscan(CanaryService):
     NAME = "portscan"
 
@@ -103,13 +104,20 @@ class CanaryPortscan(CanaryService):
         pass
 
     def set_iptables_rules(self):
-        iptables_path = shutil.which("iptables-legacy", STDPATH) or shutil.which("iptables", STDPATH)
+        iptables_path = shutil.which("iptables-legacy", path=STDPATH)
 
         if not iptables_path:
-            raise Exception("Portscan module failed to start as iptables cannot be found. Please install iptables.")
+            iptables_path = shutil.which("iptables", path=STDPATH)
+
+        if not iptables_path:
+            err = "Portscan module failed to start as iptables cannot be found. Please install iptables."
+            print(err)
+            raise Exception(err)
 
         if b"nf_tables" in subprocess.check_output([iptables_path, "--version"]):
-            raise Exception("Portscan module failed to start as iptables-legacy cannot be found. Please install iptables-legacy")
+            err = "Portscan module failed to start as iptables-legacy cannot be found. Please install iptables-legacy"
+            print(err)
+            raise Exception(err)
 
         os.system(
             'sudo {0} -t mangle -D PREROUTING -p tcp -i lo -j LOG --log-level=warning --log-prefix="canaryfw: " -m limit --limit="{1}/hour"'.format(
