@@ -3,7 +3,6 @@ import sys
 import json
 import itertools
 import string
-import shutil
 import re
 from os.path import expanduser
 from pkg_resources import resource_filename
