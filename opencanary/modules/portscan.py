@@ -1,7 +1,8 @@
 from opencanary.modules import CanaryService
 from opencanary.modules import FileSystemWatcher
-from opencanary import safe_exec
+from opencanary import STDPATH
 import os
+import subprocess
 import shutil
 
 
@@ -66,11 +67,6 @@ class SynLogWatcher(FileSystemWatcher):
 
             self.logger.log(data)
 
-
-def detectNFTables():
-    return b"nf_tables" in safe_exec("iptables", ["--version"])
-
-
 class CanaryPortscan(CanaryService):
     NAME = "portscan"
 
@@ -85,17 +81,7 @@ class CanaryPortscan(CanaryService):
             "portscan.ignore_localhost", default=False
         )
         self.ignore_ports = config.getVal("portscan.ignore_ports", default=[])
-        self.iptables_path = self.config.getVal("portscan.iptables_path", False)
         self.config = config
-
-    def getIptablesPath(self):
-        if self.iptables_path:
-            return self.iptables_path
-
-        if detectNFTables():
-            return shutil.which("iptables-legacy")
-
-        return shutil.which("iptables") or "/sbin/iptables"
 
     def startYourEngines(self, reactor=None):
         # Logging rules for loopback interface.
@@ -117,7 +103,14 @@ class CanaryPortscan(CanaryService):
         pass
 
     def set_iptables_rules(self):
-        iptables_path = self.getIptablesPath()
+        iptables_path = shutil.which("iptables-legacy", STDPATH) or shutil.which("iptables", STDPATH)
+
+        if not iptables_path:
+            raise Exception("Portscan module failed to start as iptables cannot be found. Please install iptables.")
+
+        if b"nf_tables" in subprocess.check_output([iptables_path, "--version"]):
+            raise Exception("Portscan module failed to start as iptables-legacy cannot be found. Please install iptables-legacy")
+
         os.system(
             'sudo {0} -t mangle -D PREROUTING -p tcp -i lo -j LOG --log-level=warning --log-prefix="canaryfw: " -m limit --limit="{1}/hour"'.format(
                 iptables_path, self.lorate

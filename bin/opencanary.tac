@@ -4,7 +4,7 @@ import sys
 from twisted.application import service
 from pkg_resources import iter_entry_points
 
-from opencanary.config import config, is_docker, detectIPTables
+from opencanary.config import config, is_docker
 from opencanary.logger import getLogger
 from opencanary.modules.http import CanaryHTTP
 from opencanary.modules.https import CanaryHTTPS
@@ -84,8 +84,6 @@ if sys.platform.startswith("linux"):
     if config.moduleEnabled("portscan") and is_docker():
         # Remove portscan if running in DOCKER (specified in Dockerfile)
         print("Can't use portscan in Docker. Portscan module disabled.")
-    elif config.moduleEnabled("portscan") and not detectIPTables():
-        print("Can't use portscan without iptables. Please install iptables.")
     else:
         from opencanary.modules.portscan import CanaryPortscan
 

@@ -41,7 +41,6 @@ For this configuration, you will need to set up your own Windows File Share. Ple
 
 `portscan` - a log watcher that works with iptables to monitor when your Opencanary is being scanned.
 At this stage, the portscan module supports the detection of Nmap OS, Nmap FIN, Nmap OS, Nmap NULL, and normal port scans.
-`portscan.iptables_path` is available for you to specify the path to your `iptables` binary.
 
 Logger Configuration
 --------------------
