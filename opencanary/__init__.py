@@ -6,6 +6,7 @@ __version__ = "0.9.5"
 
 STDPATH = os.pathsep.join(["/usr/bin", "/bin", "/usr/sbin", "/sbin"])
 
+
 def safe_exec(binary_name: str, args: list) -> bytes:
     """
     Executes the given binary with the given arguments as a subprocess. What makes this safe is that the binary name
