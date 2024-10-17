@@ -1,7 +1,7 @@
 import os
 import subprocess
 
-__version__ = "0.9.4"
+__version__ = "0.9.5"
 
 from os import PathLike
 from typing import Union

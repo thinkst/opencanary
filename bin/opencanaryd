@@ -33,9 +33,11 @@ for arg in "$@"; do
     esac
 done
 
-if [[ -z $TWISTD_UID_FLAG || -z $TWISTD_GID_FLAG ]]; then
-    echo "WARNING: OpenCanary will not drop root user or group privileges after launching. Set both --uid=nobody and --gid=nogroup (another other low privilege user/group) to silence this warning."
-fi
+function warn_drop_privileges {
+  if  [[ -z $TWISTD_UID_FLAG || -z $TWISTD_GID_FLAG ]]; then
+      echo "WARNING: OpenCanary will not drop root user or group privileges after launching. Set both --uid=nobody and --gid=nogroup (or another low privilege user/group) to silence this warning." >&2
+  fi
+}
 
 # Use sudo when not running as root
 function sudo() {
@@ -48,8 +50,10 @@ function sudo() {
 }
 
 if [ "${cmd}" == "--start" ]; then
+    warn_drop_privileges
     sudo -E "${DIR}/twistd" -y "${DIR}/opencanary.tac" --pidfile "${PIDFILE}" --syslog --prefix=opencanaryd ${TWISTD_UID_FLAG:-} ${TWISTD_GID_FLAG:-}
 elif [ "${cmd}" == "--dev" ]; then
+    warn_drop_privileges
     sudo -E "${DIR}/twistd" -noy "${DIR}/opencanary.tac" ${TWISTD_UID_FLAG:-} ${TWISTD_GID_FLAG:-}
 elif [ "${cmd}" == "--usermodule" ]; then
   usermodconf=$(python -c "from pkg_resources import resource_filename; print(resource_filename('opencanary', 'data/settings-usermodule.json'))")
@@ -67,6 +71,7 @@ elif [ "${cmd}" == "--usermodule" ]; then
 elif [ "${cmd}" == "--restart" ]; then
     pid=`sudo -E cat "${PIDFILE}"`
     sudo -E kill "$pid"
+    warn_drop_privileges
     sudo -E "${DIR}/twistd" -y "${DIR}/opencanary.tac" --pidfile "${PIDFILE}" --syslog --prefix=opencanaryd ${TWISTD_UID_FLAG:-} ${TWISTD_GID_FLAG:-}
 elif [ "${cmd}" == "--stop" ]; then
     pid=`sudo -E cat "${PIDFILE}"`
