@@ -1,4 +1,6 @@
 from opencanary.modules import CanaryService
+from pkg_resources import resource_filename
+
 import twisted
 import os
 import time
@@ -268,7 +270,11 @@ class HoneyPotSSHFactory(factory.SSHFactory):
 
         @rtype: L{dict}
         """
-        _modulis = ["/etc/ssh/moduli", "/private/etc/moduli"]
+        _modulis = [
+            "/etc/ssh/moduli",
+            "/private/etc/moduli",
+            resource_filename("opencanary", "data/moduli"),
+        ]
         _primes = None
         for _moduli in _modulis:
             try:
