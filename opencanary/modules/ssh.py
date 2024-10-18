@@ -273,7 +273,7 @@ class HoneyPotSSHFactory(factory.SSHFactory):
         _modulis = [
             "/etc/ssh/moduli",
             "/private/etc/moduli",
-            resource_filename('opencanary', 'data/moduli'),
+            resource_filename("opencanary", "data/moduli"),
         ]
         _primes = None
         for _moduli in _modulis:
