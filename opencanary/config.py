@@ -3,12 +3,10 @@ import sys
 import json
 import itertools
 import string
-import shutil
 import re
 from os.path import expanduser
 from pkg_resources import resource_filename
 from pathlib import Path
-from . import safe_exec
 
 SAMPLE_SETTINGS = resource_filename(__name__, "data/settings.json")
 SETTINGS = "opencanary.conf"
@@ -34,13 +32,6 @@ def is_docker():
         or cgroup.is_file()
         and "docker" in cgroup.read_text()
     )
-
-
-def detectIPTables():
-    if shutil.which("iptables"):
-        return True
-    else:
-        return False
 
 
 SERVICE_REGEXES = {
@@ -77,7 +68,6 @@ class Config:
                 print("[-] Failed to open %s for reading (%s)" % (fname, e))
             except ValueError as e:
                 print("[-] Failed to decode json from %s (%s)" % (fname, e))
-                safe_exec("cp", ["-r", fname, "/var/tmp/config-err-$(date +%%s)"])
             except Exception as e:
                 print("[-] An error occurred loading %s (%s)" % (fname, e))
         if self.__config is None:
