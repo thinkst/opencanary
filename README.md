@@ -10,7 +10,7 @@
 
 OpenCanary runs as a daemon and implements multiple common network protocols. When attackers breach networks and interact with the honeypot, OpenCanary will send you alerts via a variety of mechanisms.
 
-OpenCanary is implemented in Python and so the core honeypot is cross-platform, however certain features require specific OSes. Running on Linux will give you the most options. It has extremely low resource requirements; for example it can be deployed happily on a Raspberry Pi, or a VM with minimal resources.
+OpenCanary is implemented in Python, so the core honeypot is cross-platform; however, certain features require specific OSes. Running on Linux will give you the most options. It has extremely low resource requirements; for example, it can be deployed happily on a Raspberry Pi or a VM with minimal resources.
 
 This README describes how to install and configure OpenCanary on Ubuntu Linux and MacOS.
 
