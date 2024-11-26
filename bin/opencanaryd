@@ -56,7 +56,7 @@ elif [ "${cmd}" == "--dev" ]; then
     warn_drop_privileges
     sudo -E "${DIR}/twistd" -noy "${DIR}/opencanary.tac" ${TWISTD_UID_FLAG:-} ${TWISTD_GID_FLAG:-}
 elif [ "${cmd}" == "--usermodule" ]; then
-  usermodconf=$(python -c "from pkg_resources import resource_filename; print(resource_filename('opencanary', 'data/settings-usermodule.json'))")
+  usermodconf=$(python3 -c "from pkg_resources import resource_filename; print(resource_filename('opencanary', 'data/settings-usermodule.json'))")
 
   if [ -f opencanary.conf ]; then
     if ! diff -q opencanary.conf "${usermodconf}" 2>&1 >/dev/null; then
@@ -87,7 +87,7 @@ elif [ "${cmd}" == "--copyconfig" ]; then
     echo -e "[*] A sample config file is ready /etc/opencanaryd/opencanary.conf\n"
     echo    "[*] Edit your configuration, then launch with \"opencanaryd --start\""
 elif [ "${cmd}" == "--version" ]; then
-    python -c "from opencanary import __version__; print(__version__);"
+    python3 -c "from opencanary import __version__; print(__version__);"
 else
     usage
     exit 1
