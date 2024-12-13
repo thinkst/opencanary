@@ -15,6 +15,7 @@ Currently, OpenCanary supports faking the following services natively:
 * `ftp` - a File Transfer Protocol server that alerts on login attempts
 * `git` - a Git protocol that alerts on repo cloning
 * `http` - an HTTP web server that alerts on login attempts
+* `https` - an HTTPS web server that alerts on login attempts
 * `httpproxy` - an HTTP web proxy that alerts when there is an attempt to proxy to another page
 * `mssql` - an MS SQL server that alerts on login attempts
 * `mysql` - an MYSQL server that alerts on login attempts
@@ -196,6 +197,11 @@ you will receive a json formatted config file at `/etc/opencanary/opencanary.con
                 "name": "nasLogin"
             }
         ],
+        "https.enabled": false,
+        "https.port": 443,
+        "https.skin": "nasLogin",
+        "https.certificate": "/etc/ssl/opencanary/opencanary.pem",
+        "https.key": "/etc/ssl/opencanary/opencanary.key",
         "httpproxy.enabled" : false,
         "httpproxy.port": 8080,
         "httpproxy.skin": "squid",
