@@ -23,7 +23,7 @@ Inside ~/.opencanary.conf:
             "name": "nasLogin"
         }
     ],
-    "https.enabled": false,
+    "https.enabled": true,
     "https.port": 443,
     "https.skin": "nasLogin",
     "https.certificate": "/etc/ssl/opencanary/opencanary.pem",
