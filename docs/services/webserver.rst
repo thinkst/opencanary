@@ -23,6 +23,11 @@ Inside ~/.opencanary.conf:
             "name": "nasLogin"
         }
     ],
+    "https.enabled": true,
+    "https.port": 443,
+    "https.skin": "nasLogin",
+    "https.certificate": "/etc/ssl/opencanary/opencanary.pem",
+    "https.key": "/etc/ssl/opencanary/opencanary.key",
     "ssh.enabled": true,
     "ssh.port": 8022,
     "ssh.version": "SSH-2.0-OpenSSH_5.1p1 Debian-4",
