@@ -1,11 +1,10 @@
-version: "3.4"
 
 x-common: &common
   restart: unless-stopped
   volumes:
     - ./data/.opencanary.conf:/root/.opencanary.conf
     # uncomment below if running Samba
-    # - /var/log/samba-audit.log:/var/log/samba-audit.log
+    # - audit-log:/var/log/samba
   image: "opencanary"
   network_mode: "host"
   ports:
@@ -44,7 +43,7 @@ x-common: &common
     # - "9418:9418"
 
 services:
-  latest: # docker-compose up --build -d latest
+  latest: # docker compose up --build -d latest
     <<: *common
     container_name: opencanary_latest
     image: thinkst/opencanary
@@ -52,9 +51,29 @@ services:
       context: .
       dockerfile: Dockerfile.latest
 
-  stable: # docker-compose up --build -d stable
+  # Uncomment if smb is to be enabled
+  # samba: # docker compose up --build -d samba
+  #   <<: *common
+  #   container_name: opencanary_samba
+  #   image: thinkst/opencanary_samba
+  #   restart: unless-stopped
+  #   volumes:
+  #     - audit-log:/var/log/samba/
+  #     - ./data/smb.conf:/etc/samba/smb.conf
+  #   network_mode: host
+  #   ports:
+  #     # SMB
+  #     - "445:445"
+  #   build:
+  #     context: .
+  #     dockerfile: Dockerfile.smb
+
+  stable: # docker compose up --build -d stable
     <<: *common
     container_name: opencanary_stable
     build:
       context: .
       dockerfile: Dockerfile.stable
+
+volumes:
+  audit-log:
