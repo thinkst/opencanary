@@ -47,10 +47,16 @@ setup(
     name="opencanary",
     version=get_version("opencanary/__init__.py"),
     url="http://www.thinkst.com/",
+    project_urls={
+        "Bug Tracker": "https://github.com/thinkst/opencanary/issues",
+        "Documentation": "https://github.com/thinkst/opencanary#readme",
+        "Source Code": "https://github.com/thinkst/opencanary",
+    },
     author="Thinkst Applied Research",
     author_email="info@thinkst.com",
     description="OpenCanary daemon",
-    long_description="A low interaction honeypot intended to be run on internal networks.",
+    long_description="file: README.md",
+    long_description_content_type="text/markdown",
     install_requires=requirements,
     license="BSD",
     packages=find_namespace_packages(
