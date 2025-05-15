@@ -23,7 +23,7 @@ def get_version(rel_path):
 
 
 requirements = [
-    "Twisted==22.8.0",
+    "Twisted==24.3.0",
     "pyasn1==0.4.5",
     "cryptography==38.0.1",
     "simplejson==3.16.0",
