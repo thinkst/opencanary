@@ -23,7 +23,7 @@ def get_version(rel_path):
 
 
 requirements = [
-    "Twisted==24.3.0",
+    "Twisted==24.11.0",
     "pyasn1==0.4.5",
     "cryptography==38.0.1",
     "simplejson==3.16.0",
@@ -71,9 +71,12 @@ setup(
         "Operating System :: POSIX :: Linux",
         "Operating System :: POSIX :: BSD :: FreeBSD",
         "Programming Language :: Python :: 3",
-        "Programming Language :: Python :: 3.5",
-        "Programming Language :: Python :: 3.6",
-        "Programming Language :: Python :: 3.7",
+        "Programming Language :: Python :: 3.8",
+        "Programming Language :: Python :: 3.9",
+        "Programming Language :: Python :: 3.10",
+        "Programming Language :: Python :: 3.11",
+        "Programming Language :: Python :: 3.12",
+        "Programming Language :: Python :: 3.13",
         "License :: OSI Approved :: BSD License",
     ],
 )
