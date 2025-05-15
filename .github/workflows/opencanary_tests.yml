@@ -23,7 +23,7 @@ jobs:
         python-version: ["3.7", "3.8", "3.9", "3.10", "3.11", "3.12"]
         os: ["ubuntu-22.04", "ubuntu-24.04", "macos-13", "macos-14", "macos-15"]
         exclude:
-          - os: "macos-14"
+          - os: ["ubuntu-24.04", "macos-14", "macos-15"]
             python-version: "3.7"
       fail-fast: false
     runs-on: ${{ matrix.os }}
