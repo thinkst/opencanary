@@ -60,4 +60,3 @@ cb.addEventListener('click', function () {
 
 updateTime();
 window.setInterval(updateTime, 2000);
-
