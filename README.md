@@ -39,7 +39,7 @@ OpenCanary is the Open Source version of our commercial [Thinkst Canary](https:/
 - **[Project Participation](#project-participation)**
   - [Contributing](#contributing)
   - [Security Vulnerability Reports](#security-vulnerability-reports)
-  - [Bug reports](bug-reports)
+  - [Bug reports](#bug-reports)
   - [Feature Requests](#feature-requests)
   - [Code of Conduct](#code-of-conduct)
 
