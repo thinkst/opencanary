@@ -49,5 +49,14 @@ document.getElementById('ext-comp-1008').innerHTML = wkday + ", " + month + " " 
 
 }
 
+var cb = document.getElementById('ext-gen32');
+cb.addEventListener('click', function () {
+	if(cb.classList.contains('syno-ux-cb-unchecked')){
+		cb.className = "syno-ux-checkbox-icon syno-ux-cb-checked";
+	}else{
+		cb.className = "syno-ux-checkbox-icon syno-ux-cb-unchecked";
+	}
+})
+
 updateTime();
 window.setInterval(updateTime, 2000);
