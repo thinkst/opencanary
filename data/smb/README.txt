@@ -1,0 +1,1 @@
+All files in this directory are copied and shared via Samba. Keep in mind that this share will allow guest access.

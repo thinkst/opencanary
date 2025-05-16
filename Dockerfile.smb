@@ -1,0 +1,23 @@
+FROM debian:stable
+
+# Download cache lists and install minimal versions
+RUN apt-get update && apt-get -yq install --no-install-recommends \
+	# Required linux dependencies
+	sudo vim samba samba-vfs-modules smbclient rsyslog && \
+	# Remove cache lists and clean up anything not needed to minimize image size
+	apt-get autoremove -yq && apt-get clean && rm -rf /var/lib/apt/lists/*
+
+RUN mkdir /samba
+COPY data/smb /samba/
+RUN touch /var/log/samba/audit.log
+RUN echo "local7.*        /var/log/samba/audit.log" >> /etc/rsyslog.conf
+
+# Create and set the working directory
+WORKDIR /srv
+
+# Copy only the files needed to install dependencies
+COPY run-smb.sh .
+
+# Set the default application we are running
+ENTRYPOINT [ "/srv/run-smb.sh" ]
+
