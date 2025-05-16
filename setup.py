@@ -22,6 +22,18 @@ def get_version(rel_path):
         raise RuntimeError("Unable to find version string.")
 
 
+def get_long_description():
+    """
+    Safely read README.md for long_description.
+    """
+    here = os.path.abspath(os.path.dirname(__file__))
+    readme_path = os.path.join(here, "README.md")
+    if not os.path.isfile(readme_path):
+        return "A low interaction honeypot intended to be run on internal networks."
+    with open(readme_path, encoding="utf-8") as f:
+        return f.read()
+
+
 requirements = [
     "Twisted==24.11.0",
     "pyasn1==0.4.5",
@@ -42,9 +54,6 @@ requirements = [
     "service-identity==21.1.0",
 ]
 
-with open("README.md", "r", encoding="utf-8") as fh:
-    long_description = fh.read()
-
 setup(
     name="opencanary",
     version=get_version("opencanary/__init__.py"),
@@ -57,7 +66,7 @@ setup(
     author="Thinkst Applied Research",
     author_email="info@thinkst.com",
     description="OpenCanary daemon",
-    long_description=long_description,
+    long_description=get_long_description(),
     long_description_content_type="text/markdown",
     install_requires=requirements,
     license="BSD",
