@@ -42,9 +42,6 @@ requirements = [
     "service-identity==21.1.0",
 ]
 
-with open("README.md", "r", encoding="utf-8") as fh:
-    long_description = fh.read()
-
 setup(
     name="opencanary",
     version=get_version("opencanary/__init__.py"),
@@ -57,7 +54,7 @@ setup(
     author="Thinkst Applied Research",
     author_email="info@thinkst.com",
     description="OpenCanary daemon",
-    long_description=long_description,
+    long_description=read("README.md"),
     long_description_content_type="text/markdown",
     install_requires=requirements,
     license="BSD",
