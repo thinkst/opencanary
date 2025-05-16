@@ -23,12 +23,12 @@ def get_version(rel_path):
 
 
 requirements = [
-    "Twisted==22.8.0",
+    "Twisted==24.11.0",
     "pyasn1==0.4.5",
     "cryptography==38.0.1",
     "simplejson==3.16.0",
     "requests==2.31.0",
-    "zope.interface==5.0.0",
+    "zope.interface==7.2",
     "PyPDF2==1.26.0",
     "fpdf==1.7.2",
     "passlib==1.7.1",
@@ -42,15 +42,23 @@ requirements = [
     "service-identity==21.1.0",
 ]
 
+with open("README.md", "r", encoding="utf-8") as fh:
+    long_description = fh.read()
 
 setup(
     name="opencanary",
     version=get_version("opencanary/__init__.py"),
     url="http://www.thinkst.com/",
+    project_urls={
+        "Bug Tracker": "https://github.com/thinkst/opencanary/issues",
+        "Documentation": "https://github.com/thinkst/opencanary#readme",
+        "Source Code": "https://github.com/thinkst/opencanary",
+    },
     author="Thinkst Applied Research",
     author_email="info@thinkst.com",
     description="OpenCanary daemon",
-    long_description="A low interaction honeypot intended to be run on internal networks.",
+    long_description=long_description,
+    long_description_content_type="text/markdown",
     install_requires=requirements,
     license="BSD",
     packages=find_namespace_packages(
@@ -71,9 +79,12 @@ setup(
         "Operating System :: POSIX :: Linux",
         "Operating System :: POSIX :: BSD :: FreeBSD",
         "Programming Language :: Python :: 3",
-        "Programming Language :: Python :: 3.5",
-        "Programming Language :: Python :: 3.6",
-        "Programming Language :: Python :: 3.7",
+        "Programming Language :: Python :: 3.8",
+        "Programming Language :: Python :: 3.9",
+        "Programming Language :: Python :: 3.10",
+        "Programming Language :: Python :: 3.11",
+        "Programming Language :: Python :: 3.12",
+        "Programming Language :: Python :: 3.13",
         "License :: OSI Approved :: BSD License",
     ],
 )

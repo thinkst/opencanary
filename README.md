@@ -1,6 +1,6 @@
 # OpenCanary by Thinkst Canary
 
-<img src="docs/logo.png" width="50" style="float: left"> OpenCanary is a multi-protocol network honeypot. It's primary use-case is to catch hackers after they've breached non-public networks. It has extremely low resource requirements and can be tweaked, modified, and extended.
+<img src="https://raw.githubusercontent.com/thinkst/opencanary/master/docs/logo.png" width="50" style="float: left"> OpenCanary is a multi-protocol network honeypot. It's primary use-case is to catch hackers after they've breached non-public networks. It has extremely low resource requirements and can be tweaked, modified, and extended.
 
 [![OpenCanary Tests](https://github.com/thinkst/opencanary/actions/workflows/opencanary_tests.yml/badge.svg)](https://github.com/thinkst/opencanary/actions/workflows/opencanary_tests.yml)
 [![Docker build](https://github.com/thinkst/opencanary/actions/workflows/docker-build.yml/badge.svg)](https://github.com/thinkst/opencanary/actions/workflows/docker-build.yml)
@@ -39,7 +39,7 @@ OpenCanary is the Open Source version of our commercial [Thinkst Canary](https:/
 - **[Project Participation](#project-participation)**
   - [Contributing](#contributing)
   - [Security Vulnerability Reports](#security-vulnerability-reports)
-  - [Bug reports](bug-reports)
+  - [Bug reports](#bug-reports)
   - [Feature Requests](#feature-requests)
   - [Code of Conduct](#code-of-conduct)
 
