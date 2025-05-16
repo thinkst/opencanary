@@ -9,3 +9,5 @@ exclude Dockerfile.latest
 exclude Dockerfile.*
 exclude docker-compose.yml
 exclude .gitignore
+
+include README.md
