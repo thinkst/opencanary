@@ -29,7 +29,6 @@ def get_long_description():
     here = os.path.abspath(os.path.dirname(__file__))
     readme_path = os.path.join(here, "README.md")
     if not os.path.isfile(readme_path):
-        exit(1) # Temp tests
         return "A low interaction honeypot intended to be run on internal networks."
     with open(readme_path, encoding="utf-8") as f:
         return f.read()
