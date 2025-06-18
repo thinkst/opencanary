@@ -10,7 +10,7 @@ LOG_CODES = {
     'XMAS': 5004,
     'FIN': 5005
 }
-LOG_PATH = '/app/opencanary.log'  # Chemin du log (doit matcher le -v du docker run)
+LOG_PATH = '/var/tmp/opencanary.log'
 
 def detect_scan_flags(pkt):
     if not pkt.haslayer(TCP): return
@@ -19,7 +19,6 @@ def detect_scan_flags(pkt):
         src = pkt[IP].src
         dst = pkt[IP].dst
     except:
-        # fallback pour IPv6 ou erreurs Scapy (rare)
         return
     sport, dport = tcp.sport, tcp.dport
     if dport not in CANARY_PORTS:
@@ -50,7 +49,7 @@ def detect_scan_flags(pkt):
         "logtype": logtype,
         "scan_type": scan_type,
         "local_time": datetime.utcnow().strftime("%Y-%m-%d %H:%M:%S.%f"),
-        "logdata": {"msg": f"Scan {scan_type} détecté sur port {dport} depuis {src}"}
+        "logdata": {"msg": f"Scan {scan_type} on port {dport} from {src}"}
     }
 
     with open(LOG_PATH, 'a') as f:
