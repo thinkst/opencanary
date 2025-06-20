@@ -10,6 +10,7 @@ from opencanary.honeycred import buildHoneyCredHook
 
 # Monkey-patch-replace Twisted Protocol with CanaryProtocol class
 from twisted.internet import protocol
+from .scapy import ScapyService
 
 
 class CanaryProtocol(protocol.Protocol):
