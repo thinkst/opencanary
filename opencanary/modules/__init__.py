@@ -7,7 +7,6 @@ from twisted.internet.protocol import Factory
 from twisted.internet.protocol import DatagramProtocol
 
 from opencanary.honeycred import buildHoneyCredHook
-from .scapy import ScapyService
 
 # Monkey-patch-replace Twisted Protocol with CanaryProtocol class
 from twisted.internet import protocol
