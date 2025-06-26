@@ -48,7 +48,6 @@ class ScapyService(CanaryService):
         print("== ScapyService (native Opencanary module) started ==")
 
         def detect_scan_flags(pkt):
-            # Require TCP and IP layers only
             if not pkt.haslayer(self.TCP) or not pkt.haslayer(self.IP):
                 return
             tcp = pkt[self.TCP]
@@ -61,17 +60,17 @@ class ScapyService(CanaryService):
                 return
 
             flags = int(tcp.flags)
-            # Map nmap/scan TCP flag values to scan-type and logger constant
-            scan_logtypes = {
-                0:   (LoggerBase.LOG_PORT_NMAPNULL, "NULL"),     # No flags set
-                1:   (LoggerBase.LOG_PORT_NMAPFIN, "FIN"),       # FIN only set
-                2:   (LoggerBase.LOG_PORT_SYN, "SYN"),           # SYN only set
-                41:  (LoggerBase.LOG_PORT_NMAPXMAS, "XMAS"),     # FIN+PSH+URG: "Xmas"
-            }
-            entry = scan_logtypes.get(flags)
-            if not entry:
+
+            if flags == 0x00:
+                logtype, scan_type = LoggerBase.LOG_PORT_NMAPNULL, "NULL"
+            elif flags == 0x01:
+                logtype, scan_type = LoggerBase.LOG_PORT_NMAPFIN, "FIN"
+            elif flags == 0x02:
+                logtype, scan_type = LoggerBase.LOG_PORT_SYN, "SYN"
+            elif flags == 0x29:
+                logtype, scan_type = LoggerBase.LOG_PORT_NMAPXMAS, "XMAS"
+            else:
                 return
-            logtype, scan_type = entry
 
             logdata = {
                 "src_host": src,
@@ -85,10 +84,8 @@ class ScapyService(CanaryService):
                     "msg": f"TCP scan type={scan_type} detected on port {dport} from {src}",
                 },
             }
-            # Submit to opencanary logger pipeline
             self.logger.log(logdata)
 
-        # Scapy "sniff" is blocking, so run in background thread
         try:
             self.sniff(
                 filter="tcp", prn=detect_scan_flags, store=0
