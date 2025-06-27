@@ -11,6 +11,7 @@ from opencanary.honeycred import buildHoneyCredHook
 # Monkey-patch-replace Twisted Protocol with CanaryProtocol class
 from twisted.internet import protocol
 
+
 class CanaryProtocol(protocol.Protocol):
     """TCP protocols (ie. descedents of this class) gain a log method that be
     can be called with just the event data, as transport data is added here"""
