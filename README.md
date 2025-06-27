@@ -173,6 +173,12 @@ The `portscan` module is only available on Linux hosts, as it modifies `iptables
 
 Please note that for the Portscan service, we have added a `portscan.ignore_localhost` setting, which means the OpenCanary `portscan` service will ignore (not alert on) port scans originating for the localhost IP (`127.0.0.1`). This setting is false by default.
 
+#### Scapy
+
+The `Scapy` module is a docker alternative for `Portscan` 
+
+it can be enabeled in the opencanary.conf and is totaly optional , for more informations about this module you can check `docs/services/scapy.rst`
+
 #### Samba Setup
 
 The Windows File Share module (`smb`) requires a Samba installation. See a step-by-step guide on [the Wiki](https://github.com/thinkst/opencanary/wiki/Opencanary-and-Samba).
