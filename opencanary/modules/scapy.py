@@ -41,50 +41,49 @@ class ScapyService(CanaryService):
         print("ScapyService scan detection started.")
 
     def sniff_scans(self):
-        """
-        This thread will sniff packets on the interface for TCP scan traffic on the given ports.
-        Detected scans are logged using the logger API as per standard Opencanary modules.
-        """
         print("== ScapyService (native Opencanary module) started ==")
 
         def detect_scan_flags(pkt):
-            if not pkt.haslayer(self.TCP) or not pkt.haslayer(self.IP):
-                return
-            tcp = pkt[self.TCP]
-            ip = pkt[self.IP]
-            src = ip.src
-            dst = ip.dst
-            sport = tcp.sport
-            dport = tcp.dport
-            if dport not in self.ports:
-                return
+            try:
+                if not pkt.haslayer(self.TCP) or not pkt.haslayer(self.IP):
+                    return
+                tcp = pkt[self.TCP]
+                ip = pkt[self.IP]
+                src = ip.src
+                dst = ip.dst
+                sport = tcp.sport
+                dport = tcp.dport
+                if dport not in self.ports:
+                    return
 
-            flags = int(tcp.flags)
+                flags = int(tcp.flags)
 
-            if flags == 0x00:
-                logtype, scan_type = LoggerBase.LOG_PORT_NMAPNULL, "NULL"
-            elif flags == 0x01:
-                logtype, scan_type = LoggerBase.LOG_PORT_NMAPFIN, "FIN"
-            elif flags == 0x02:
-                logtype, scan_type = LoggerBase.LOG_PORT_SYN, "SYN"
-            elif flags == 0x29:
-                logtype, scan_type = LoggerBase.LOG_PORT_NMAPXMAS, "XMAS"
-            else:
-                return
+                if flags == 0x00:
+                    logtype, scan_type = LoggerBase.LOG_PORT_NMAPNULL, "NULL"
+                elif flags == 0x01:
+                    logtype, scan_type = LoggerBase.LOG_PORT_NMAPFIN, "FIN"
+                elif flags == 0x02:
+                    logtype, scan_type = LoggerBase.LOG_PORT_SYN, "SYN"
+                elif flags == 0x29:
+                    logtype, scan_type = LoggerBase.LOG_PORT_NMAPXMAS, "XMAS"
+                else:
+                    return
 
-            logdata = {
-                "src_host": src,
-                "src_port": sport,
-                "dst_host": dst,
-                "dst_port": dport,
-                "logtype": logtype,
-                "scan_type": scan_type,
-                "local_time": datetime.utcnow().strftime("%Y-%m-%d %H:%M:%S.%f"),
-                "logdata": {
-                    "msg": f"TCP scan type={scan_type} detected on port {dport} from {src}",
-                },
-            }
-            self.logger.log(logdata)
+                logdata = {
+                    "src_host": src,
+                    "src_port": sport,
+                    "dst_host": dst,
+                    "dst_port": dport,
+                    "logtype": logtype,
+                    "scan_type": scan_type,
+                    "local_time": datetime.utcnow().strftime("%Y-%m-%d %H:%M:%S.%f"),
+                    "logdata": {
+                        "msg": f"TCP scan type={scan_type} detected on port {dport} from {src}",
+                    },
+                }
+                self.logger.log(logdata)
+            except Exception as ex:
+                print(f"[ScapyService] Error in detect_scan_flags: {ex}")
 
         try:
             self.sniff(
@@ -95,3 +94,4 @@ class ScapyService(CanaryService):
 
     def configUpdated(self):
         pass
+        
