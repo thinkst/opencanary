@@ -25,7 +25,7 @@ class ScapyService(CanaryService):
     def _get_ports(self, config):
         return config.getVal(
             "scapy.ports",
-            default=[21, 22, 23, 80, 110, 139, 443, 445, 3306, 3389, 8080, 5900],
+            default=[21, 22, 23, 80, 110, 443, 3306, 3389, 8080, 5900],
         )
 
     def startYourEngines(self, reactor=None):
