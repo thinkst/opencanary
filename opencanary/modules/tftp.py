@@ -26,7 +26,7 @@ class Tftp(DatagramProtocol):
             return
 
         try:
-            (filename, mode, ignore) = data[2:].split(b"\x00")
+            (filename, mode, *_) = data[2:].split(b"\x00")
         except ValueError:
             return
 
