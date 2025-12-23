@@ -307,7 +307,7 @@ class TeamsHandler(logging.Handler):
         payload = self.message(data)
         headers = {"Content-Type": "application/json"}
         response = requests.post(self.webhook_url, headers=headers, json=payload)
-        if response.status_code != 200:
+        if response.status_code not in [200, 202]:
             print(
                 "Error %s sending Teams message, the response was:\n%s"
                 % (response.status_code, response.text)
