@@ -6,7 +6,7 @@ exclude: >
 fail_fast: true
 repos:
 -   repo: https://github.com/pre-commit/pre-commit-hooks
-    rev: v4.1.0
+    rev: v6.0.0
     hooks:
     -   id: trailing-whitespace
     -   id: end-of-file-fixer
@@ -19,11 +19,12 @@ repos:
     #     # GitHub only allows branch protection for teams or enterprise.
     #     args: ['--pattern', '^(?!T\d+.*)']
 -   repo: https://github.com/psf/black
-    rev: 22.3.0
+    rev: 25.12.0
     hooks:
     -   id: black
 -   repo: https://github.com/PyCQA/flake8
-    rev: 4.0.1
+    rev: 7.3.0
     hooks:
     -   id: flake8
-        additional_dependencies: [flake8-typing-imports==1.12.0]
+        additional_dependencies: [flake8-typing-imports==1.17.0]
+        # see https://github.com/asottile/flake8-typing-imports/tags

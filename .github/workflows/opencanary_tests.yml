@@ -3,20 +3,24 @@ name: OpenCanary Tests
 on:
   - "push"
 
+env:
+  PYTHON_LATEST: "3.14"
+
 jobs:
   precommit_tests:
-    runs-on: "ubuntu-22.04"
+    runs-on: ubuntu-22.04
     steps:
-      - name: "Check out repository code"
-        uses: "actions/checkout@v3"
-      - name: Set up Python 3.10
-        uses: actions/setup-python@v3
+      - name: Checkout repository
+        uses: actions/checkout@v6
+      - name: Set up Python "${{ env.PYTHON_LATEST }}"
+        uses: actions/setup-python@v6
         with:
-          python-version: "3.10"
+          python-version: "${{ env.PYTHON_LATEST }}"
       - name: Install pre-commit
         run: pip install pre-commit
       - name: Check pre-commit is happy
         run: pre-commit run --all-files
+
   opencanary_tests:
     strategy:
       matrix:
