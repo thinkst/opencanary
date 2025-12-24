@@ -1,5 +1,5 @@
 """
-    A log-only SNMP server. It won't respond, but it will log SNMP queries.
+A log-only SNMP server. It won't respond, but it will log SNMP queries.
 """
 
 from opencanary.modules import CanaryService

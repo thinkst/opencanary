@@ -1,7 +1,7 @@
 """
-    A log-only NTP server. It won't respond, but it will log attempts
-    to trigger the MON_GETLIST_1 NTP commands, which is used for DDOS
-    and network recon.
+A log-only NTP server. It won't respond, but it will log attempts
+to trigger the MON_GETLIST_1 NTP commands, which is used for DDOS
+and network recon.
 """
 
 from opencanary.modules import CanaryService
