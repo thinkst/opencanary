@@ -1,6 +1,6 @@
 """
-    A log-only Tftp server. It won't respond, but it will log attempts
-    to either read or write files.
+A log-only Tftp server. It won't respond, but it will log attempts
+to either read or write files.
 """
 
 from opencanary.modules import CanaryService

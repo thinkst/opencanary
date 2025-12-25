@@ -1,6 +1,6 @@
 """
-    A log-only SIP server. It won't respond, but it will log any
-    SIP requests sent its way.
+A log-only SIP server. It won't respond, but it will log any
+SIP requests sent its way.
 """
 
 from opencanary.modules import CanaryService
