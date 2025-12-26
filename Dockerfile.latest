@@ -23,7 +23,7 @@ RUN pip install scapy pcapy-ng
 COPY opencanary ./opencanary
 
 # Set the default application we are running
-ENTRYPOINT [ "opencanaryd" ]
+ENTRYPOINT ["/bin/bash", "-c", "rm -f /usr/local/bin/opencanaryd.pid && exec opencanaryd \"$@\"", "--"]
 
 # Set the default arguments to be used for the entrypoint
 CMD [ "--dev", "--uid=nobody", "--gid=nogroup" ]
