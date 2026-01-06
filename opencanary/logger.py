@@ -301,34 +301,31 @@ class TeamsHandler(logging.Handler):
                                                 "type": "Image",
                                                 "url": "https://opencanary.readthedocs.io/en/latest/_static/logo.png",
                                                 "width": "90px",
-                                                "horizontalAlignment": "Left"
+                                                "horizontalAlignment": "Left",
                                             }
-                                        ]
+                                        ],
                                     },
                                     {
                                         "type": "Column",
                                         "items": [
                                             {
                                                 "type": "TextBlock",
-                                                "text": "\u00A0",
-                                                "size": "Small"
+                                                "text": "\u00a0",
+                                                "size": "Small",
                                             },
                                             {
                                                 "type": "TextBlock",
                                                 "text": "OpenCanary Alert",
                                                 "weight": "Bolder",
-                                                "size": "ExtraLarge"
-                                            }
-                                        ]
-                                    }
-                                ]
+                                                "size": "ExtraLarge",
+                                            },
+                                        ],
+                                    },
+                                ],
                             },
-                            {
-                                "type": "FactSet",
-                                "facts": self.facts(data)
-                            }
-                        ]
-                    }
+                            {"type": "FactSet", "facts": self.facts(data)},
+                        ],
+                    },
                 }
             ]
         }
