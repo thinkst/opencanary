@@ -32,7 +32,7 @@ Here is a basic configuration:
 }
 ```
 
-Webhooks can also be configured to post Slack or Microsoft Teams channels.
+Webhooks can also be configured to post to Slack or Microsoft Teams channels.
 
 In both cases, only the following required configuration options are allowed:
 
