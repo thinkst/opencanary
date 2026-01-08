@@ -281,22 +281,61 @@ class TeamsHandler(logging.Handler):
         self.webhook_url = webhook_url
 
     def message(self, data):
-        message = {
-            "@type": "MessageCard",
-            "@context": "http://schema.org/extensions",
-            "themeColor": "49c176",
-            "summary": "OpenCanary Notification",
-            "title": "OpenCanary Alert",
-            "sections": [{"facts": self.facts(data)}],
+        return {
+            "attachments": [
+                {
+                    "contentType": "application/vnd.microsoft.card.adaptive",
+                    "content": {
+                        "type": "AdaptiveCard",
+                        "$schema": "https://adaptivecards.io/schemas/adaptive-card.json",
+                        "version": "1.5",
+                        "body": [
+                            {
+                                "type": "ColumnSet",
+                                "columns": [
+                                    {
+                                        "type": "Column",
+                                        "width": "auto",
+                                        "items": [
+                                            {
+                                                "type": "Image",
+                                                "url": "https://resources.canary.tools/images/open-canary-green_logo.png",
+                                                "width": "82px",
+                                                "horizontalAlignment": "Left",
+                                            }
+                                        ],
+                                    },
+                                    {
+                                        "type": "Column",
+                                        "items": [
+                                            {
+                                                "type": "TextBlock",
+                                                "text": "\u00a0",
+                                                "size": "Small",
+                                            },
+                                            {
+                                                "type": "TextBlock",
+                                                "text": "OpenCanary Alert",
+                                                "weight": "Bolder",
+                                                "size": "ExtraLarge",
+                                            },
+                                        ],
+                                    },
+                                ],
+                            },
+                            {"type": "FactSet", "facts": self.facts(data)},
+                        ],
+                    },
+                }
+            ]
         }
-        return message
 
     def facts(self, data, prefix=None):
         facts = []
         for k, v in data.items():
             key = str(k).lower() if prefix is None else prefix + "__" + str(k).lower()
             if type(v) is not dict:
-                facts.append({"name": key, "value": str(v)})
+                facts.append({"title": key, "value": str(v)})
             else:
                 nested = self.facts(v, key)
                 facts.extend(nested)
@@ -307,7 +346,7 @@ class TeamsHandler(logging.Handler):
         payload = self.message(data)
         headers = {"Content-Type": "application/json"}
         response = requests.post(self.webhook_url, headers=headers, json=payload)
-        if response.status_code != 200:
+        if response.status_code != 202:
             print(
                 "Error %s sending Teams message, the response was:\n%s"
                 % (response.status_code, response.text)

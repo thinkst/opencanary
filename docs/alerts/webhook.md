@@ -32,6 +32,43 @@ Here is a basic configuration:
 }
 ```
 
+Webhooks can also be configured to post to Slack or Microsoft Teams channels.
+
+In both cases, only the following required configuration options are allowed:
+
+* **class** - Either "opencanary.logger.SlackHandler" or "opencanary.logger.TeamsHandler".
+* **url** - The full URL of the webhook HTTP endpoint.
+
+**Slack**
+
+You'll need to create a Slack App, enable Incoming Webhooks and select a channel to post to in order to get a Slack webhook URL.
+
+An example of a correctly formatted URL is given below:
+
+```json
+"handlers": {
+    "slack":{
+        "class":"opencanary.logger.SlackHandler",
+        "webhook_url":"https://hooks.slack.com/services/xxx/xxx/xxx"
+    }
+}
+```
+
+**Microsoft Teams**
+
+The Workflows app in Teams must be used to create a flow with the `When a Teams webhook request is received` step, which will generate a webhook URL.
+
+An example of a correctly formatted URL is given below:
+
+```json
+"handlers": {
+    "teams": {
+        "class": "opencanary.logger.TeamsHandler",
+        "webhook_url":"https://defaultxxx.ac.environment.api.powerplatform.com:443/powerautomate/automations/direct/workflows/xxx/triggers/manual/paths/invoke?api-version=1&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=xxx"
+    }
+}
+```
+
 ## Advanced Usage
 
 ### Advanced Data Mapping
