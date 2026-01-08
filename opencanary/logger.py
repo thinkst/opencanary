@@ -299,8 +299,8 @@ class TeamsHandler(logging.Handler):
                                         "items": [
                                             {
                                                 "type": "Image",
-                                                "url": "https://opencanary.readthedocs.io/en/latest/_static/logo.png",
-                                                "width": "90px",
+                                                "url": "https://resources.canary.tools/images/open-canary-green_logo.png",
+                                                "width": "82px",
                                                 "horizontalAlignment": "Left",
                                             }
                                         ],
