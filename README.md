@@ -33,7 +33,7 @@ OpenCanary is the Open Source version of our commercial [Thinkst Canary](https:/
      - [Samba Setup](#samba-setup)
 - **[Running OpenCanary](#running-opencanary)**
   - [Directly on Linux or macOS](#directly-on-linux-or-macos)
-  - [With docker-compose](#with-docker-compose)
+  - [With docker compose](#with-docker-compose)
   - [With Docker](#with-docker)
 - **[Documentation](#documentation)**
 - **[Project Participation](#project-participation)**
@@ -203,7 +203,7 @@ $ sudo -E pkgx opencanaryd --start --uid=nobody --gid=nogroup
 With the `uid` and `gid` flags, OpenCanary drops root privileges after binding to its ports. This can be changed to other low-privileged user/group or omitted to keep running with root privileges.
 
 
-### With docker-compose
+### With docker compose
 
 The route requires [Docker](https://docs.docker.com/get-docker/) and [Docker Compose](https://docs.docker.com/compose/install/) to be installed.
 
@@ -214,12 +214,12 @@ The route requires [Docker](https://docs.docker.com/get-docker/) and [Docker Com
 1. Edit the `ports` section of the `docker-compose.yml` file to enable/disable the desired ports based on the services you have enabled in the config file.
 1. Run the container.
     ```bash
-    docker-compose up latest
+    docker compose up latest
     ```
 
-To view the logs run `docker-compose logs latest`.
+To view the logs run `docker compose logs latest`.
 
-To stop the container run `docker-compose down`.
+To stop the container run `docker compose down`.
 
 To build your own Docker OpenCanary using `docker compose`, head over to our [wiki](https://github.com/thinkst/opencanary/wiki/Using-Dockerised-OpenCanary#building-and-running-your-own-docker-opencanary-image-with-docker-compose)
 

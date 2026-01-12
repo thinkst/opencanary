@@ -2,6 +2,8 @@ version: "3.4"
 
 x-common: &common
   restart: unless-stopped
+  tmpfs:
+    - /run
   volumes:
     - ./data/.opencanary.conf:/root/.opencanary.conf
     # uncomment below if running Samba
