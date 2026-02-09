@@ -37,7 +37,7 @@ def get_long_description():
 requirements = [
     "Twisted==24.11.0",
     "pyasn1==0.4.5",
-    "cryptography==39.0.1",
+    "cryptography==46.0.4",
     "simplejson==3.16.0",
     "requests==2.32.0",
     "zope.interface==7.2",
@@ -50,7 +50,7 @@ requirements = [
     "setuptools==78.1.1",
     "urllib3==2.6.3",
     "hpfeeds==3.0.0",
-    "pyOpenSSL==22.1.0",
+    "pyOpenSSL==25.3.0",
     "service-identity==21.1.0",
 ]
 
