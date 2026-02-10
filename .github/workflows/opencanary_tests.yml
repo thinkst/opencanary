@@ -20,7 +20,7 @@ jobs:
   opencanary_tests:
     strategy:
       matrix:
-        python-version: ["3.8", "3.9", "3.10", "3.11", "3.12", "3.13"]
+        python-version: ["3.9", "3.10", "3.11", "3.12", "3.13"]
         os: ["ubuntu-22.04", "ubuntu-24.04", "macos-14", "macos-15", "macos-26"]
       fail-fast: false
     runs-on: ${{ matrix.os }}
@@ -32,7 +32,7 @@ jobs:
         with:
           python-version: "${{ matrix.python-version }}"
       - name: Install setuptools
-        run: pip3 install setuptools>=63.2.0
+        run: pip3 install setuptools>=78.1.1
       - name: Install wheel
         run: pip3 install wheel
       - name: Create package
