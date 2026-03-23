@@ -403,6 +403,7 @@ class CanaryMongoDB(Factory, CanaryService):
         """Log disconnection"""
         logdata = {'action': 'mongodb.disconnect'}
         self.log(logdata, transport=transport)
-
+    def getService(self):
+        return internet.TCPServer(self.port, self, interface=self.listen_addr)
 
 CanaryServiceFactory = CanaryMongoDB
