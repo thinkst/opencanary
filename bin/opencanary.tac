@@ -22,6 +22,7 @@ from opencanary.modules.git import CanaryGit
 from opencanary.modules.redis import CanaryRedis
 from opencanary.modules.tcpbanner import CanaryTCPBanner
 from opencanary.modules.rdp import CanaryRDP
+from opencanary.modules.mongodb import CanaryMongoDB
 
 
 def warn(*args, **kwargs):
@@ -40,6 +41,7 @@ MODULES = [
     CanaryGit,
     CanaryHTTP,
     CanaryHTTPS,
+    CanaryMongoDB,
     CanaryMySQL,
     CanaryNtp,
     CanaryRDP,
