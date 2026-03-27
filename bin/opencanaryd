@@ -1,7 +1,6 @@
 #!/bin/bash
 DIR=$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )
 PIDFILE="/var/run/opencanaryd.pid"
-PYTHON_BIN="$DIR/python3"
 USE_UV=0
 
 if command -v uv >/dev/null 2>&1; then
@@ -57,21 +56,19 @@ function sudo() {
 
 function run_python() {
   if [[ "$USE_UV" -eq 1 ]]; then
-    uv run --python "$PYTHON_BIN" python3 "$@"
-  elif [[ -x "$PYTHON_BIN" ]]; then
-    "$PYTHON_BIN" "$@"
+    uv run --python 3 python3 "$@"
+  elif [[ -x python3 ]]; then
+    python3 "$@"
   else
     python3 "$@"
   fi
 }
 
 function sudo_run_twistd() {
-  local twistd_bin="$DIR/twistd"
-
   if [[ "$USE_UV" -eq 1 ]]; then
-    sudo -E uv run --python "$PYTHON_BIN" "$twistd_bin" "$@"
+    sudo -E uv run --python 3 twistd "$@"
   else
-    sudo -E "$twistd_bin" "$@"
+    sudo -E twistd "$@"
   fi
 }
 
