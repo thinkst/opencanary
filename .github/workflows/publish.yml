@@ -32,7 +32,7 @@ jobs:
     - name: check version matches tag
       run: |
             uv pip install dist/*.tar.gz
-            version_to_release=$(opencanaryd --version)
+            version_to_release=$(uv run opencanaryd --version)
             tag_name="${{ github.event.release.tag_name }}"
             tag_name_without_v="${tag_name#v}"
             if [[ "$version_to_release" == "$tag_name_without_v" ]]; then
@@ -44,6 +44,5 @@ jobs:
               echo "Git tag is: $tag_name -> $tag_name_without_v"
               exit 1
             fi
-
-    - name: Publish package distributions to PyPI
-      uses: pypa/gh-action-pypi-publish@release/v1
+    - name: Publish
+      run: uv publish

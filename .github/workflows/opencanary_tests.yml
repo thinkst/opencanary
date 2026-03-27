@@ -29,18 +29,15 @@ jobs:
     steps:
       - name: "Check out repository code"
         uses: "actions/checkout@v6"
-      - name: Set up Python ${{ matrix.python-version }}
-        uses: actions/setup-python@v3
-        with:
-          python-version: "${{ matrix.python-version }}"
       - name: Install uv
         uses: astral-sh/setup-uv@v7
-      - name: Build package
-        run: uv build
-      - name: Install package
-        run: uv pip install dist/opencanary-*.tar.gz
-      - name: Install test dependencies
-        run: uv pip install -r opencanary/test/requirements.txt
+        with:
+          python-version: ${{ matrix.python-version }}
+          enable-cache: true
+      - name: Set up Python
+        run: uv python install
+      - name: Install OpenCanary
+        run: uv sync --locked --all-extras --dev
       - name: Copy config file
         run: cp opencanary/test/opencanary.conf .
       - name: Start OpenCanary)
