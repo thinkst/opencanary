@@ -48,3 +48,4 @@ jobs:
         run: opencanaryd --start
       - name: Run Pytest
         run: pytest -s
+        
