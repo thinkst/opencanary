@@ -31,7 +31,7 @@ classifiers = [
     "Programming Language :: Python :: 3.13",
     "License :: OSI Approved :: BSD License",
 ]
-requires-python = ">= 3.9"
+requires-python = ">= 3.10"
 dependencies = [
     "Twisted==24.11.0",
     "pyasn1==0.4.5",
@@ -44,7 +44,7 @@ dependencies = [
     "passlib==1.7.1",
     "Jinja2==3.1.6",
     "ntlmlib==0.72",
-    "bcrypt==3.1.7",
+    "bcrypt==3.2.0",
     "setuptools==78.1.1",
     "urllib3==2.6.3",
     "hpfeeds==3.0.0",
@@ -67,3 +67,12 @@ version = { attr = "opencanary.__version__" }
 
 [tool.setuptools.packages.find]
 exclude = ["docs", "docs*", "opencanary.test", "opencanary.test*"]
+
+[dependency-groups]
+dev = [
+    "gitpython>=3.1.46",
+    "paramiko==3.4.0",
+    "pymysql>=1.1.2",
+    "pytest>=9.0.2",
+    "requests>=2.32.4",
+]
