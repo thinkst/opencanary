@@ -18,6 +18,11 @@ BUILD_SCRIPT_DIR=$(dirname -- "$(readlink -f -- "$0";)";)
 OPENCANARY_DIR="$(readlink -f -- "$BUILD_SCRIPT_DIR/../";)"
 BUILD_LOG="$BUILD_SCRIPT_DIR/build.log"
 VENV_PATH="$OPENCANARY_DIR/$VENV_DIR"
+USE_UV=0
+
+if command -v uv &>/dev/null; then
+    USE_UV=1
+fi
 
 
 # Echo a string to both STDOUT and the build log
@@ -40,12 +45,32 @@ mv_to_old() {
 # Create python virtual env
 create_venv() {
     echo_log "Creating new virtualenv in '$VENV_DIR'..."
-    $VENV_CREATION_CMD "$VENV_PATH" >> "$BUILD_LOG"
+    if [[ "$USE_UV" -eq 1 ]]; then
+        uv venv "$VENV_PATH" >> "$BUILD_LOG"
+    else
+        $VENV_CREATION_CMD "$VENV_PATH" >> "$BUILD_LOG"
+    fi
+}
+
+install_into_venv() {
+    local package="$1"
+
+    if [[ "$USE_UV" -eq 1 ]]; then
+        uv pip install --python "$VENV_PATH/bin/python" "$package" >> "$BUILD_LOG"
+    else
+        pip install "$package" >> "$BUILD_LOG"
+    fi
 }
 
 
 echo -e "Build log will be written to '$BUILD_LOG'..."
 pushd "$OPENCANARY_DIR" >> "$BUILD_LOG"
+
+if [[ "$USE_UV" -eq 1 ]]; then
+    echo_log "uv detected. Using uv where possible for virtualenv creation and package installs."
+else
+    echo_log "uv not detected. Falling back to python3/pip."
+fi
 
 
 if [[ $SYSTEM_INFO =~ 'Darwin' ]]; then
@@ -59,7 +84,7 @@ if [[ $SYSTEM_INFO =~ 'Darwin' ]]; then
     set +e
     OPENSSL_PATH=$(brew --prefix "$HOMEBREW_OPENSSL_FORMULA" 2>/dev/null)
 
-    if [ $? -ne 0 ] ; then
+    if [[ $? -ne 0 ]]; then
         echo_log "ERROR: $HOMEBREW_OPENSSL_FORMULA not found. Try 'brew install $HOMEBREW_OPENSSL_FORMULA'."
         exit 1
     fi
@@ -91,7 +116,7 @@ fi
 
 
 # Backup current checkout and pull a fresh one from github if requested
-if [ "${OPENCANARY_BUILD_FULL_CLEAN+set}" = set ]; then
+if [[ "${OPENCANARY_BUILD_FULL_CLEAN+set}" == set ]]; then
     echo_log "OPENCANARY_BUILD_FULL_CLEAN requested; backing up repo and rebuilding from scratch..."
     pushd .. >> "$BUILD_LOG"
     [[ -a opencanary ]] && mv_to_old opencanary
@@ -105,7 +130,7 @@ fi
 
 # Backup current virtual env and make a new one if requested
 if [[ -d $VENV_PATH ]]; then
-    if [[ "${OPENCANARY_BUILD_FRESH_VENV+set}" = set ]]; then
+    if [[ "${OPENCANARY_BUILD_FRESH_VENV+set}" == set ]]; then
         mv_to_old "$VENV_PATH"
         create_venv
     else
@@ -121,20 +146,25 @@ echo_log "Activating virtual env in subshell..."
 . "$VENV_PATH/bin/activate"
 
 echo_log "Installing setuptools..."
-pip3 install setuptools >> "$BUILD_LOG"
+install_into_venv setuptools
 echo_log "Installing cryptography package..."
-pip3 install cryptography >> "$BUILD_LOG"
+install_into_venv cryptography
 
 echo_log "Building..."
 python3 setup.py sdist >> "$BUILD_LOG" 2>&1
-BUILT_PKG=$(ls dist/opencanary*.tar.gz)
+BUILT_PKG=`ls -t dist/opencanary*.tar.gz | head -n 1`
+BUILT_PKG_COUNT=`ls -1 dist/opencanary*.tar.gz | wc -l | tr -d ' '`
+
+if [[ "$BUILT_PKG_COUNT" -gt 1 ]]; then
+    echo_log "Found multiple built packages in dist/; using the newest artifact '$BUILT_PKG'."
+fi
 
 echo_log "Installing built package '$BUILT_PKG'..."
-pip install "$BUILT_PKG" >> "$BUILD_LOG" 2>&1
+install_into_venv "$BUILT_PKG"
 
 echo_log "Install complete.\n"
 
-if [[ "${VIRTUAL_ENV+set}" = set ]]; then
+if [[ "${VIRTUAL_ENV+set}" == set ]]; then
     echo_log "IMPORTANT: virtualenv is NOT active!"
 fi
 

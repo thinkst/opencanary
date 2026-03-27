@@ -1,0 +1,69 @@
+[build-system]
+requires = ["setuptools>=78.1.1"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "opencanary"
+dynamic = ["version"]
+description = "OpenCanary daemon"
+readme = "README.md"
+license = { text = "BSD" }
+authors = [
+    { name = "Thinkst Applied Research", email = "info@thinkst.com" },
+]
+classifiers = [
+    "Development Status :: 5 - Production/Stable",
+    "Intended Audience :: Developers",
+    "Framework :: Twisted",
+    "Topic :: System :: Networking",
+    "Topic :: Security",
+    "Topic :: System :: Networking :: Monitoring",
+    "Natural Language :: English",
+    "Operating System :: Unix",
+    "Operating System :: POSIX :: Linux",
+    "Operating System :: POSIX :: BSD :: FreeBSD",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.8",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "License :: OSI Approved :: BSD License",
+]
+requires-python = ">= 3.9"
+dependencies = [
+    "Twisted==24.11.0",
+    "pyasn1==0.4.5",
+    "cryptography==46.0.4",
+    "simplejson==3.16.0",
+    "requests==2.32.4",
+    "zope.interface==7.2",
+    "PyPDF2==1.27.9",
+    "fpdf==1.7.2",
+    "passlib==1.7.1",
+    "Jinja2==3.1.6",
+    "ntlmlib==0.72",
+    "bcrypt==3.1.7",
+    "setuptools==78.1.1",
+    "urllib3==2.6.3",
+    "hpfeeds==3.0.0",
+    "pyOpenSSL==25.3.0",
+    "service-identity==21.1.0",
+]
+
+[project.urls]
+Homepage = "http://www.thinkst.com/"
+"Bug Tracker" = "https://github.com/thinkst/opencanary/issues"
+Documentation = "https://github.com/thinkst/opencanary#readme"
+"Source Code" = "https://github.com/thinkst/opencanary"
+
+[tool.setuptools]
+include-package-data = true
+script-files = ["bin/opencanaryd", "bin/opencanary.tac"]
+
+[tool.setuptools.dynamic]
+version = { attr = "opencanary.__version__" }
+
+[tool.setuptools.packages.find]
+exclude = ["docs", "docs*", "opencanary.test", "opencanary.test*"]

@@ -60,6 +60,8 @@ OpenCanary is the Open Source version of our commercial [Thinkst Canary](https:/
 
 The OpenCanary installation essentially involves ensuring the Python environment is ready, then installing the OpenCanary Python package (plus optional extras).
 
+If `uv` is installed, you can use it for virtual environment creation and package installation. If it is not installed, the standard `python`/`pip` flow below continues to work.
+
 ### Installation on Ubuntu
 
 Installation on Ubuntu 22.04 LTS or 24.04 LTS:
@@ -68,6 +70,13 @@ $ sudo apt-get install python3-dev python3-pip python3-virtualenv python3-venv p
 $ virtualenv env/
 $ . env/bin/activate
 $ pip install opencanary
+```
+
+Optional `uv` equivalent:
+```
+$ uv venv env
+$ . env/bin/activate
+$ uv pip install opencanary
 ```
 
 Optional extras (if you wish to use the Windows File Share module, and the SNMP module):
@@ -81,6 +90,12 @@ $ pip install scapy pcapy-ng # if you plan to use the SNMP module
 First, create and activate a new Python virtual environment:
 ```
 $ virtualenv env/
+$ . env/bin/activate
+```
+
+Optional `uv` equivalent:
+```
+$ uv venv env
 $ . env/bin/activate
 ```
 
@@ -110,6 +125,12 @@ $ pip install opencanary
 $ pip install scapy pcapy-ng # optional
 ```
 
+With `uv` installed, the equivalent commands are:
+```
+$ uv pip install opencanary
+$ uv pip install scapy pcapy-ng # optional
+```
+
 The Windows File Share (smb) module is not available on macOS.
 
 ### Installation via Git
@@ -122,6 +143,11 @@ $ cd opencanary
 $ python setup.py sdist
 $ cd dist
 $ pip install opencanary-<version>.tar.gz
+```
+
+With `uv` installed, you can replace the final install step with:
+```
+$ uv pip install opencanary-<version>.tar.gz
 ```
 
 ### Use via pkgx

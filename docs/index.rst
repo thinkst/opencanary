@@ -76,6 +76,12 @@ Inside the virtualenv, you can upgrade your OpenCanary by,
 
   $ pip install opencanary --upgrade
 
+If `uv` is installed, the equivalent upgrade command is,
+
+.. code-block:: sh
+
+  $ uv pip install opencanary --upgrade
+
 Please note that this will not wipe your existing OpenCanary config file. If you would like a new one (with the new settings), please regenerate the config file using,
 
 .. code-block:: sh

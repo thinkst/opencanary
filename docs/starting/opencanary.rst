@@ -11,6 +11,13 @@ To get started create a virtual environment to play in:
    $ virtualenv env
    $ . env/bin/activate
 
+If `uv` is installed, you can create the virtual environment with:
+
+.. code-block:: sh
+
+   $ uv venv env
+   $ . env/bin/activate
+
 Inside the virtualenv, install OpenCanary following the instructions in the `README <https://github.com/thinkst/opencanary>`_.
 
 OpenCanary ships with a default config, which we'll copy and edit to get started. The config is a single `JSON <https://en.wikipedia.org/wiki/JSON>`_ dictionary.
