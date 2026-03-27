@@ -20,17 +20,19 @@ jobs:
     - name: Set up Python
       uses: actions/setup-python@v3
     - name: "Check out repository code"
-      uses: "actions/checkout@v3"
+      uses: "actions/checkout@v6"
+    - name: Install uv
+      uses: astral-sh/setup-uv@v7
     - name: Install setuptools
       run: pip3 install setuptools>=63.2.0
     - name: Install wheel
       run: pip3 install wheel
-    - name: Create package
-      run: python3 setup.py sdist
+    - name: Build package distributions
+      run: uv build
     - name: check version matches tag
       run: |
-            python3 -m pip install dist/*
-            version_to_release=$(opencanaryd --version)
+            uv pip install dist/*.tar.gz
+            version_to_release=$(uv run opencanaryd --version)
             tag_name="${{ github.event.release.tag_name }}"
             tag_name_without_v="${tag_name#v}"
             if [[ "$version_to_release" == "$tag_name_without_v" ]]; then
@@ -42,6 +44,5 @@ jobs:
               echo "Git tag is: $tag_name -> $tag_name_without_v"
               exit 1
             fi
-
-    - name: Publish package distributions to PyPI
-      uses: pypa/gh-action-pypi-publish@release/v1
+    - name: Publish
+      run: uv publish
