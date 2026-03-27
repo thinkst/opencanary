@@ -38,6 +38,8 @@ jobs:
       - name: Install wheel
         run: pip3 install wheel
 
+      - name: Setup venv using uv
+        run: uv venv
       - name: Install package
         run: uv pip install dist/opencanary-*.tar.gz
       - name: Install test dependencies
@@ -48,4 +50,3 @@ jobs:
         run: opencanaryd --start
       - name: Run Pytest
         run: pytest -s
-        
