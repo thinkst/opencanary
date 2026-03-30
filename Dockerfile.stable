@@ -7,12 +7,13 @@ RUN apt-get update && apt-get -yq install --no-install-recommends \
 	# Remove cache lists and clean up anything not needed to minimize image size
 	apt-get autoremove -yq && apt-get clean && rm -rf /var/lib/apt/lists/*
 
+COPY --from=ghcr.io/astral-sh/uv:latest /uv /uvx /bin/
 # Install required pip dependencies
-RUN pip install opencanary
-RUN pip install scapy pcapy-ng
+RUN uv tool install opencanary
+RUN uv pip install scapy pcapy-ng
 
 # Set the default application we are running
-ENTRYPOINT [ "opencanaryd" ]
+ENTRYPOINT [ "uv", "tool", "run", "--from", "opencanary", "opencanaryd" ]
 
 # Set the default arguments to be used for the entrypoint
 CMD [ "--dev", "--uid=nobody", "--gid=nogroup" ]
