@@ -40,7 +40,7 @@ jobs:
         run: uv sync --locked --all-extras --dev
       - name: Copy config file
         run: cp opencanary/test/opencanary.conf .
-      - name: Start OpenCanary)
+      - name: Start OpenCanary
         run: uv run opencanaryd --start
       - name: Run Pytest
         run: uv run pytest -s
