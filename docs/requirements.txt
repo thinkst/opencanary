@@ -13,7 +13,7 @@ mdit-py-plugins==0.3.5
 mdurl==0.1.2
 myst-parser==1.0.0
 packaging==23.1
-Pygments==2.15.1
+Pygments==2.20.0
 pytz==2023.3
 PyYAML==6.0
 requests==2.32.4
