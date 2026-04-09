@@ -140,23 +140,17 @@ To install from source, instead of running pip do the following:
 ```
 $ git clone https://github.com/thinkst/opencanary
 $ cd opencanary
-$ python setup.py sdist
-$ cd dist
-$ pip install opencanary-<version>.tar.gz
-```
-
-With `uv` installed, you can replace the final install step with:
-```
-$ uv pip install opencanary-<version>.tar.gz
+$ uv build
+$ uv pip install dist/opencanary-<version>.tar.gz
 ```
 
 ### Use via pkgx
 
-OpenCanary is packaged via [pkgx](https://pkgx.sh/), so no installation is needed if pkgx is installed, simply preface the `opencanaryd` command with
+OpenCanary is packaged via [pkgx](https://pkgx.sh/), so no installation is needed if pkgx is installed, simply preface the `opencanary` command with
 `pkgx`. Due to environment variable protections in modern `sudo` implementations, the entire command must be run as root, or via `sudo -E`.
 
 ```
-$ pkgx opencanaryd --version
+$ pkgx opencanary --version
 ```
 
 ### Installation for Docker
@@ -175,10 +169,10 @@ When OpenCanary starts it looks for config files in the following locations and 
 
 To create an initial configuration, run as `root` (you may be prompted for a `sudo` password):
 ```
-$ opencanaryd --copyconfig
+$ opencanary --copyconfig
 [*] A sample config file is ready /etc/opencanaryd/opencanary.conf
 
-[*] Edit your configuration, then launch with "opencanaryd --start --uid=nobody --gid=nogroup"
+[*] Edit your configuration, then launch with "opencanary --start --uid=nobody --gid=nogroup"
 ```
 
 This creates the path and file `/etc/opencanaryd/opencanary.conf`. You must now edit the config file to determine which services and logging options you want to enable.
@@ -213,7 +207,7 @@ Start OpenCanary by running:
 
 ```
 $ . env/bin/activate
-$ opencanaryd --start --uid=nobody --gid=nogroup
+$ opencanary --start --uid=nobody --gid=nogroup
 ```
 
 With the `uid` and `gid` flags, OpenCanary drops root privileges after binding to its ports. This can be changed to other low-privileged user/group or omitted to keep running with root privileges.
@@ -223,7 +217,7 @@ With the `uid` and `gid` flags, OpenCanary drops root privileges after binding t
 Start OpenCanary by running:
 
 ```
-$ sudo -E pkgx opencanaryd --start --uid=nobody --gid=nogroup
+$ sudo -E pkgx opencanary --start --uid=nobody --gid=nogroup
 ```
 
 With the `uid` and `gid` flags, OpenCanary drops root privileges after binding to its ports. This can be changed to other low-privileged user/group or omitted to keep running with root privileges.

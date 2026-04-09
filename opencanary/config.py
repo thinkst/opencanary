@@ -5,10 +5,8 @@ import itertools
 import string
 import re
 from os.path import expanduser
-from pkg_resources import resource_filename
 from pathlib import Path
 
-SAMPLE_SETTINGS = resource_filename(__name__, "data/settings.json")
 SETTINGS = "opencanary.conf"
 
 
@@ -72,7 +70,7 @@ class Config:
                 print("[-] An error occurred loading %s (%s)" % (fname, e))
         if self.__config is None:
             print(
-                'No config file found. Please create one with "opencanaryd --copyconfig"'
+                'No config file found. Please create one with "opencanary --copyconfig"'
             )
             sys.exit(1)
 
