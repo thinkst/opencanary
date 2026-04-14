@@ -65,11 +65,11 @@ def _twistd_flags(uid: str | None, gid: str | None) -> list[str]:
 def _start(uid: str | None, gid: str | None, nodaemon: bool) -> int:
     _warn_drop_privileges(uid, gid)
     with _resource_path("opencanary.tac") as tac_path:
-        options = ["--python", str(tac_path), "--pidfile", str(PIDFILE)]
+        options = ["--python", str(tac_path)]
         if nodaemon:
             options.insert(0, "--nodaemon")
         else:
-            options.extend(["--syslog", "--prefix=opencanary"])
+            options.extend(["--pidfile", str(PIDFILE), "--syslog", "--prefix=opencanary"])
         options.extend(_twistd_flags(uid, gid))
         return _run_twistd(options)
 
