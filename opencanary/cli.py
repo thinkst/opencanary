@@ -7,6 +7,7 @@ from pathlib import Path
 from typing import Annotated
 
 import typer
+from twisted.internet.error import CannotListenError
 from twisted.python import usage
 from twisted.scripts._twistd_unix import ServerOptions, UnixApplicationRunner
 
@@ -32,6 +33,14 @@ def _run_twistd(options: list[str]) -> int:
 
     try:
         UnixApplicationRunner(config).run()
+    except CannotListenError as exc:
+        if getattr(exc.socketError, "errno", None) == 13 and exc.port is not None and exc.port < 1024:
+            print(
+                f"Cannot bind to privileged port {exc.port}. Run `sudo opencanary ...` or use a config with ports above 1024 for development.",
+                file=sys.stderr,
+            )
+            return 1
+        raise
     except SystemExit as exc:
         code = exc.code
         return code if isinstance(code, int) else 1
