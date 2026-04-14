@@ -169,10 +169,10 @@ When OpenCanary starts it looks for config files in the following locations and 
 
 To create an initial configuration, run as `root` (you may be prompted for a `sudo` password):
 ```
-$ opencanary --copyconfig
+$ opencanary copyconfig
 [*] A sample config file is ready /etc/opencanaryd/opencanary.conf
 
-[*] Edit your configuration, then launch with "opencanary --start --uid=nobody --gid=nogroup"
+[*] Edit your configuration, then launch with "opencanary start --uid=nobody --gid=nogroup"
 ```
 
 This creates the path and file `/etc/opencanaryd/opencanary.conf`. You must now edit the config file to determine which services and logging options you want to enable.
@@ -207,7 +207,7 @@ Start OpenCanary by running:
 
 ```
 $ . env/bin/activate
-$ opencanary --start --uid=nobody --gid=nogroup
+$ opencanary start --uid=nobody --gid=nogroup
 ```
 
 With the `uid` and `gid` flags, OpenCanary drops root privileges after binding to its ports. This can be changed to other low-privileged user/group or omitted to keep running with root privileges.
@@ -217,7 +217,7 @@ With the `uid` and `gid` flags, OpenCanary drops root privileges after binding t
 Start OpenCanary by running:
 
 ```
-$ sudo -E pkgx opencanary --start --uid=nobody --gid=nogroup
+$ sudo -E pkgx opencanary start --uid=nobody --gid=nogroup
 ```
 
 With the `uid` and `gid` flags, OpenCanary drops root privileges after binding to its ports. This can be changed to other low-privileged user/group or omitted to keep running with root privileges.

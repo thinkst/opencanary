@@ -41,6 +41,6 @@ jobs:
       - name: Copy config file
         run: cp opencanary/test/opencanary.conf .
       - name: Start OpenCanary
-        run: uv run opencanary --start
+        run: uv run opencanary start
       - name: Run Pytest
         run: uv run pytest -s

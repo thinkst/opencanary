@@ -15,7 +15,7 @@ from opencanary import __version__
 PIDFILE = Path("/var/run/opencanary.pid")
 CONFIG_DIR = Path("/etc/opencanaryd")
 CONFIG_NAME = "opencanary.conf"
-app = typer.Typer(add_completion=False, invoke_without_command=True)
+app = typer.Typer(add_completion=False, no_args_is_help=True)
 
 
 def _resource_path(name: str):
@@ -84,7 +84,7 @@ def _copyconfig() -> int:
 
     if os.geteuid() != 0:
         print(
-            "Writing /etc/opencanaryd/opencanary.conf requires root. Run `sudo opencanary --copyconfig`.",
+            "Writing /etc/opencanaryd/opencanary.conf requires root. Run `sudo opencanary copyconfig`.",
             file=sys.stderr,
         )
         return 1
@@ -94,7 +94,7 @@ def _copyconfig() -> int:
         shutil.copy(default_config, destination)
 
     print("[*] A sample config file is ready /etc/opencanaryd/opencanary.conf\n")
-    print('[*] Edit your configuration, then launch with "opencanary --start"')
+    print('[*] Edit your configuration, then launch with "opencanary start"')
     return 0
 
 
@@ -124,7 +124,7 @@ def _stop() -> int:
         os.kill(pid, signal.SIGTERM)
     except PermissionError:
         print(
-            f"Stopping process {pid} requires sufficient permissions. Run `sudo opencanary --stop` if needed.",
+            f"Stopping process {pid} requires sufficient permissions. Run `sudo opencanary stop` if needed.",
             file=sys.stderr,
         )
         return 1
@@ -144,34 +144,25 @@ def _version_callback(value: bool) -> None:
         raise typer.Exit(0)
 
 
+UidOption = Annotated[
+    str | None,
+    typer.Option(help="Specify a user or uid to drop privileges to"),
+]
+GidOption = Annotated[
+    str | None,
+    typer.Option(help="Specify a group or gid to drop privileges to"),
+]
+AllowRootOption = Annotated[
+    bool,
+    typer.Option(
+        "--allow-run-as-root",
+        help="Accepted for compatibility; privilege dropping is controlled by --uid and --gid.",
+    ),
+]
+
+
 @app.callback()
 def cli(
-    start: Annotated[
-        bool,
-        typer.Option(help="Starts the opencanary process"),
-    ] = False,
-    dev: Annotated[
-        bool,
-        typer.Option(help="Run the opencanary process in the foreground"),
-    ] = False,
-    stop: Annotated[
-        bool,
-        typer.Option(help="Stops the opencanary process"),
-    ] = False,
-    restart: Annotated[
-        bool,
-        typer.Option(help="Restarts the opencanary process"),
-    ] = False,
-    usermodule: Annotated[
-        bool,
-        typer.Option(help="Run opencanary in foreground with only usermodules enabled"),
-    ] = False,
-    copyconfig: Annotated[
-        bool,
-        typer.Option(
-            help="Creates a default config file at /etc/opencanaryd/opencanary.conf"
-        ),
-    ] = False,
     version: Annotated[
         bool,
         typer.Option(
@@ -181,53 +172,53 @@ def cli(
             help="Displays the current opencanary version.",
         ),
     ] = False,
-    uid: Annotated[
-        str | None,
-        typer.Option(help="Specify a user or uid to drop privileges to"),
-    ] = None,
-    gid: Annotated[
-        str | None,
-        typer.Option(help="Specify a group or gid to drop privileges to"),
-    ] = None,
-    allow_run_as_root: Annotated[
-        bool,
-        typer.Option(
-            "--allow-run-as-root",
-            help="Accepted for compatibility; privilege dropping is controlled by --uid and --gid.",
-        ),
-    ] = False,
 ) -> None:
     del version
+
+
+@app.command(help="Start the opencanary process.")
+def start(
+    uid: UidOption = None,
+    gid: GidOption = None,
+    allow_run_as_root: AllowRootOption = False,
+) -> None:
     del allow_run_as_root
+    raise typer.Exit(_start(uid, gid, nodaemon=False))
 
-    selected_actions = [
-        start,
-        dev,
-        stop,
-        restart,
-        usermodule,
-        copyconfig,
-    ]
-    action_count = sum(selected_actions)
-    if action_count != 1:
-        print(
-            "Exactly one action flag is required: --start, --dev, --stop, --restart, --usermodule, or --copyconfig.",
-            file=sys.stderr,
-        )
-        raise typer.Exit(1)
 
-    if copyconfig:
-        raise typer.Exit(_copyconfig())
-    if usermodule:
-        raise typer.Exit(_usermodule())
-    if stop:
-        raise typer.Exit(_stop())
-    if restart:
-        raise typer.Exit(_restart(uid, gid))
-    if start:
-        raise typer.Exit(_start(uid, gid, nodaemon=False))
-
+@app.command(help="Run opencanary in the foreground.")
+def dev(
+    uid: UidOption = None,
+    gid: GidOption = None,
+    allow_run_as_root: AllowRootOption = False,
+) -> None:
+    del allow_run_as_root
     raise typer.Exit(_start(uid, gid, nodaemon=True))
+
+
+@app.command(help="Stop the opencanary process.")
+def stop() -> None:
+    raise typer.Exit(_stop())
+
+
+@app.command(help="Restart the opencanary process.")
+def restart(
+    uid: UidOption = None,
+    gid: GidOption = None,
+    allow_run_as_root: AllowRootOption = False,
+) -> None:
+    del allow_run_as_root
+    raise typer.Exit(_restart(uid, gid))
+
+
+@app.command(help="Run opencanary in foreground with only usermodules enabled.")
+def usermodule() -> None:
+    raise typer.Exit(_usermodule())
+
+
+@app.command(help="Create a default config file at /etc/opencanaryd/opencanary.conf.")
+def copyconfig() -> None:
+    raise typer.Exit(_copyconfig())
 
 
 def main() -> None:

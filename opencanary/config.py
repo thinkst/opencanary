@@ -70,7 +70,7 @@ class Config:
                 print("[-] An error occurred loading %s (%s)" % (fname, e))
         if self.__config is None:
             print(
-                'No config file found. Please create one with "opencanary --copyconfig"'
+                'No config file found. Please create one with "opencanary copyconfig"'
             )
             sys.exit(1)
 
