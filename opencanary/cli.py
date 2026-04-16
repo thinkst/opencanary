@@ -14,7 +14,7 @@ from twisted.scripts._twistd_unix import ServerOptions, UnixApplicationRunner
 from opencanary import __version__
 
 PIDFILE = Path("/var/run/opencanary.pid")
-CONFIG_DIR = Path("/etc/opencanaryd")
+CONFIG_DIR = Path("/etc/opencanary")
 CONFIG_NAME = "opencanary.conf"
 app = typer.Typer(add_completion=False, no_args_is_help=True)
 
@@ -87,13 +87,13 @@ def _copyconfig() -> int:
     destination = CONFIG_DIR / CONFIG_NAME
     if destination.exists():
         print(
-            "A config file already exists at /etc/opencanaryd/opencanary.conf, please move it first"
+            "A config file already exists at /etc/opencanary/opencanary.conf, please move it first"
         )
         return 1
 
     if os.geteuid() != 0:
         print(
-            "Writing /etc/opencanaryd/opencanary.conf requires root. Run `sudo opencanary copyconfig`.",
+            "Writing /etc/opencanary/opencanary.conf requires root. Run `sudo opencanary copyconfig`.",
             file=sys.stderr,
         )
         return 1
@@ -102,7 +102,7 @@ def _copyconfig() -> int:
         CONFIG_DIR.mkdir(parents=True, exist_ok=True)
         shutil.copy(default_config, destination)
 
-    print("[*] A sample config file is ready /etc/opencanaryd/opencanary.conf\n")
+    print("[*] A sample config file is ready /etc/opencanary/opencanary.conf\n")
     print('[*] Edit your configuration, then launch with "opencanary start"')
     return 0
 
@@ -225,7 +225,7 @@ def usermodule() -> None:
     raise typer.Exit(_usermodule())
 
 
-@app.command(help="Create a default config file at /etc/opencanaryd/opencanary.conf.")
+@app.command(help="Create a default config file at /etc/opencanary/opencanary.conf.")
 def copyconfig() -> None:
     raise typer.Exit(_copyconfig())
 

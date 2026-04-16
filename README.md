@@ -165,17 +165,17 @@ When OpenCanary starts it looks for config files in the following locations and 
 
 1. `./opencanary.conf` (i.e. the directory where OpenCanary is installed)
 2. `~/.opencanary.conf` (i.e. the home directory of the user, usually this will be `root` so `/root/.opencanary.conf`)
-3. `/etc/opencanaryd/opencanary.conf`
+3. `/etc/opencanary/opencanary.conf`
 
 To create an initial configuration, run as `root` (you may be prompted for a `sudo` password):
 ```
 $ opencanary copyconfig
-[*] A sample config file is ready /etc/opencanaryd/opencanary.conf
+[*] A sample config file is ready /etc/opencanary/opencanary.conf
 
 [*] Edit your configuration, then launch with "opencanary start --uid=nobody --gid=nogroup"
 ```
 
-This creates the path and file `/etc/opencanaryd/opencanary.conf`. You must now edit the config file to determine which services and logging options you want to enable.
+This creates the path and file `/etc/opencanary/opencanary.conf`. You must now edit the config file to determine which services and logging options you want to enable.
 
 ### Enabling protocol modules and alerting
 

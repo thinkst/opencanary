@@ -20,8 +20,8 @@ Rules for execution:
 - [x] Move `--copyconfig` logic from the Bash wrapper into Python.
 - [x] Move `--start` and `--dev` argument parsing into a Python CLI module.
 - [x] Move `--stop` and `--restart` PID management into Python or remove those commands if they are no longer justified.
-- [x] Remove `python3 -c` calls from the old `bin/opencanaryd` wrapper.
-- [x] Remove the custom `sudo()` shell function from the old `bin/opencanaryd` wrapper.
+- [x] Remove `python3 -c` calls from the old `bin/opencanary` wrapper.
+- [x] Remove the custom `sudo()` shell function from the old `bin/opencanary` wrapper.
 - [x] Replace remaining `pkg_resources.resource_filename` usage with `importlib.resources`.
 - [x] Update source-install documentation to stop using `setup.py sdist`.
 - [x] Align Python version classifiers with `requires-python`.

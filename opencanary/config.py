@@ -43,7 +43,7 @@ class Config:
         self.__configfile = configfile
 
         files = [
-            "/etc/opencanaryd/%s" % configfile,
+            "/etc/opencanary/%s" % configfile,
             "%s/.%s" % (expanduser("~"), configfile),
             configfile,
         ]
