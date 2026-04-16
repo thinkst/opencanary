@@ -1,7 +1,7 @@
 MySQL Server
 ================
 
-Inside ~/.opencanary.conf:
+Inside ~/.opencanary/opencanary.conf:
 
 .. code-block:: json
 

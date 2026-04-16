@@ -1,7 +1,7 @@
 Email Alerts
 ============
 
-To have an OpenCanary daemon directly send email alerts to edit the logger section of the *~/.opencanary.conf*. The file format is JSON.
+To have an OpenCanary daemon directly send email alerts to edit the logger section of the *~/.opencanary/opencanary.conf*. The file format is JSON.
 
 In the configurations below, set these configuration variables:
 

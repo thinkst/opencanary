@@ -25,7 +25,7 @@ OpenCanary ships with a default config, which we'll copy and edit to get started
 .. code-block:: sh
 
    $ opencanary copyconfig
-   $ $EDITOR ~/.opencanary.conf
+   $ $EDITOR ~/.opencanary/opencanary.conf
 
 In the config file we'll change **device.node_id** which must be unique for
 each instance of opencanary, and we'll configure **logger** to log
@@ -71,7 +71,7 @@ The tool JQ can be used to check that the config file is well-formed JSON.
 
 .. code-block:: sh
 
-   $ jq . ~/.opencanary.conf
+   $ jq . ~/.opencanary/opencanary.conf
 
 Run opencanary in the foreground to see more error messages.
 

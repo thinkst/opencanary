@@ -171,7 +171,7 @@ When you generate the default OpenCanary config file using,
 
     $ opencanary copyconfig
 
-you will receive a json formatted config file at `/etc/opencanary/opencanary.conf` such as the following,
+you will receive a json formatted config file at `~/.opencanary/opencanary.conf` such as the following,
 
 .. code-block:: json
 
