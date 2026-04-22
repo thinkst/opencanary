@@ -1,8 +1,8 @@
 import traceback
 import warnings
 import sys
+from importlib.metadata import entry_points
 from twisted.application import service
-from pkg_resources import iter_entry_points
 
 from opencanary.config import config, is_docker
 from opencanary.logger import getLogger
@@ -156,16 +156,16 @@ def logMsg(msg):
     logger.log(data, retry=False)
 
 
-application = service.Application("opencanaryd")
+application = service.Application("opencanary")
 
 # List of modules to start
 start_modules = []
 
 # Add all custom modules
 # (Permanently enabled as they don't officially use settings yet)
-for ep in iter_entry_points(ENTRYPOINT):
+for ep in entry_points(group=ENTRYPOINT):
     try:
-        klass = ep.load(require=False)
+        klass = ep.load()
         start_modules.append(klass)
     except Exception:
         err = "Failed to load class from the entrypoint: %s. %s" % (

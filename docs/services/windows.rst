@@ -4,7 +4,7 @@ Windows Server
 The Samba and RDP modules require an extra installation step. It's a
 good idea to consult the `README <https://github.com/thinkst/opencanary>`_ before trying this out.
 
-Inside ~/.opencanary.conf:
+Inside ~/.opencanary/opencanary.conf:
 
 .. code-block:: json
 

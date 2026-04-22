@@ -4,12 +4,14 @@ import json
 import itertools
 import string
 import re
-from os.path import expanduser
-from pkg_resources import resource_filename
 from pathlib import Path
 
-SAMPLE_SETTINGS = resource_filename(__name__, "data/settings.json")
 SETTINGS = "opencanary.conf"
+USER_CONFIG_DIR = Path.home() / ".opencanary"
+USER_CONFIG_PATH = USER_CONFIG_DIR / SETTINGS
+LEGACY_USER_CONFIG_PATH = Path.home() / f".{SETTINGS}"
+LEGACY_SYSTEM_CONFIG_DIR = Path("/etc/opencanary")
+LEGACY_SYSTEM_CONFIG_PATH = LEGACY_SYSTEM_CONFIG_DIR / SETTINGS
 
 
 def expand_vars(var):
@@ -45,9 +47,10 @@ class Config:
         self.__configfile = configfile
 
         files = [
-            "/etc/opencanaryd/%s" % configfile,
-            "%s/.%s" % (expanduser("~"), configfile),
-            configfile,
+            Path(configfile),
+            USER_CONFIG_DIR / configfile,
+            LEGACY_USER_CONFIG_PATH if configfile == SETTINGS else USER_CONFIG_DIR / configfile,
+            LEGACY_SYSTEM_CONFIG_PATH if configfile == SETTINGS else LEGACY_SYSTEM_CONFIG_DIR / configfile,
         ]
         print(
             "** We hope you enjoy using OpenCanary. For more open source Canary goodness, head over to canarytokens.org. **"
@@ -58,10 +61,9 @@ class Config:
                     print("[-] Using config file: %s" % fname)
                     self.__config = json.load(f)
                     self.__config = expand_vars(self.__config)
-                if fname is configfile:
+                if Path(fname) == Path(configfile):
                     print(
-                        "[-] Warning, making use of the configuration file in the immediate directory is not recommended! Suggested locations: %s"
-                        % ", ".join(files[:2])
+                        "[-] Using the configuration file in the current directory."
                     )
                 return
             except IOError as e:
@@ -72,7 +74,7 @@ class Config:
                 print("[-] An error occurred loading %s (%s)" % (fname, e))
         if self.__config is None:
             print(
-                'No config file found. Please create one with "opencanaryd --copyconfig"'
+                f'No config file found. Please create one with "opencanary copyconfig" or place a config at "{USER_CONFIG_PATH}".'
             )
             sys.exit(1)
 

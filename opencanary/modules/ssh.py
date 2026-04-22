@@ -1,5 +1,5 @@
 from opencanary.modules import CanaryService
-from pkg_resources import resource_filename
+from importlib.resources import files
 
 import twisted
 import os
@@ -273,7 +273,7 @@ class HoneyPotSSHFactory(factory.SSHFactory):
         _modulis = [
             "/etc/ssh/moduli",
             "/private/etc/moduli",
-            resource_filename("opencanary", "data/moduli"),
+            str(files("opencanary").joinpath("data/moduli")),
         ]
         _primes = None
         for _moduli in _modulis:

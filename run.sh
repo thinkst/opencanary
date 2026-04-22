@@ -1,14 +1,14 @@
 #! /bin/bash
 
-CONF="/etc/opencanaryd/opencanary.conf"
-TEMP_CONF="/etc/opencanaryd/.opencanary.conf"
+CONF="$HOME/.opencanary/opencanary.conf"
+TEMP_CONF="./opencanary.conf"
 
 if [ -f $CONF ]; then
 	echo "INFO: Main configuration file found"
-	opencanaryd --start
+	opencanary start
 elif [ -f $TEMP_CONF ]; then
 	echo "INFO: Temp configuration file found"
-	opencanaryd --dev
+	opencanary dev
 else
-	opencanaryd --copyconfig && echo "A Config file was generated at /etc/opencanaryd/.opencanary.conf."
+	opencanary copyconfig && echo "A config file was generated at $HOME/.opencanary/opencanary.conf."
 fi

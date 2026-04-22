@@ -24,11 +24,11 @@ OpenCanary ships with a default config, which we'll copy and edit to get started
 
 .. code-block:: sh
 
-   $ opencanaryd --copyconfig
-   $ $EDITOR ~/.opencanary.conf
+   $ opencanary copyconfig
+   $ $EDITOR ~/.opencanary/opencanary.conf
 
 In the config file we'll change **device.node_id** which must be unique for
-each instance of opencanaryd, and we'll configure **logger** to log
+each instance of opencanary, and we'll configure **logger** to log
 alerts to a file.
 
 .. code-block:: json
@@ -55,7 +55,7 @@ With that in place, we can run the daemon and test that it logs a failed FTP log
 
 .. code-block:: sh
 
-   $ opencanaryd --start
+   $ opencanary start
    [...]
    $ ftp localhost
    [...]
@@ -71,16 +71,16 @@ The tool JQ can be used to check that the config file is well-formed JSON.
 
 .. code-block:: sh
 
-   $ jq . ~/.opencanary.conf
+   $ jq . ~/.opencanary/opencanary.conf
 
-Run opencanaryd in the foreground to see more error messages.
+Run opencanary in the foreground to see more error messages.
 
 .. code-block:: sh
 
-   $ opencanaryd --dev
+   $ opencanary dev
 
 You may also easily restart the service using,
 
 .. code-block:: sh
 
-   $ opencanaryd --restart
+   $ opencanary restart

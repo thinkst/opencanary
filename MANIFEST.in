@@ -1,5 +1,6 @@
 recursive-include opencanary/data *
 recursive-include opencanary/modules/data *
+include opencanary/opencanary.tac
 
 recursive-exclude opencanary/test *
 recursive-exclude .github *

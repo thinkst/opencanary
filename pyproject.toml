@@ -23,8 +23,6 @@ classifiers = [
     "Operating System :: POSIX :: Linux",
     "Operating System :: POSIX :: BSD :: FreeBSD",
     "Programming Language :: Python :: 3",
-    "Programming Language :: Python :: 3.8",
-    "Programming Language :: Python :: 3.9",
     "Programming Language :: Python :: 3.10",
     "Programming Language :: Python :: 3.11",
     "Programming Language :: Python :: 3.12",
@@ -34,6 +32,7 @@ classifiers = [
 requires-python = ">= 3.10"
 dependencies = [
     "Twisted==24.11.0",
+    "typer>=0.12",
     "pyasn1==0.4.5",
     "cryptography==46.0.4",
     "simplejson==3.16.0",
@@ -45,7 +44,6 @@ dependencies = [
     "Jinja2==3.1.6",
     "ntlmlib==0.72",
     "bcrypt==3.2.0",
-    "setuptools==78.1.1",
     "urllib3==2.6.3",
     "hpfeeds==3.0.0",
     "pyOpenSSL==25.3.0",
@@ -58,9 +56,14 @@ Homepage = "http://www.thinkst.com/"
 Documentation = "https://github.com/thinkst/opencanary#readme"
 "Source Code" = "https://github.com/thinkst/opencanary"
 
+[project.scripts]
+opencanary = "opencanary.cli:main"
+
 [tool.setuptools]
 include-package-data = true
-script-files = ["bin/opencanaryd", "bin/opencanary.tac"]
+
+[tool.setuptools.package-data]
+opencanary = ["opencanary.tac"]
 
 [tool.setuptools.dynamic]
 version = { attr = "opencanary.__version__" }

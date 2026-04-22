@@ -86,7 +86,7 @@ Please note that this will not wipe your existing OpenCanary config file. If you
 
 .. code-block:: sh
 
-  $ opencanaryd --copyconfig
+  $ opencanary copyconfig
 
 
 
