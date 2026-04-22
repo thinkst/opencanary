@@ -7,16 +7,17 @@ from pathlib import Path
 from typing import Annotated
 
 import typer
+import errno
 from twisted.internet.error import CannotListenError
 from twisted.python import usage
 from twisted.scripts._twistd_unix import ServerOptions, UnixApplicationRunner
 
 from opencanary import __version__
 
-PIDFILE = Path("/var/run/opencanary.pid")
 CONFIG_DIR = Path.home() / ".opencanary"
 CONFIG_NAME = "opencanary.conf"
 CONFIG_PATH = CONFIG_DIR / CONFIG_NAME
+PIDFILE = CONFIG_DIR / "opencanary.pid"
 app = typer.Typer(add_completion=False, no_args_is_help=True)
 
 
@@ -35,15 +36,16 @@ def _run_twistd(options: list[str]) -> int:
     try:
         UnixApplicationRunner(config).run()
     except CannotListenError as exc:
-        if getattr(exc.socketError, "errno", None) == 13 and exc.port is not None and exc.port < 1024:
+        if getattr(exc.socketError, "errno", None) == errno.EACCES and exc.port is not None and exc.port < 1024:
             print(
-                f"Cannot bind to privileged port {exc.port}. Run `sudo opencanary ...` or use a config with ports above 1024 for development.",
+                f"Cannot bind to privileged port {exc.port}. Run `sudo opencanary ...` or use a config with ports 1024 and above for development.",
                 file=sys.stderr,
             )
             return 1
         raise
     except SystemExit as exc:
         code = exc.code
+        print(exc, file=sys.stderr)
         return code if isinstance(code, int) else 1
 
     return 0
@@ -74,6 +76,8 @@ def _twistd_flags(uid: str | None, gid: str | None) -> list[str]:
 
 def _start(uid: str | None, gid: str | None, nodaemon: bool) -> int:
     _warn_drop_privileges(uid, gid)
+    if not nodaemon:
+        CONFIG_DIR.mkdir(parents=True, exist_ok=True)
     with _resource_path("opencanary.tac") as tac_path:
         options = ["--python", str(tac_path)]
         if nodaemon:
@@ -219,7 +223,7 @@ def usermodule() -> None:
     raise typer.Exit(_usermodule())
 
 
-@app.command(help="Create a default config file at ~/.opencanary/opencanary.conf.")
+@app.command(help=f"Create a default config file at {CONFIG_PATH}.")
 def copyconfig() -> None:
     raise typer.Exit(_copyconfig())
 

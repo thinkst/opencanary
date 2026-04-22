@@ -32,7 +32,7 @@ VENV_BIN_DIR = join(VENV_DIR, "bin")
 DEFAULT_LOG_DIR = join(OPENCANARY_DIR, "log")
 
 # daemon config
-DAEMON_CONFIG_DIR = str(Path.home() / ".opencanary")
+DAEMON_CONFIG_DIR = str(pathlib.Path.home() / ".opencanary")
 DAEMON_CONFIG_PATH = join(DAEMON_CONFIG_DIR, CONFIG_FILE_BASENAME)
 DAEMON_PATH = join(VENV_BIN_DIR, "opencanary")
 DAEMON_RUNTIME_OPTIONS = "--dev"

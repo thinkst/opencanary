@@ -10,7 +10,8 @@ SETTINGS = "opencanary.conf"
 USER_CONFIG_DIR = Path.home() / ".opencanary"
 USER_CONFIG_PATH = USER_CONFIG_DIR / SETTINGS
 LEGACY_USER_CONFIG_PATH = Path.home() / f".{SETTINGS}"
-LEGACY_SYSTEM_CONFIG_PATH = Path("/etc/opencanary") / SETTINGS
+LEGACY_SYSTEM_CONFIG_DIR = Path("/etc/opencanary")
+LEGACY_SYSTEM_CONFIG_PATH = LEGACY_SYSTEM_CONFIG_DIR / SETTINGS
 
 
 def expand_vars(var):
@@ -49,7 +50,7 @@ class Config:
             Path(configfile),
             USER_CONFIG_DIR / configfile,
             LEGACY_USER_CONFIG_PATH if configfile == SETTINGS else USER_CONFIG_DIR / configfile,
-            LEGACY_SYSTEM_CONFIG_PATH if configfile == SETTINGS else Path("/etc/opencanary") / configfile,
+            LEGACY_SYSTEM_CONFIG_PATH if configfile == SETTINGS else LEGACY_SYSTEM_CONFIG_DIR / configfile,
         ]
         print(
             "** We hope you enjoy using OpenCanary. For more open source Canary goodness, head over to canarytokens.org. **"
