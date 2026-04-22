@@ -111,7 +111,7 @@ def _usermodule() -> int:
         if current_config.exists() and current_config.read_bytes() != Path(
             usermod_config
         ).read_bytes():
-            print("Backing up old config to ./opencanary.conf.old")
+            print(f"Backing up old config to {current_config.with_suffix('.conf.old')}")
             shutil.copy(current_config, current_config.with_suffix(".conf.old"))
 
         shutil.copy(usermod_config, current_config)
