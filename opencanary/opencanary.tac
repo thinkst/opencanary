@@ -1,10 +1,17 @@
+import os
 import traceback
 import warnings
 import sys
 from importlib.metadata import entry_points
 from twisted.application import service
 
-from opencanary.config import config, is_docker
+from opencanary.config import (
+    CONFIG_PATH_ENVVAR,
+    SETTINGS,
+    is_docker,
+    load_config,
+    validate_config,
+)
 from opencanary.logger import getLogger
 from opencanary.modules.http import CanaryHTTP
 from opencanary.modules.https import CanaryHTTPS
@@ -57,6 +64,18 @@ MODULES = [
     # CanaryExample0,
     # CanaryExample1,
 ]
+
+
+def _load_runtime_config():
+    config = load_config(os.environ.get(CONFIG_PATH_ENVVAR, SETTINGS))
+    errors = validate_config(config)
+    if errors:
+        error_text = "\n".join(str(error) for error in errors)
+        raise RuntimeError(f"Invalid config file {config.source_path}:\n{error_text}")
+    return config
+
+
+config = _load_runtime_config()
 
 if config.moduleEnabled("snmp"):
     try:

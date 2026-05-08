@@ -28,15 +28,15 @@ Rules for execution:
 
 ## Phase 2: Config Loading And Validation
 
-- [ ] Remove config loading side effects from module import in `opencanary/config.py`.
-- [ ] Expose a pure config loading function that returns a config object without exiting the process.
-- [ ] Expose a pure config validation function that returns structured errors.
-- [ ] Move process exit behavior for invalid config into the CLI startup path.
-- [ ] Add unit tests for config file search order.
-- [ ] Add unit tests for environment-variable expansion in config values.
-- [ ] Add unit tests for port collision validation.
-- [ ] Add unit tests for key field validation such as `device.name`, `device.desc`, and `ssh.version`.
-- [ ] Decide whether to keep JSON config or move to a typed schema model as a follow-up phase.
+- [x] Remove config loading side effects from module import in `opencanary/config.py`.
+- [x] Expose a pure config loading function that returns a config object without exiting the process.
+- [x] Expose a pure config validation function that returns structured errors.
+- [x] Move process exit behavior for invalid config into the CLI startup path.
+- [x] Add unit tests for config file search order.
+- [x] Add unit tests for environment-variable expansion in config values.
+- [x] Add unit tests for port collision validation.
+- [x] Add unit tests for key field validation such as `device.name`, `device.desc`, and `ssh.version`.
+- [x] Keep JSON config for now and treat a typed schema model as a follow-up phase after the test and linting work lands.
 
 ## Phase 3: Linting, Formatting, And Type Safety
 
@@ -109,3 +109,4 @@ Rules for execution:
 - Start with Phase 1, Phase 2, and Phase 3. They unblock the rest.
 - Prefer changes that reduce import-time side effects before deeper test refactors.
 - Treat architecture rewrites as follow-up work, not the first milestone.
+- Keep JSON config loading for now; revisit a typed schema after the Phase 3 and Phase 4 groundwork is in place.

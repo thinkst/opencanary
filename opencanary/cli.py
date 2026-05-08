@@ -13,6 +13,12 @@ from twisted.python import usage
 from twisted.scripts._twistd_unix import ServerOptions, UnixApplicationRunner
 
 from opencanary import __version__
+from opencanary.config import (
+    CONFIG_PATH_ENVVAR,
+    ConfigLoadError,
+    load_config,
+    validate_config,
+)
 
 CONFIG_DIR = Path.home() / ".opencanary"
 CONFIG_NAME = "opencanary.conf"
@@ -51,6 +57,24 @@ def _run_twistd(options: list[str]) -> int:
     return 0
 
 
+def _prepare_runtime_config(configfile: str | Path = CONFIG_NAME) -> int:
+    try:
+        config = load_config(configfile)
+    except ConfigLoadError as exc:
+        print(exc, file=sys.stderr)
+        return 1
+
+    errors = validate_config(config)
+    if errors:
+        for error in errors:
+            print(error, file=sys.stderr)
+        return 1
+
+    if config.source_path is not None:
+        os.environ[CONFIG_PATH_ENVVAR] = str(config.source_path)
+    return 0
+
+
 def _read_pid() -> int:
     return int(PIDFILE.read_text().strip())
 
@@ -75,6 +99,10 @@ def _twistd_flags(uid: str | None, gid: str | None) -> list[str]:
 
 
 def _start(uid: str | None, gid: str | None, nodaemon: bool) -> int:
+    config_status = _prepare_runtime_config()
+    if config_status != 0:
+        return config_status
+
     _warn_drop_privileges(uid, gid)
     with _resource_path("opencanary.tac") as tac_path:
         options = ["--python", str(tac_path)]
@@ -114,6 +142,10 @@ def _usermodule() -> int:
             shutil.copy(current_config, current_config.with_suffix(".conf.old"))
 
         shutil.copy(usermod_config, current_config)
+
+    config_status = _prepare_runtime_config(current_config)
+    if config_status != 0:
+        return config_status
 
     with _resource_path("opencanary.tac") as tac_path:
         return _run_twistd(["--nodaemon", "--python", str(tac_path)])
