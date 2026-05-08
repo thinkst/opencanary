@@ -13,6 +13,25 @@ import requests
 from opencanary.iphelper import check_ip
 
 
+def _configured_log_file_locations(logger_config):
+    handlers = logger_config.get("kwargs", {}).get("handlers", {})
+    file_locations = []
+    for handler in handlers.values():
+        filename = handler.get("filename")
+        if filename:
+            file_locations.append(str(filename))
+    return file_locations
+
+
+def _log_file_hint(logger_config):
+    file_locations = _configured_log_file_locations(logger_config)
+    if not file_locations:
+        return ""
+    if len(file_locations) == 1:
+        return f" Log file: {file_locations[0]}"
+    return " Log files: %s" % ", ".join(file_locations)
+
+
 class Singleton(type):
     _instances = {}
 
@@ -43,10 +62,14 @@ def getLogger(config):
     if kwargs is None:
         print("Logger section is missing the kwargs key.", file=sys.stderr)
         exit(1)
+    log_file_hint = _log_file_hint(d)
     try:
         logger = LoggerClass(config, **kwargs)
     except Exception as e:
-        print("An error occurred initialising the logger class", file=sys.stderr)
+        print(
+            f"An error occurred initialising the logger class.{log_file_hint}",
+            file=sys.stderr,
+        )
         print(e)
         exit(1)
 
@@ -155,7 +178,10 @@ class PyLogger(LoggerBase):
         try:
             logging.config.dictConfig(logconfig)
         except Exception as e:
-            print("Invalid logging config", file=sys.stderr)
+            print(
+                f"Invalid logging config.{_log_file_hint({'kwargs': {'handlers': handlers}})}",
+                file=sys.stderr,
+            )
             print(type(e))
             print(e)
             exit(1)
