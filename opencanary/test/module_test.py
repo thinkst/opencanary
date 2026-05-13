@@ -29,7 +29,6 @@ import git
 from pymongo import MongoClient
 from pymongo.errors import OperationFailure
 
-
 MONGODB_PORT = 27017
 MONGODB_VERSION = "4.4.6"
 MONGODB_AUTH_FAILED_CODE = 18
