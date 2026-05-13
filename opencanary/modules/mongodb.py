@@ -7,10 +7,8 @@ It implements the MongoDB wire protocol to respond realistically to connection a
 
 from opencanary.modules import CanaryService
 from twisted.internet.protocol import Protocol, Factory
-from twisted.internet import reactor
-from opencanary import logger
+from twisted.internet import TCPServer
 import struct
-import json
 import re
 from datetime import datetime
 
@@ -180,8 +178,6 @@ class MongoDBProtocol(Protocol):
         if len(payload) < 8:
             return
 
-        flags = struct.unpack("<i", payload[0:4])[0]
-
         null_pos = payload.find(b"\x00", 4)
         if null_pos == -1:
             return
@@ -202,8 +198,6 @@ class MongoDBProtocol(Protocol):
         """Handle OP_MSG messages (modern MongoDB protocol)"""
         if len(payload) < 5:
             return
-
-        flag_bits = struct.unpack(MSG_FLAG_BITS_FORMAT, payload[0:4])[0]
 
         if len(payload) > 4 and payload[4] == MSG_SECTION_KIND_BODY:
             try:
@@ -318,7 +312,7 @@ class MongoDBProtocol(Protocol):
 
         self.transport.write(header + payload)
 
-    def parse_bson(self, data):
+    def parse_bson(self, data):  # noqa: C901
         """
         Minimal BSON parser for extracting key fields.
         Handles common cases for authentication.
@@ -364,7 +358,6 @@ class MongoDBProtocol(Protocol):
                 if pos + 4 > len(data):
                     break
                 bin_length = struct.unpack(BSON_BIN_LEN_FORMAT, data[pos : pos + 4])[0]
-                subtype = data[pos + 4]
                 pos += 5
                 if pos + bin_length > len(data):
                     break
@@ -501,7 +494,7 @@ class CanaryMongoDB(Factory, CanaryService):
         self.log({"action": LOG_ACTION_DISCONNECT}, transport=transport)
 
     def getService(self):
-        return internet.TCPServer(self.port, self, interface=self.listen_addr)
+        return TCPServer(self.port, self, interface=self.listen_addr)
 
 
 CanaryServiceFactory = CanaryMongoDB
