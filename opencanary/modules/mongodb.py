@@ -17,105 +17,105 @@ from datetime import datetime
 # ---------------------------------------------------------------------------
 # Wire protocol opcodes
 # ---------------------------------------------------------------------------
-OPCODE_OP_REPLY  = 1
+OPCODE_OP_REPLY = 1
 OPCODE_OP_INSERT = 2002
 OPCODE_OP_UPDATE = 2001
 OPCODE_OP_DELETE = 2006
-OPCODE_OP_QUERY  = 2004
-OPCODE_OP_MSG    = 2013
+OPCODE_OP_QUERY = 2004
+OPCODE_OP_MSG = 2013
 
 # ---------------------------------------------------------------------------
 # Wire protocol / message framing
 # ---------------------------------------------------------------------------
-MSG_HEADER_SIZE          = 16   # 4 × int32 fields
-MSG_HEADER_FORMAT        = '<iiii'
-MSG_FLAG_BITS_FORMAT     = '<I'
-MSG_FLAG_BITS_NONE       = 0
-MSG_SECTION_KIND_BODY    = 0    # OP_MSG section kind 0: single document body
-MSG_SECTION_KIND_BYTE    = b'\x00'
-SYNTHETIC_REQUEST_ID     = 9999  # request_id used in outbound responses
+MSG_HEADER_SIZE = 16  # 4 × int32 fields
+MSG_HEADER_FORMAT = "<iiii"
+MSG_FLAG_BITS_FORMAT = "<I"
+MSG_FLAG_BITS_NONE = 0
+MSG_SECTION_KIND_BODY = 0  # OP_MSG section kind 0: single document body
+MSG_SECTION_KIND_BYTE = b"\x00"
+SYNTHETIC_REQUEST_ID = 9999  # request_id used in outbound responses
 
 # ---------------------------------------------------------------------------
 # BSON element types
 # ---------------------------------------------------------------------------
-BSON_TYPE_DOUBLE   = 0x01
-BSON_TYPE_STRING   = 0x02
+BSON_TYPE_DOUBLE = 0x01
+BSON_TYPE_STRING = 0x02
 BSON_TYPE_DOCUMENT = 0x03
-BSON_TYPE_BINARY   = 0x05
-BSON_TYPE_BOOLEAN  = 0x08
-BSON_TYPE_INT32    = 0x10
-BSON_TYPE_EOD      = 0x00   # End-of-document marker
+BSON_TYPE_BINARY = 0x05
+BSON_TYPE_BOOLEAN = 0x08
+BSON_TYPE_INT32 = 0x10
+BSON_TYPE_EOD = 0x00  # End-of-document marker
 
-BSON_BOOL_TRUE     = b'\x01'
-BSON_BOOL_FALSE    = b'\x00'
-BSON_MIN_DOC_SIZE  = 5       # 4-byte length + 1-byte EOD
+BSON_BOOL_TRUE = b"\x01"
+BSON_BOOL_FALSE = b"\x00"
+BSON_MIN_DOC_SIZE = 5  # 4-byte length + 1-byte EOD
 
 # ---------------------------------------------------------------------------
 # BSON string encoding
 # ---------------------------------------------------------------------------
-BSON_STRING_FORMAT = '<i'
-BSON_DOC_LEN_FORMAT = '<i'
-BSON_BIN_LEN_FORMAT = '<i'
+BSON_STRING_FORMAT = "<i"
+BSON_DOC_LEN_FORMAT = "<i"
+BSON_BIN_LEN_FORMAT = "<i"
 
 # ---------------------------------------------------------------------------
 # MongoDB server capability constants (advertised in isMaster response)
 # ---------------------------------------------------------------------------
-MONGO_MAX_BSON_OBJECT_SIZE        = 16_777_216
-MONGO_MAX_MESSAGE_SIZE_BYTES      = 48_000_000
-MONGO_MAX_WRITE_BATCH_SIZE        = 100_000
+MONGO_MAX_BSON_OBJECT_SIZE = 16_777_216
+MONGO_MAX_MESSAGE_SIZE_BYTES = 48_000_000
+MONGO_MAX_WRITE_BATCH_SIZE = 100_000
 MONGO_LOGICAL_SESSION_TIMEOUT_MIN = 30
-MONGO_CONNECTION_ID               = 1
-MONGO_MIN_WIRE_VERSION            = 0
-MONGO_MAX_WIRE_VERSION            = 8
+MONGO_CONNECTION_ID = 1
+MONGO_MIN_WIRE_VERSION = 0
+MONGO_MAX_WIRE_VERSION = 8
 
 # ---------------------------------------------------------------------------
 # MongoDB error / result codes
 # ---------------------------------------------------------------------------
-MONGO_OK_TRUE  = 1.0
+MONGO_OK_TRUE = 1.0
 MONGO_OK_FALSE = 0.0
 
-MONGO_ERR_AUTH_FAILED_CODE   = 18
-MONGO_ERR_AUTH_FAILED_NAME   = 'AuthenticationFailed'
-MONGO_ERR_AUTH_FAILED_MSG    = 'Authentication failed.'
+MONGO_ERR_AUTH_FAILED_CODE = 18
+MONGO_ERR_AUTH_FAILED_NAME = "AuthenticationFailed"
+MONGO_ERR_AUTH_FAILED_MSG = "Authentication failed."
 
-MONGO_ERR_UNAUTHORIZED_CODE  = 13
-MONGO_ERR_UNAUTHORIZED_NAME  = 'Unauthorized'
-MONGO_ERR_AUTH_REQUIRED_MSG  = 'Authentication required'
+MONGO_ERR_UNAUTHORIZED_CODE = 13
+MONGO_ERR_UNAUTHORIZED_NAME = "Unauthorized"
+MONGO_ERR_AUTH_REQUIRED_MSG = "Authentication required"
 
 # ---------------------------------------------------------------------------
 # SASL / authentication
 # ---------------------------------------------------------------------------
-SASL_SCRAM_USERNAME_PATTERN = r'n=(.+?),'   # SCRAM client-first-message username field
-AUTH_UNKNOWN_USER           = 'unknown'
-AUTH_DEFAULT_MECHANISM      = 'SCRAM-SHA-1'
+SASL_SCRAM_USERNAME_PATTERN = r"n=(.+?),"  # SCRAM client-first-message username field
+AUTH_UNKNOWN_USER = "unknown"
+AUTH_DEFAULT_MECHANISM = "SCRAM-SHA-1"
 
 # ---------------------------------------------------------------------------
 # Logging action strings
 # ---------------------------------------------------------------------------
-LOG_ACTION_CONNECTION   = 'mongodb.connection'
-LOG_ACTION_AUTH_ATTEMPT = 'mongodb.auth_attempt'
-LOG_ACTION_COMMAND      = 'mongodb.command'
-LOG_ACTION_ERROR        = 'mongodb.error'
-LOG_ACTION_DISCONNECT   = 'mongodb.disconnect'
+LOG_ACTION_CONNECTION = "mongodb.connection"
+LOG_ACTION_AUTH_ATTEMPT = "mongodb.auth_attempt"
+LOG_ACTION_COMMAND = "mongodb.command"
+LOG_ACTION_ERROR = "mongodb.error"
+LOG_ACTION_DISCONNECT = "mongodb.disconnect"
 
-LOG_TYPE_MONGODB = 20001   # OpenCanary logtype for MongoDB events
+LOG_TYPE_MONGODB = 20001  # OpenCanary logtype for MongoDB events
 
 # ---------------------------------------------------------------------------
 # Config keys and their defaults
 # ---------------------------------------------------------------------------
-CONFIG_KEY_PORT         = 'mongodb.port'
-CONFIG_KEY_VERSION      = 'mongodb.version'
-CONFIG_KEY_LISTEN_ADDR  = 'device.listen_addr'
+CONFIG_KEY_PORT = "mongodb.port"
+CONFIG_KEY_VERSION = "mongodb.version"
+CONFIG_KEY_LISTEN_ADDR = "device.listen_addr"
 
-CONFIG_DEFAULT_PORT         = 27017
-CONFIG_DEFAULT_VERSION      = '4.4.6'
-CONFIG_DEFAULT_LISTEN_ADDR  = ''
+CONFIG_DEFAULT_PORT = 27017
+CONFIG_DEFAULT_VERSION = "4.4.6"
+CONFIG_DEFAULT_LISTEN_ADDR = ""
 
 # ---------------------------------------------------------------------------
 # Query collection / command names
 # ---------------------------------------------------------------------------
-CMD_COLLECTION_SUFFIX = '$cmd'
-CMD_QUERY_PREFIX      = 'query:'
+CMD_COLLECTION_SUFFIX = "$cmd"
+CMD_QUERY_PREFIX = "query:"
 
 
 class MongoDBProtocol(Protocol):
@@ -126,7 +126,7 @@ class MongoDBProtocol(Protocol):
 
     def __init__(self, factory):
         self.factory = factory
-        self.buffer = b''
+        self.buffer = b""
         self.authenticated = False
 
     def connectionMade(self):
@@ -145,7 +145,7 @@ class MongoDBProtocol(Protocol):
             if len(self.buffer) < 4:
                 break
 
-            msg_length = struct.unpack('<i', self.buffer[0:4])[0]
+            msg_length = struct.unpack("<i", self.buffer[0:4])[0]
 
             if len(self.buffer) < msg_length:
                 break  # Wait for complete message
@@ -180,15 +180,17 @@ class MongoDBProtocol(Protocol):
         if len(payload) < 8:
             return
 
-        flags = struct.unpack('<i', payload[0:4])[0]
+        flags = struct.unpack("<i", payload[0:4])[0]
 
-        null_pos = payload.find(b'\x00', 4)
+        null_pos = payload.find(b"\x00", 4)
         if null_pos == -1:
             return
 
-        collection_name = payload[4:null_pos].decode('utf-8', errors='ignore')
+        collection_name = payload[4:null_pos].decode("utf-8", errors="ignore")
 
-        query_start = null_pos + 1 + 8  # +1 for null, +8 for numberToSkip and numberToReturn
+        query_start = (
+            null_pos + 1 + 8
+        )  # +1 for null, +8 for numberToSkip and numberToReturn
         if query_start < len(payload):
             try:
                 query_doc = self.parse_bson(payload[query_start:])
@@ -207,12 +209,12 @@ class MongoDBProtocol(Protocol):
             try:
                 doc = self.parse_bson(payload[5:])
 
-                if 'saslStart' in doc or 'authenticate' in doc:
+                if "saslStart" in doc or "authenticate" in doc:
                     self.handle_auth_attempt(request_id, doc)
-                elif 'ismaster' in doc or 'isMaster' in doc or 'hello' in doc:
+                elif "ismaster" in doc or "isMaster" in doc or "hello" in doc:
                     self.send_ismaster_response(request_id)
                 else:
-                    command = list(doc.keys())[0] if doc else 'unknown'
+                    command = list(doc.keys())[0] if doc else "unknown"
                     self.factory.log_command(self.transport, command, doc)
                     self.send_error_response(request_id, MONGO_ERR_AUTH_REQUIRED_MSG)
             except Exception:
@@ -220,13 +222,15 @@ class MongoDBProtocol(Protocol):
 
     def handle_query(self, request_id, collection, query):
         """Handle query operations and check for authentication"""
-        self.factory.log_command(self.transport, f"{CMD_QUERY_PREFIX}{collection}", query)
+        self.factory.log_command(
+            self.transport, f"{CMD_QUERY_PREFIX}{collection}", query
+        )
 
         if CMD_COLLECTION_SUFFIX in collection and query:
-            if 'authenticate' in query or 'saslStart' in query:
+            if "authenticate" in query or "saslStart" in query:
                 self.handle_auth_attempt(request_id, query)
                 return
-            elif 'ismaster' in query or 'isMaster' in query:
+            elif "ismaster" in query or "isMaster" in query:
                 self.send_ismaster_response(request_id)
                 return
 
@@ -234,20 +238,19 @@ class MongoDBProtocol(Protocol):
 
     def handle_auth_attempt(self, request_id, auth_doc):
         """Log authentication attempts and send response"""
-        username  = auth_doc.get('user', auth_doc.get('username', AUTH_UNKNOWN_USER))
-        mechanism = auth_doc.get('mechanism', AUTH_DEFAULT_MECHANISM)
+        username = auth_doc.get("user", auth_doc.get("username", AUTH_UNKNOWN_USER))
+        mechanism = auth_doc.get("mechanism", AUTH_DEFAULT_MECHANISM)
 
-        if username == AUTH_UNKNOWN_USER and 'payload' in auth_doc:
-            payload = auth_doc['payload']
+        if username == AUTH_UNKNOWN_USER and "payload" in auth_doc:
+            payload = auth_doc["payload"]
             if isinstance(payload, bytes):
-                payload_str = payload.decode('utf-8', errors='ignore')
+                payload_str = payload.decode("utf-8", errors="ignore")
                 match = re.search(SASL_SCRAM_USERNAME_PATTERN, payload_str)
                 if match:
                     username = match.group(1)
 
         printable_doc = {
-            k: (v.hex() if isinstance(v, bytes) else v)
-            for k, v in auth_doc.items()
+            k: (v.hex() if isinstance(v, bytes) else v) for k, v in auth_doc.items()
         }
 
         self.factory.log_auth_attempt(
@@ -262,38 +265,38 @@ class MongoDBProtocol(Protocol):
     def send_ismaster_response(self, request_id):
         """Send isMaster/hello response with MongoDB version info"""
         response_doc = {
-            'ismaster':                     True,
-            'maxBsonObjectSize':            MONGO_MAX_BSON_OBJECT_SIZE,
-            'maxMessageSizeBytes':          MONGO_MAX_MESSAGE_SIZE_BYTES,
-            'maxWriteBatchSize':            MONGO_MAX_WRITE_BATCH_SIZE,
-            'localTime':                    datetime.utcnow().isoformat(),
-            'logicalSessionTimeoutMinutes': MONGO_LOGICAL_SESSION_TIMEOUT_MIN,
-            'connectionId':                 MONGO_CONNECTION_ID,
-            'minWireVersion':               MONGO_MIN_WIRE_VERSION,
-            'maxWireVersion':               MONGO_MAX_WIRE_VERSION,
-            'readOnly':                     False,
-            'ok':                           MONGO_OK_TRUE,
-            'version':                      self.factory.mongo_version,
+            "ismaster": True,
+            "maxBsonObjectSize": MONGO_MAX_BSON_OBJECT_SIZE,
+            "maxMessageSizeBytes": MONGO_MAX_MESSAGE_SIZE_BYTES,
+            "maxWriteBatchSize": MONGO_MAX_WRITE_BATCH_SIZE,
+            "localTime": datetime.utcnow().isoformat(),
+            "logicalSessionTimeoutMinutes": MONGO_LOGICAL_SESSION_TIMEOUT_MIN,
+            "connectionId": MONGO_CONNECTION_ID,
+            "minWireVersion": MONGO_MIN_WIRE_VERSION,
+            "maxWireVersion": MONGO_MAX_WIRE_VERSION,
+            "readOnly": False,
+            "ok": MONGO_OK_TRUE,
+            "version": self.factory.mongo_version,
         }
         self.send_op_msg_response(request_id, response_doc)
 
     def send_auth_failure(self, request_id):
         """Send authentication failure response"""
         response_doc = {
-            'ok':       MONGO_OK_FALSE,
-            'errmsg':   MONGO_ERR_AUTH_FAILED_MSG,
-            'code':     MONGO_ERR_AUTH_FAILED_CODE,
-            'codeName': MONGO_ERR_AUTH_FAILED_NAME,
+            "ok": MONGO_OK_FALSE,
+            "errmsg": MONGO_ERR_AUTH_FAILED_MSG,
+            "code": MONGO_ERR_AUTH_FAILED_CODE,
+            "codeName": MONGO_ERR_AUTH_FAILED_NAME,
         }
         self.send_op_msg_response(request_id, response_doc)
 
     def send_error_response(self, request_id, error_msg):
         """Send generic error response"""
         response_doc = {
-            'ok':       MONGO_OK_FALSE,
-            'errmsg':   error_msg,
-            'code':     MONGO_ERR_UNAUTHORIZED_CODE,
-            'codeName': MONGO_ERR_UNAUTHORIZED_NAME,
+            "ok": MONGO_OK_FALSE,
+            "errmsg": error_msg,
+            "code": MONGO_ERR_UNAUTHORIZED_CODE,
+            "codeName": MONGO_ERR_UNAUTHORIZED_NAME,
         }
         self.send_op_msg_response(request_id, response_doc)
 
@@ -302,7 +305,7 @@ class MongoDBProtocol(Protocol):
         bson_doc = self.encode_bson(doc)
 
         flag_bits = struct.pack(MSG_FLAG_BITS_FORMAT, MSG_FLAG_BITS_NONE)
-        payload   = flag_bits + MSG_SECTION_KIND_BYTE + bson_doc
+        payload = flag_bits + MSG_SECTION_KIND_BYTE + bson_doc
 
         msg_length = MSG_HEADER_SIZE + len(payload)
         header = struct.pack(
@@ -337,40 +340,42 @@ class MongoDBProtocol(Protocol):
 
             pos += 1
 
-            null_pos = data.find(b'\x00', pos)
+            null_pos = data.find(b"\x00", pos)
             if null_pos == -1:
                 break
 
-            field_name = data[pos:null_pos].decode('utf-8', errors='ignore')
+            field_name = data[pos:null_pos].decode("utf-8", errors="ignore")
             pos = null_pos + 1
 
             if element_type == BSON_TYPE_STRING:
                 if pos + 4 > len(data):
                     break
-                str_length = struct.unpack(BSON_STRING_FORMAT, data[pos:pos+4])[0]
+                str_length = struct.unpack(BSON_STRING_FORMAT, data[pos : pos + 4])[0]
                 pos += 4
                 if pos + str_length > len(data):
                     break
-                value = data[pos:pos+str_length-1].decode('utf-8', errors='ignore')
+                value = data[pos : pos + str_length - 1].decode(
+                    "utf-8", errors="ignore"
+                )
                 pos += str_length
                 result[field_name] = value
 
             elif element_type == BSON_TYPE_BINARY:
                 if pos + 4 > len(data):
                     break
-                bin_length = struct.unpack(BSON_BIN_LEN_FORMAT, data[pos:pos+4])[0]
-                subtype = data[pos+4]
+                bin_length = struct.unpack(BSON_BIN_LEN_FORMAT, data[pos : pos + 4])[0]
+                subtype = data[pos + 4]
                 pos += 5
                 if pos + bin_length > len(data):
                     break
-                value = data[pos:pos+bin_length]
+                value = data[pos : pos + bin_length]
                 pos += bin_length
                 result[field_name] = value
 
             elif element_type == BSON_TYPE_INT32:
                 if pos + 4 > len(data):
                     break
-                value = struct.unpack('<i', data[pos:pos+4])[0]
+                value = struct.unpack("<i", data[pos : pos + 4])[0]
                 pos += 4
                 result[field_name] = value
 
@@ -384,7 +389,9 @@ class MongoDBProtocol(Protocol):
             elif element_type == BSON_TYPE_DOCUMENT:
                 if pos + 4 > len(data):
                     break
-                subdoc_length = struct.unpack(BSON_DOC_LEN_FORMAT, data[pos:pos+4])[0]
+                subdoc_length = struct.unpack(BSON_DOC_LEN_FORMAT, data[pos : pos + 4])[
+                    0
+                ]
                 if pos + subdoc_length > len(data):
                     break
                 pos += subdoc_length  # Simplified: skip sub-documents
@@ -399,13 +406,13 @@ class MongoDBProtocol(Protocol):
         Minimal BSON encoder for responses.
         Handles strings, numbers, and booleans.
         """
-        body = b''
+        body = b""
 
         for key, value in doc.items():
-            key_bytes = key.encode('utf-8') + b'\x00'
+            key_bytes = key.encode("utf-8") + b"\x00"
 
             if isinstance(value, str):
-                str_bytes = value.encode('utf-8') + b'\x00'
+                str_bytes = value.encode("utf-8") + b"\x00"
                 body += (
                     bytes([BSON_TYPE_STRING])
                     + key_bytes
@@ -419,17 +426,9 @@ class MongoDBProtocol(Protocol):
                     + (BSON_BOOL_TRUE if value else BSON_BOOL_FALSE)
                 )
             elif isinstance(value, int):
-                body += (
-                    bytes([BSON_TYPE_INT32])
-                    + key_bytes
-                    + struct.pack('<i', value)
-                )
+                body += bytes([BSON_TYPE_INT32]) + key_bytes + struct.pack("<i", value)
             elif isinstance(value, float):
-                body += (
-                    bytes([BSON_TYPE_DOUBLE])
-                    + key_bytes
-                    + struct.pack('<d', value)
-                )
+                body += bytes([BSON_TYPE_DOUBLE]) + key_bytes + struct.pack("<d", value)
 
         body += bytes([BSON_TYPE_EOD])
 
@@ -449,14 +448,18 @@ class CanaryMongoDB(Factory, CanaryService):
     Logs all connection attempts, commands, and authentication attempts.
     """
 
-    NAME = 'mongodb'
+    NAME = "mongodb"
 
     def __init__(self, config=None, logger=None):
         CanaryService.__init__(self, config=config, logger=logger)
-        self.port         = int(config.getVal(CONFIG_KEY_PORT,        default=CONFIG_DEFAULT_PORT))
-        self.mongo_version = config.getVal(CONFIG_KEY_VERSION,        default=CONFIG_DEFAULT_VERSION)
-        self.listen_addr   = config.getVal(CONFIG_KEY_LISTEN_ADDR,    default=CONFIG_DEFAULT_LISTEN_ADDR)
-        self.logtype       = LOG_TYPE_MONGODB
+        self.port = int(config.getVal(CONFIG_KEY_PORT, default=CONFIG_DEFAULT_PORT))
+        self.mongo_version = config.getVal(
+            CONFIG_KEY_VERSION, default=CONFIG_DEFAULT_VERSION
+        )
+        self.listen_addr = config.getVal(
+            CONFIG_KEY_LISTEN_ADDR, default=CONFIG_DEFAULT_LISTEN_ADDR
+        )
+        self.logtype = LOG_TYPE_MONGODB
 
     def buildProtocol(self, addr):
         """Factory method to build protocol instances"""
@@ -464,16 +467,16 @@ class CanaryMongoDB(Factory, CanaryService):
 
     def log_connection(self, transport):
         """Log new connection"""
-        self.log({'action': LOG_ACTION_CONNECTION}, transport=transport)
+        self.log({"action": LOG_ACTION_CONNECTION}, transport=transport)
 
     def log_auth_attempt(self, transport, username, mechanism, auth_doc):
         """Log authentication attempt"""
         self.log(
             {
-                'action':    LOG_ACTION_AUTH_ATTEMPT,
-                'username':  username,
-                'mechanism': mechanism,
-                'auth_data': str(auth_doc),
+                "action": LOG_ACTION_AUTH_ATTEMPT,
+                "username": username,
+                "mechanism": mechanism,
+                "auth_data": str(auth_doc),
             },
             transport=transport,
         )
@@ -482,20 +485,20 @@ class CanaryMongoDB(Factory, CanaryService):
         """Log MongoDB command"""
         self.log(
             {
-                'action':  LOG_ACTION_COMMAND,
-                'command': command,
-                'query':   str(query),
+                "action": LOG_ACTION_COMMAND,
+                "command": command,
+                "query": str(query),
             },
             transport=transport,
         )
 
     def log_error(self, transport, error):
         """Log protocol error"""
-        self.log({'action': LOG_ACTION_ERROR, 'error': error}, transport=transport)
+        self.log({"action": LOG_ACTION_ERROR, "error": error}, transport=transport)
 
     def log_disconnect(self, transport):
         """Log disconnection"""
-        self.log({'action': LOG_ACTION_DISCONNECT}, transport=transport)
+        self.log({"action": LOG_ACTION_DISCONNECT}, transport=transport)
 
     def getService(self):
         return internet.TCPServer(self.port, self, interface=self.listen_addr)
