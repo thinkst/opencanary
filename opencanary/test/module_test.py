@@ -26,6 +26,20 @@ import requests
 import paramiko
 import pymysql
 import git
+from pymongo import MongoClient
+from pymongo.errors import OperationFailure
+
+
+MONGODB_PORT = 27017
+MONGODB_VERSION = "4.4.6"
+MONGODB_AUTH_FAILED_CODE = 18
+MONGODB_UNAUTHORIZED_CODE = 13
+MONGODB_CLIENT_OPTIONS = {
+    "serverSelectionTimeoutMS": 2000,
+    "connectTimeoutMS": 2000,
+    "socketTimeoutMS": 2000,
+    "directConnection": True,
+}
 
 
 def get_last_log():
@@ -45,6 +59,37 @@ def get_last_n_logs(n):
     last_n_lines = lines[-n:]
     deserialized_data = [json.loads(line) for line in last_n_lines]
     return deserialized_data
+
+
+def get_log_count():
+    with open("/var/tmp/opencanary.log", "r") as file:
+        return len(file.readlines())
+
+
+def get_mongodb_log(action, start_line, logdata=None):
+    logdata = logdata or {}
+    for _ in range(10):
+        for log in reversed(get_logs_after(start_line)):
+            if log["dst_port"] != MONGODB_PORT:
+                continue
+            if log["logdata"].get("action") != action:
+                continue
+            if not all(log["logdata"].get(k) == v for k, v in logdata.items()):
+                continue
+            return log
+        time.sleep(0.1)
+
+    return None
+
+
+def get_logs_after(start_line):
+    with open("/var/tmp/opencanary.log", "r") as file:
+        lines = file.readlines()[start_line:]
+    return [json.loads(line) for line in lines]
+
+
+def get_mongodb_client(uri="mongodb://localhost:27017"):
+    return MongoClient(uri, **MONGODB_CLIENT_OPTIONS)
 
 
 class TestFTPModule(unittest.TestCase):
@@ -502,6 +547,81 @@ class TestMySQLModule(unittest.TestCase):
         self.assertEqual(log["logtype"], 9003)
         self.assertEqual(log["dst_port"], 3306)
         self.assertEqual(log["logdata"], {})
+
+
+class TestMongoDBModule(unittest.TestCase):
+    """
+    Tests the MongoDB server with a real MongoDB client.
+    """
+
+    def setUp(self):
+        self.log_start = get_log_count()
+        self.client = get_mongodb_client()
+
+    def test_mongodb_hello(self):
+        """
+        Connect to the MongoDB service and send a hello command.
+        """
+        response = self.client.admin.command("hello")
+
+        self.assertEqual(response["ok"], 1.0)
+        self.assertTrue(response["ismaster"])
+        self.assertEqual(response["version"], MONGODB_VERSION)
+
+        last_log = get_mongodb_log("mongodb.connection", self.log_start)
+        self.assertIsNotNone(last_log)
+        self.assertEqual(last_log["logtype"], 20001)
+        self.assertEqual(last_log["dst_port"], MONGODB_PORT)
+        self.assertEqual(last_log["logdata"]["action"], "mongodb.connection")
+
+    def test_mongodb_auth_attempt(self):
+        """
+        Try to authenticate to the MongoDB service.
+        """
+        self.client.close()
+        self.client = get_mongodb_client(
+            "mongodb://test_user:test_pass@localhost:27017/admin?"
+            "authMechanism=SCRAM-SHA-256"
+        )
+
+        with self.assertRaises(OperationFailure) as error:
+            self.client.admin.command("ping")
+
+        self.assertEqual(error.exception.code, MONGODB_AUTH_FAILED_CODE)
+        last_log = get_mongodb_log(
+            "mongodb.auth_attempt",
+            self.log_start,
+            {"username": "test_user", "mechanism": "SCRAM-SHA-256"},
+        )
+        self.assertIsNotNone(last_log)
+        self.assertEqual(last_log["logtype"], 20001)
+        self.assertEqual(last_log["dst_port"], MONGODB_PORT)
+        self.assertEqual(last_log["logdata"]["action"], "mongodb.auth_attempt")
+        self.assertEqual(last_log["logdata"]["username"], "test_user")
+        self.assertEqual(last_log["logdata"]["mechanism"], "SCRAM-SHA-256")
+        self.assertIn("payload", last_log["logdata"]["auth_data"])
+
+    def test_mongodb_command_attempt(self):
+        """
+        Try to run an unauthenticated MongoDB command.
+        """
+        with self.assertRaises(OperationFailure) as error:
+            self.client.admin.command("listDatabases")
+
+        self.assertEqual(error.exception.code, MONGODB_UNAUTHORIZED_CODE)
+
+        last_log = get_mongodb_log(
+            "mongodb.command", self.log_start, {"command": "listDatabases"}
+        )
+        self.assertIsNotNone(last_log)
+        self.assertEqual(last_log["logtype"], 20001)
+        self.assertEqual(last_log["dst_port"], MONGODB_PORT)
+        self.assertEqual(last_log["logdata"]["action"], "mongodb.command")
+        self.assertEqual(last_log["logdata"]["command"], "listDatabases")
+        self.assertIn("listDatabases", last_log["logdata"]["query"])
+
+    def tearDown(self):
+        self.client.close()
 
 
 class TestRDPModule(unittest.TestCase):

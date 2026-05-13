@@ -126,10 +126,22 @@ class MongoDBProtocol(Protocol):
         self.factory = factory
         self.buffer = b""
         self.authenticated = False
+        self.transport_log_data = {}
 
     def connectionMade(self):
         """Log new connection attempts"""
+        self.transport_log_data = self.get_transport_log_data()
         self.factory.log_connection(self.transport)
+
+    def get_transport_log_data(self):
+        us = self.transport.getHost()
+        peer = self.transport.getPeer()
+        return {
+            "src_host": peer.host,
+            "src_port": peer.port,
+            "dst_host": us.host,
+            "dst_port": us.port,
+        }
 
     def dataReceived(self, data):
         """
@@ -430,7 +442,7 @@ class MongoDBProtocol(Protocol):
 
     def connectionLost(self, reason):
         """Log connection closure"""
-        self.factory.log_disconnect(self.transport)
+        self.factory.log_disconnect(**self.transport_log_data)
 
 
 class CanaryMongoDB(Factory, CanaryService):
@@ -489,9 +501,9 @@ class CanaryMongoDB(Factory, CanaryService):
         """Log protocol error"""
         self.log({"action": LOG_ACTION_ERROR, "error": error}, transport=transport)
 
-    def log_disconnect(self, transport):
+    def log_disconnect(self, **kwargs):
         """Log disconnection"""
-        self.log({"action": LOG_ACTION_DISCONNECT}, transport=transport)
+        self.log({"action": LOG_ACTION_DISCONNECT}, **kwargs)
 
     def getService(self):
         return internet.TCPServer(self.port, self, interface=self.listen_addr)
