@@ -22,19 +22,19 @@ class SynLogWatcher(FileSystemWatcher):
             try:
                 if "canaryfw: " in line:
                     logtype = self.logger.LOG_PORT_SYN
-                    (rubbish, log) = line.split("canaryfw: ")
+                    rubbish, log = line.split("canaryfw: ")
                 elif "canarynmapNULL" in line:
                     logtype = self.logger.LOG_PORT_NMAPNULL
-                    (rubbish, log) = line.split("canarynmapNULL: ")
+                    rubbish, log = line.split("canarynmapNULL: ")
                 elif "canarynmapXMAS" in line:
                     logtype = self.logger.LOG_PORT_NMAPXMAS
-                    (rubbish, log) = line.split("canarynmapXMAS: ")
+                    rubbish, log = line.split("canarynmapXMAS: ")
                 elif "canarynmapFIN" in line:
                     logtype = self.logger.LOG_PORT_NMAPFIN
-                    (rubbish, log) = line.split("canarynmapFIN: ")
+                    rubbish, log = line.split("canarynmapFIN: ")
                 elif "canarynmap: " in line:
                     logtype = self.logger.LOG_PORT_NMAPOS
-                    (rubbish, log) = line.split("canarynmap: ")
+                    rubbish, log = line.split("canarynmap: ")
                 else:
                     continue
             except ValueError:
@@ -43,7 +43,7 @@ class SynLogWatcher(FileSystemWatcher):
             kv = {}
             for tag in tags:
                 if tag.find("=") >= 0:
-                    (key, val) = tag.split("=")
+                    key, val = tag.split("=")
                 else:
                     key = tag
                     val = ""

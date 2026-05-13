@@ -21,11 +21,8 @@ class CanaryProtocol(protocol.Protocol):
             kwargs["transport"] = self.transport
             return self.factory.log(*args, **kwargs)
 
-        raise AttributeError(
-            """Instance of %s does not have 'factory' attribute
-        or factory does not have a log function."""
-            % self.__class__.__name__
-        )
+        raise AttributeError("""Instance of %s does not have 'factory' attribute
+        or factory does not have a log function.""" % self.__class__.__name__)
 
 
 protocol.Protocol = CanaryProtocol

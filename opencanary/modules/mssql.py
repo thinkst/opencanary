@@ -137,7 +137,7 @@ class MSSQLProtocol(Protocol, TimeoutMixin):
             return None
 
         def getOption(i):
-            (token, offset, length) = struct.unpack(">BHH", options[i : i + 5])
+            token, offset, length = struct.unpack(">BHH", options[i : i + 5])
             tokendata = data[offset : offset + length]
             assert len(tokendata) == length
             return PreLoginOption._make((token, tokendata))
