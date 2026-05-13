@@ -7,7 +7,7 @@ It implements the MongoDB wire protocol to respond realistically to connection a
 
 from opencanary.modules import CanaryService
 from twisted.internet.protocol import Protocol, Factory
-from twisted.internet import TCPServer
+from twisted.application import internet
 import struct
 import re
 from datetime import datetime
@@ -494,7 +494,7 @@ class CanaryMongoDB(Factory, CanaryService):
         self.log({"action": LOG_ACTION_DISCONNECT}, transport=transport)
 
     def getService(self):
-        return TCPServer(self.port, self, interface=self.listen_addr)
+        return internet.TCPServer(self.port, self, interface=self.listen_addr)
 
 
 CanaryServiceFactory = CanaryMongoDB
