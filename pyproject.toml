@@ -34,10 +34,10 @@ classifiers = [
 requires-python = ">= 3.10"
 dependencies = [
     "Twisted==24.11.0",
-    "pyasn1==0.4.5",
-    "cryptography==46.0.4",
+    "pyasn1==0.6.3",
+    "cryptography==46.0.7",
     "simplejson==3.16.0",
-    "requests==2.32.4",
+    "requests==2.33.0",
     "zope.interface==7.2",
     "PyPDF2==1.27.9",
     "fpdf==1.7.2",
@@ -70,10 +70,10 @@ exclude = ["docs", "docs*", "opencanary.test", "opencanary.test*"]
 
 [dependency-groups]
 dev = [
-    "gitpython>=3.1.46",
+    "gitpython>=3.1.49",
     "paramiko==3.4.0",
     "pymongo>=4.17.0",
     "pymysql>=1.1.2",
-    "pytest>=9.0.2",
+    "pytest>=9.0.3",
     "requests>=2.32.4",
 ]
