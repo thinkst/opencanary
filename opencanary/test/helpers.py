@@ -1,7 +1,6 @@
 import json
 import time
 
-
 LOG_PATH = "/var/tmp/opencanary.log"
 
 
