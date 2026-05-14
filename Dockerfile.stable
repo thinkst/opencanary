@@ -1,4 +1,4 @@
-FROM python:3.10-buster
+FROM python:3.10-bookworm
 
 # Download cache lists and install minimal versions
 RUN apt-get update && apt-get -yq install --no-install-recommends \
