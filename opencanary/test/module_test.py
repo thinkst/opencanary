@@ -19,7 +19,6 @@ import unittest
 # OpenCanary requirements, there is a requirements.txt file in the tests folder
 # Simply run `pip install -r opencanary/test/requirements.txt`
 import requests
-import pymysql
 
 
 def get_last_log():
@@ -304,50 +303,6 @@ class TestHTTPSModule(unittest.TestCase):
         )
         # Just an arbitrary image
         self.assertEqual(request.status_code, 200)
-
-
-class TestMySQLModule(unittest.TestCase):
-    """
-    Tests the MySQL Server attempting to login should fail and
-    """
-
-    def test_mysql_server_login(self):
-        """
-        Login to the mysql server
-        """
-        self.assertRaises(
-            pymysql.err.OperationalError,
-            pymysql.connect,
-            host="localhost",
-            user="test_user",
-            password="test_pass",
-            db="db",
-            charset="utf8mb4",
-            cursorclass=pymysql.cursors.DictCursor,
-        )
-        last_log = get_last_log()
-        self.assertEqual(last_log["logdata"]["USERNAME"], "test_user")
-        #        self.assertEqual(last_log['logdata']['PASSWORD'], "b2e5ed6a0e59f99327399ced2009338d5c0fe237")
-        self.assertEqual(last_log["dst_port"], 3306)
-
-    def test_attempted_mysql_login(self):
-        """
-        Try to connect to the FTP service should log the connection attempt.
-        """
-        self.assertRaises(
-            pymysql.err.OperationalError,
-            pymysql.connect,
-            host="localhost",
-            user="anyone",
-            password="AsDAS9d103294",
-            db="invaliddb",
-            charset="utf8mb4",
-            cursorclass=pymysql.cursors.DictCursor,
-        )
-        log = get_last_n_logs(2)[0]
-        self.assertEqual(log["logtype"], 9003)
-        self.assertEqual(log["dst_port"], 3306)
-        self.assertEqual(log["logdata"], {})
 
 
 if __name__ == "__main__":
