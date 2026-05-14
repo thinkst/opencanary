@@ -7,10 +7,8 @@ It implements the MongoDB wire protocol to respond realistically to connection a
 
 from opencanary.modules import CanaryService
 from twisted.internet.protocol import Protocol, Factory
-from twisted.internet import reactor
-from opencanary import logger
+from twisted.application import internet
 import struct
-import json
 import re
 from datetime import datetime
 
@@ -128,10 +126,22 @@ class MongoDBProtocol(Protocol):
         self.factory = factory
         self.buffer = b""
         self.authenticated = False
+        self.transport_log_data = {}
 
     def connectionMade(self):
         """Log new connection attempts"""
+        self.transport_log_data = self.get_transport_log_data()
         self.factory.log_connection(self.transport)
+
+    def get_transport_log_data(self):
+        us = self.transport.getHost()
+        peer = self.transport.getPeer()
+        return {
+            "src_host": peer.host,
+            "src_port": peer.port,
+            "dst_host": us.host,
+            "dst_port": us.port,
+        }
 
     def dataReceived(self, data):
         """
@@ -180,8 +190,6 @@ class MongoDBProtocol(Protocol):
         if len(payload) < 8:
             return
 
-        flags = struct.unpack("<i", payload[0:4])[0]
-
         null_pos = payload.find(b"\x00", 4)
         if null_pos == -1:
             return
@@ -202,8 +210,6 @@ class MongoDBProtocol(Protocol):
         """Handle OP_MSG messages (modern MongoDB protocol)"""
         if len(payload) < 5:
             return
-
-        flag_bits = struct.unpack(MSG_FLAG_BITS_FORMAT, payload[0:4])[0]
 
         if len(payload) > 4 and payload[4] == MSG_SECTION_KIND_BODY:
             try:
@@ -318,7 +324,7 @@ class MongoDBProtocol(Protocol):
 
         self.transport.write(header + payload)
 
-    def parse_bson(self, data):
+    def parse_bson(self, data):  # noqa: C901
         """
         Minimal BSON parser for extracting key fields.
         Handles common cases for authentication.
@@ -364,7 +370,6 @@ class MongoDBProtocol(Protocol):
                 if pos + 4 > len(data):
                     break
                 bin_length = struct.unpack(BSON_BIN_LEN_FORMAT, data[pos : pos + 4])[0]
-                subtype = data[pos + 4]
                 pos += 5
                 if pos + bin_length > len(data):
                     break
@@ -437,7 +442,7 @@ class MongoDBProtocol(Protocol):
 
     def connectionLost(self, reason):
         """Log connection closure"""
-        self.factory.log_disconnect(self.transport)
+        self.factory.log_disconnect(**self.transport_log_data)
 
 
 class CanaryMongoDB(Factory, CanaryService):
@@ -496,9 +501,9 @@ class CanaryMongoDB(Factory, CanaryService):
         """Log protocol error"""
         self.log({"action": LOG_ACTION_ERROR, "error": error}, transport=transport)
 
-    def log_disconnect(self, transport):
+    def log_disconnect(self, **kwargs):
         """Log disconnection"""
-        self.log({"action": LOG_ACTION_DISCONNECT}, transport=transport)
+        self.log({"action": LOG_ACTION_DISCONNECT}, **kwargs)
 
     def getService(self):
         return internet.TCPServer(self.port, self, interface=self.listen_addr)
