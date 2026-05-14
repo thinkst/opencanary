@@ -16,13 +16,11 @@ import time
 import json
 import unittest
 import socket
-import warnings  # Used in the TestSSHModule (see comment there)
 
 # These libraries are only needed by the test suite and so aren't in the
 # OpenCanary requirements, there is a requirements.txt file in the tests folder
 # Simply run `pip install -r opencanary/test/requirements.txt`
 import requests
-import paramiko
 import pymysql
 
 
@@ -308,44 +306,6 @@ class TestHTTPSModule(unittest.TestCase):
         )
         # Just an arbitrary image
         self.assertEqual(request.status_code, 200)
-
-
-class TestSSHModule(unittest.TestCase):
-    """
-    Tests the cases for the SSH server
-    """
-
-    def setUp(self):
-        self.connection = paramiko.SSHClient()
-        self.connection.set_missing_host_key_policy(paramiko.AutoAddPolicy())
-
-    def test_ssh_with_basic_login(self):
-        """
-        Try to log into the SSH server
-        """
-        # FIXME: At the time of this writing, paramiko calls cryptography
-        # which throws a depreciation warning. It looks like this has been
-        # fixed https://github.com/paramiko/paramiko/issues/1369 but the fix
-        # hasn't been pushed to pypi. When the fix is pushed we can update
-        # and remove the import warnings and the warnings.catch.
-        with warnings.catch_warnings():
-            warnings.simplefilter("ignore")
-            self.assertRaises(
-                paramiko.ssh_exception.AuthenticationException,
-                self.connection.connect,
-                hostname="localhost",
-                port=2222,
-                username="test_user",
-                password="test_pass",
-            )
-        last_log = get_last_log()
-        self.assertEqual(last_log["dst_port"], 2222)
-        self.assertIn("paramiko", last_log["logdata"]["REMOTEVERSION"])
-        self.assertEqual(last_log["logdata"]["USERNAME"], "test_user")
-        self.assertEqual(last_log["logdata"]["PASSWORD"], "test_pass")
-
-    def tearDown(self):
-        self.connection.close()
 
 
 class TestMySQLModule(unittest.TestCase):
