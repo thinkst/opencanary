@@ -6,6 +6,7 @@ interaction with the server (GET, POST) should be logged.
 """
 
 import requests
+import pytest
 
 from helpers import get_last_log
 
@@ -98,69 +99,27 @@ def test_get_supporting_image_file():
     assert request.status_code == 200
 
 
-def test_unimplemented_delete_http_method():
+@pytest.mark.parametrize(
+    "request_type, request_kwargs",
+    [
+        pytest.param("DELETE", {}, id="delete"),
+        pytest.param("PATCH", {"json": {}}, id="patch"),
+        pytest.param("PUT", {}, id="put"),
+        pytest.param("CONNECT", {}, id="connect"),
+        pytest.param("TRACE", {}, id="trace"),
+        pytest.param("HEAD", {}, id="head"),
+    ],
+)
+def test_unimplemented_http_methods(request_type, request_kwargs):
     """
-    Try sending a request with an unimplemented HTTP type (DELETE)
+    Try sending requests with unimplemented HTTP types.
     """
-    request = requests.delete("http://localhost/index.html")
+    request = requests.request(
+        request_type, "http://localhost/index.html", **request_kwargs
+    )
     last_log = get_last_log()
     assert last_log["logtype"] == 3002
-    assert last_log["logdata"]["REQUEST_TYPE"] == "DELETE"
-    assert request.status_code == 405
-
-
-def test_unimplemented_patch_http_method():
-    """
-    Try sending a request with an unimplemented HTTP type (PATCH)
-    """
-    request = requests.patch("http://localhost/index.html", {})
-    last_log = get_last_log()
-    assert last_log["logtype"] == 3002
-    assert last_log["logdata"]["REQUEST_TYPE"] == "PATCH"
-    assert request.status_code == 405
-
-
-def test_unimplemented_put_http_method():
-    """
-    Try sending a request with an unimplemented HTTP type (PUT)
-    """
-    request = requests.put("http://localhost/index.html")
-    last_log = get_last_log()
-    assert last_log["logtype"] == 3002
-    assert last_log["logdata"]["REQUEST_TYPE"] == "PUT"
-    assert request.status_code == 405
-
-
-def test_unimplemented_connect_http_method():
-    """
-    Try sending a request with an unimplemented HTTP type (CONNECT)
-    """
-    request = requests.request("CONNECT", "http://localhost/index.html")
-    last_log = get_last_log()
-    assert last_log["logtype"] == 3002
-    assert last_log["logdata"]["REQUEST_TYPE"] == "CONNECT"
-    assert request.status_code == 405
-
-
-def test_unimplemented_trace_http_method():
-    """
-    Try sending a request with an unimplemented HTTP type (TRACE)
-    """
-    request = requests.request("TRACE", "http://localhost/index.html")
-    last_log = get_last_log()
-    assert last_log["logtype"] == 3002
-    assert last_log["logdata"]["REQUEST_TYPE"] == "TRACE"
-    assert request.status_code == 405
-
-
-def test_unimplemented_head_http_method():
-    """
-    Try sending a request with an unimplemented HTTP type (HEAD)
-    """
-    request = requests.head("http://localhost/index.html")
-    last_log = get_last_log()
-    assert last_log["logtype"] == 3002
-    assert last_log["logdata"]["REQUEST_TYPE"] == "HEAD"
+    assert last_log["logdata"]["REQUEST_TYPE"] == request_type
     assert request.status_code == 405
 
 
