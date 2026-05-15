@@ -59,7 +59,7 @@ Documentation = "https://github.com/thinkst/opencanary#readme"
 "Source Code" = "https://github.com/thinkst/opencanary"
 
 [project.optional-dependencies]
-required_for_snmp = [
+required-for-snmp = [
     "scapy",
     "pcapy-ng",
 ]
