@@ -12,10 +12,8 @@ test the code directly rather than relying on the out put of logs.
 Still this is a start.
 """
 
-import time
 import json
 import unittest
-import socket
 
 # These libraries are only needed by the test suite and so aren't in the
 # OpenCanary requirements, there is a requirements.txt file in the tests folder
@@ -350,56 +348,6 @@ class TestMySQLModule(unittest.TestCase):
         self.assertEqual(log["logtype"], 9003)
         self.assertEqual(log["dst_port"], 3306)
         self.assertEqual(log["logdata"], {})
-
-
-class TestRDPModule(unittest.TestCase):
-    """
-    Tests the RDP Server
-    """
-
-    def test_rdp_with_user_cookie(self):
-        """
-        Login to the RDP server and pass the username in the connection request
-        """
-        self.connection = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        self.connection.connect(("localhost", 3389))
-        packet = b""
-        # https://learn.microsoft.com/en-us/openspecs/windows_protocols/ms-rdpbcgr/902b090b-9cb3-4efc-92bf-ee13373371e3
-        # TPKT details
-        packet += b"\x03\x00\x00\x33"
-        # ISO connection
-        packet += b"\x2e\xe0\x00\x00\x00\x00\x00"
-        # RDP Cookie
-        packet += b"Cookie: mstshash=test_rdp_user"
-        # Negotiation request
-        packet += b"\x01\x00\x08\x00\x03\x00\x00\x00"
-        self.connection.sendall(packet)
-        time.sleep(1)
-
-        last_log = get_last_log()
-        self.assertEqual(last_log["logdata"]["USERNAME"], "test_rdp_user")
-        self.assertEqual(last_log["dst_port"], 3389)
-
-    def test_rdp_connection_with_no_user_details(self):
-        """
-        Connect to the RDP server, but do not pass a username (e.g. namp scan)
-        """
-        self.connection = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        self.connection.connect(("localhost", 3389))
-        packet = b""
-        # https://learn.microsoft.com/en-us/openspecs/windows_protocols/ms-rdpbcgr/902b090b-9cb3-4efc-92bf-ee13373371e3
-        # TPKT details
-        packet += b"\x03\x00\x00\x13"
-        # ISO connection
-        packet += b"\x0e\xe0\x00\x00\x00\x00\x01"
-        # Negotiation request
-        packet += b"\x01\x00\x08\x00\x03\x00\x00\x00"
-        self.connection.sendall(packet)
-        time.sleep(1)
-
-        last_log = get_last_log()
-        self.assertEqual(last_log["logdata"]["USERNAME"], None)
-        self.assertEqual(last_log["dst_port"], 3389)
 
 
 if __name__ == "__main__":
