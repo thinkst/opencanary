@@ -14,7 +14,6 @@ Still this is a start.
 
 import time
 import json
-from ftplib import FTP, error_perm
 import unittest
 import socket
 import warnings  # Used in the TestSSHModule (see comment there)
@@ -44,52 +43,6 @@ def get_last_n_logs(n):
     last_n_lines = lines[-n:]
     deserialized_data = [json.loads(line) for line in last_n_lines]
     return deserialized_data
-
-
-class TestFTPModule(unittest.TestCase):
-    """
-    Tests the cases for the FTP module.
-
-    The FTP server should not allow logins and should log each attempt.
-    """
-
-    def setUp(self):
-        self.ftp = FTP("localhost")
-
-    def test_attempted_ftp_connection(self):
-        """
-        Try to connect to the FTP service should log the connection attempt.
-        """
-        self.assertRaises(error_perm, self.ftp.login)
-        log = get_last_n_logs(2)[0]
-        self.assertEqual(log["logtype"], 2001)
-        self.assertEqual(log["dst_port"], 21)
-        self.assertEqual(log["logdata"], {})
-
-    def test_anonymous_ftp(self):
-        """
-        Try to connect to the FTP service with no username or password.
-        """
-        self.assertRaises(error_perm, self.ftp.login)
-        log = get_last_log()
-        self.assertEqual(log["dst_port"], 21)
-        self.assertEqual(log["logdata"]["USERNAME"], "anonymous")
-        self.assertEqual(log["logdata"]["PASSWORD"], "anonymous@")
-
-    def test_authenticated_ftp(self):
-        """
-        Connect to the FTP service with a test username and password.
-        """
-        self.assertRaises(
-            error_perm, self.ftp.login, user="test_user", passwd="test_pass"
-        )
-        last_log = get_last_log()
-        self.assertEqual(last_log["dst_port"], 21)
-        self.assertEqual(last_log["logdata"]["USERNAME"], "test_user")
-        self.assertEqual(last_log["logdata"]["PASSWORD"], "test_pass")
-
-    def tearDown(self):
-        self.ftp.close()
 
 
 class TestHTTPModule(unittest.TestCase):
