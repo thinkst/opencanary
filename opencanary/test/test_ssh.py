@@ -16,14 +16,10 @@ def test_ssh_with_basic_login(ssh_connection):
     """
     Try to log into the SSH server
     """
-    pytest.raises(
-        paramiko.ssh_exception.AuthenticationException,
-        ssh_connection.connect,
-        hostname="localhost",
-        port=2222,
-        username="test_user",
-        password="test_pass",
-    )
+    with pytest.raises(paramiko.ssh_exception.AuthenticationException):
+        ssh_connection.connect(
+            hostname="localhost", port=2222, username="test_user", password="test_pass"
+        )
     last_log = get_last_log()
     assert last_log["dst_port"] == 2222
     assert "paramiko" in last_log["logdata"]["REMOTEVERSION"]
