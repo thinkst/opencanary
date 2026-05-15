@@ -547,6 +547,12 @@ dependencies = [
     { name = "zope-interface" },
 ]
 
+[package.optional-dependencies]
+required-for-snmp = [
+    { name = "pcapy-ng" },
+    { name = "scapy" },
+]
+
 [package.dev-dependencies]
 dev = [
     { name = "gitpython" },
@@ -566,10 +572,12 @@ requires-dist = [
     { name = "jinja2", specifier = "==3.1.6" },
     { name = "ntlmlib", specifier = "==0.72" },
     { name = "passlib", specifier = "==1.7.1" },
+    { name = "pcapy-ng", marker = "extra == 'required-for-snmp'" },
     { name = "pyasn1", specifier = "==0.6.3" },
     { name = "pyopenssl", specifier = "==25.3.0" },
     { name = "pypdf2", specifier = "==1.27.9" },
     { name = "requests", specifier = "==2.33.0" },
+    { name = "scapy", marker = "extra == 'required-for-snmp'" },
     { name = "service-identity", specifier = "==21.1.0" },
     { name = "setuptools", specifier = "==78.1.1" },
     { name = "simplejson", specifier = "==3.16.0" },
@@ -577,6 +585,7 @@ requires-dist = [
     { name = "urllib3", specifier = "==2.7.0" },
     { name = "zope-interface", specifier = "==7.2" },
 ]
+provides-extras = ["required-for-snmp"]
 
 [package.metadata.requires-dev]
 dev = [
@@ -625,6 +634,12 @@ sdist = { url = "https://files.pythonhosted.org/packages/25/4b/6fbfc66aabb3017cd
 wheels = [
     { url = "https://files.pythonhosted.org/packages/ee/a7/d6d238d927df355d4e4e000670342ca4705a72f0bf694027cf67d9bcf5af/passlib-1.7.1-py2.py3-none-any.whl", hash = "sha256:43526aea08fa32c6b6dbbbe9963c4c767285b78147b7437597f992812f69d280", size = 498755, upload-time = "2017-01-31T02:42:45.029Z" },
 ]
+
+[[package]]
+name = "pcapy-ng"
+version = "1.1.0"
+source = { registry = "https://pypi.org/simple" }
+sdist = { url = "https://files.pythonhosted.org/packages/ce/19/19bc650e1f58a6ef7376d85ef2b9cd24554c032858bb5e6b05092939d900/pcapy_ng-1.1.0.tar.gz", hash = "sha256:802da2f3a66929e82d29d9ab101ffa841ee4ea91fc94472f401eeecf06495cd1", size = 38671, upload-time = "2026-01-06T17:04:49.006Z" }
 
 [[package]]
 name = "pluggy"
@@ -842,6 +857,15 @@ dependencies = [
 sdist = { url = "https://files.pythonhosted.org/packages/34/64/8860370b167a9721e8956ae116825caff829224fbca0ca6e7bf8ddef8430/requests-2.33.0.tar.gz", hash = "sha256:c7ebc5e8b0f21837386ad0e1c8fe8b829fa5f544d8df3b2253bff14ef29d7652", size = 134232, upload-time = "2026-03-25T15:10:41.586Z" }
 wheels = [
     { url = "https://files.pythonhosted.org/packages/56/5d/c814546c2333ceea4ba42262d8c4d55763003e767fa169adc693bd524478/requests-2.33.0-py3-none-any.whl", hash = "sha256:3324635456fa185245e24865e810cecec7b4caf933d7eb133dcde67d48cee69b", size = 65017, upload-time = "2026-03-25T15:10:40.382Z" },
+]
+
+[[package]]
+name = "scapy"
+version = "2.7.0"
+source = { registry = "https://pypi.org/simple" }
+sdist = { url = "https://files.pythonhosted.org/packages/82/97/7caec64f05eae3d305d83e7cce1ef2f337710513b89efb334f7278202e79/scapy-2.7.0.tar.gz", hash = "sha256:bfc1ef1b93280aea1ddee53be7f74232aa28ac3d891244d41ee85200d24aa446", size = 2412897, upload-time = "2025-12-26T22:10:53.359Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/f0/6f/bd32e5e8adc391063858da17271bb444e4b009842cffa593bca8b2b78af7/scapy-2.7.0-py3-none-any.whl", hash = "sha256:eb22786da92be6fd8e5c694ae5595e4f5b9ac1f4364c9c45986844f3e3063561", size = 2590982, upload-time = "2025-12-26T22:07:48.941Z" },
 ]
 
 [[package]]

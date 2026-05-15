@@ -21,10 +21,7 @@ COPY bin /opencanary/bin
 COPY opencanary ./opencanary
 
 # Install dependencies and the package from the uv lockfile
-RUN uv sync --frozen --no-dev
-
-# Runtime extras kept outside core project dependencies
-RUN uv pip install --python /opencanary/.venv/bin/python scapy pcapy-ng
+RUN uv sync --frozen --no-dev --extra required-for-snmp
 
 # Set the default application we are running
 ENTRYPOINT [ "opencanaryd" ]
