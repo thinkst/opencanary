@@ -31,7 +31,7 @@ jobs:
       run: uv build
     - name: check version matches tag
       run: |
-            uv pip install dist/*.tar.gz
+            uv pip install --system dist/*.tar.gz
             version_to_release=$(uv run opencanaryd --version)
             tag_name="${{ github.event.release.tag_name }}"
             tag_name_without_v="${tag_name#v}"
