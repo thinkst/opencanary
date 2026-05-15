@@ -4,6 +4,25 @@ import time
 LOG_PATH = "/var/tmp/opencanary.log"
 
 
+def get_last_log():
+    """
+    Gets the last line from the log file as a dictionary
+    """
+    return get_last_n_logs(1)[0]
+
+
+def get_last_n_logs(n):
+    """
+    Reads the last 'n' lines from the log file and returns them as a list of dictionaries.
+    """
+    with open(LOG_PATH, "r") as file:
+        lines = file.readlines()
+
+    last_n_lines = lines[-n:]
+    deserialized_data = [json.loads(line) for line in last_n_lines]
+    return deserialized_data
+
+
 def get_log_count():
     with open(LOG_PATH, "r") as file:
         return len(file.readlines())
