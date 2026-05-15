@@ -37,7 +37,7 @@ def test_rdp_with_user_cookie(rdp_connection):
 
 def test_rdp_connection_with_no_user_details(rdp_connection):
     """
-    Connect to the RDP server, but do not pass a username (e.g. namp scan)
+    Connect to the RDP server, but do not pass a username (e.g. nmap scan)
     """
     packet = b""
     # https://learn.microsoft.com/en-us/openspecs/windows_protocols/ms-rdpbcgr/902b090b-9cb3-4efc-92bf-ee13373371e3
