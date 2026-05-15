@@ -58,6 +58,12 @@ Homepage = "http://www.thinkst.com/"
 Documentation = "https://github.com/thinkst/opencanary#readme"
 "Source Code" = "https://github.com/thinkst/opencanary"
 
+[project.optional-dependencies]
+required-for-snmp = [
+    "scapy",
+    "pcapy-ng",
+]
+
 [tool.setuptools]
 include-package-data = true
 script-files = ["bin/opencanaryd", "bin/opencanary.tac"]

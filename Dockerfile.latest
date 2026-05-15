@@ -1,5 +1,7 @@
 FROM python:3.10-bookworm
 
+COPY --from=docker.io/astral/uv:0.11.7 /uv /uvx /bin/
+
 # Download cache lists and install minimal versions
 RUN apt-get update && apt-get -yq install --no-install-recommends \
 	# Required linux dependencies
@@ -10,17 +12,16 @@ RUN apt-get update && apt-get -yq install --no-install-recommends \
 # Create and set the working directory
 WORKDIR /opencanary
 
-# Copy only the files needed to install dependencies
-COPY opencanary/__init__.py ./opencanary/__init__.py
-COPY requirements.txt setup.py ./
+# Use the uv-managed project environment at runtime.
+ENV PATH="/opencanary/.venv/bin:${PATH}"
+
+# Copy in project files
+COPY pyproject.toml uv.lock README.md ./
 COPY bin /opencanary/bin
-
-# Install the required dependencies
-RUN pip install -r requirements.txt
-RUN pip install scapy pcapy-ng
-
-# Copy in the latest version
 COPY opencanary ./opencanary
+
+# Install dependencies and the package from the uv lockfile
+RUN uv sync --frozen --no-dev --extra required-for-snmp
 
 # Set the default application we are running
 ENTRYPOINT [ "opencanaryd" ]
