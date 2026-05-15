@@ -77,7 +77,7 @@ exclude = ["docs", "docs*", "opencanary.test", "opencanary.test*"]
 [dependency-groups]
 dev = [
     "gitpython>=3.1.50",
-    "paramiko==3.4.0",
+    "paramiko==3.4.1",
     "pymongo>=4.17.0",
     "pymysql>=1.1.2",
     "pytest>=9.0.3",
