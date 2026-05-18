@@ -81,5 +81,6 @@ dev = [
     "pymongo>=4.17.0",
     "pymysql>=1.1.2",
     "pytest>=9.0.3",
+    "redis>=6.4.0",
     "requests>=2.32.4",
 ]

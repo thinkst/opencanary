@@ -3,4 +3,5 @@ paramiko==3.4.0
 PyMySQL
 gitpython
 pymongo
+redis
 pytest
