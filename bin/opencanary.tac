@@ -23,6 +23,7 @@ from opencanary.modules.redis import CanaryRedis
 from opencanary.modules.tcpbanner import CanaryTCPBanner
 from opencanary.modules.rdp import CanaryRDP
 from opencanary.modules.mongodb import CanaryMongoDB
+from opencanary.modules.samba import CanarySamba
 
 
 def warn(*args, **kwargs):
@@ -47,6 +48,7 @@ MODULES = [
     CanaryRDP,
     CanaryRedis,
     CanarySIP,
+    CanarySamba,
     CanarySSH,
     CanaryTCPBanner,
     CanaryTftp,
@@ -78,11 +80,8 @@ if config.moduleEnabled("llmnr"):
         print("Can't import LLMNR. Please ensure you have Scapy installed.")
         pass
 
-# NB: imports below depend on inotify, only available on linux
+# NB: portscan depends on inotify, only available on linux
 if sys.platform.startswith("linux"):
-    from opencanary.modules.samba import CanarySamba
-
-    MODULES.append(CanarySamba)
     if config.moduleEnabled("portscan") and is_docker():
         # Remove portscan if running in DOCKER (specified in Dockerfile)
         print("Can't use portscan in Docker. Portscan module disabled.")

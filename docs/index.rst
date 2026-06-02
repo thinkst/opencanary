@@ -3,7 +3,7 @@ OpenCanary
 
 Welcome to the OpenCanary guide.
 
-Please note we have a wiki on Github with FAQ and Samba Setup help over `here <https://github.com/thinkst/opencanary/wiki>`_.
+Please note we have a wiki on Github with FAQ and setup help over `here <https://github.com/thinkst/opencanary/wiki>`_.
 
 OpenCanary is a daemon that runs canary services, which trigger alerts
 when (ab) is used. The alerts can be sent to a variety of sources,

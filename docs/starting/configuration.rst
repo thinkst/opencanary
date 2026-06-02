@@ -36,9 +36,9 @@ The default generated config will include all options, with all services set to 
 
 You may also want to fiddle with some of our other services which require a bit more setup;
 
-`smb` - a log watcher for Samba logging files which allows Opencanary to alert on files being opened in a Windows File Share.
+`smb` - a pure Python SMB server using impacket which allows Opencanary to alert on Windows File Share activity.
 
-For this configuration, you will need to set up your own Windows File Share. Please read the steps over `here <https://github.com/thinkst/opencanary/wiki/Opencanary-and-Samba>`_.
+By default this module exposes a read-only guest share. It can also be configured to require NTLM credentials before clients can authenticate and mount the share.
 
 `portscan` - a log watcher that works with iptables to monitor when your Opencanary is being scanned.
 At this stage, the portscan module supports the detection of Nmap OS, Nmap FIN, Nmap OS, Nmap NULL, and normal port scans.
@@ -240,8 +240,11 @@ you will receive a json formatted config file at `/etc/opencanary/opencanary.con
         "portscan.synrate": 5,
         "portscan.nmaposrate": 5,
         "portscan.lorate": 3,
-        "smb.auditfile": "/var/log/samba-audit.log",
         "smb.enabled": false,
+        "smb.port": 445,
+        "smb.share_name": "myshare",
+        "smb.server_name": "SRV01",
+        "smb.auth_mode": "guest",
         "mysql.enabled": false,
         "mysql.port": 3306,
         "mysql.banner": "5.5.43-0ubuntu0.14.04.1",

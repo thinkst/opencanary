@@ -30,7 +30,7 @@ OpenCanary is the Open Source version of our commercial [Thinkst Canary](https:/
   - [Optional modules](#optional-modules)
      - [SNMP](#snmp)
      - [Portscan](#portscan)
-     - [Samba Setup](#samba-setup)
+     - [Windows File Share](#windows-file-share)
 - **[Running OpenCanary](#running-opencanary)**
   - [Directly on Linux or macOS](#directly-on-linux-or-macos)
   - [With docker compose](#with-docker-compose)
@@ -48,7 +48,6 @@ OpenCanary is the Open Source version of our commercial [Thinkst Canary](https:/
 * AMD64: Python 3.10+
 * ARM64: Python 3.10+
 * _Optional_ SNMP requires the Python library Scapy
-* _Optional_ Samba module needs a working installation of Samba
 * _Optional_ Portscan uses iptables (not nftables) and is only supported on Linux-based operating systems
 
 ## Features
@@ -79,9 +78,8 @@ $ . env/bin/activate
 $ uv pip install opencanary
 ```
 
-Optional extras (if you wish to use the Windows File Share module, and the SNMP module):
+Optional extras (if you wish to use the SNMP module):
 ```
-$ sudo apt install samba # if you plan to use the Windows File Share module
 $ pip install scapy pcapy-ng # if you plan to use the SNMP module
 ```
 
@@ -131,7 +129,7 @@ $ uv pip install opencanary
 $ uv pip install scapy pcapy-ng # optional
 ```
 
-The Windows File Share (smb) module is not available on macOS.
+The Windows File Share (smb) module can run on macOS for development, but binding to TCP port 445 still requires elevated privileges.
 
 ### Installation via Git
 
@@ -199,9 +197,9 @@ The `portscan` module is only available on Linux hosts, as it modifies `iptables
 
 Please note that for the Portscan service, we have added a `portscan.ignore_localhost` setting, which means the OpenCanary `portscan` service will ignore (not alert on) port scans originating for the localhost IP (`127.0.0.1`). This setting is false by default.
 
-#### Samba Setup
+#### Windows File Share
 
-The Windows File Share module (`smb`) requires a Samba installation. See a step-by-step guide on [the Wiki](https://github.com/thinkst/opencanary/wiki/Opencanary-and-Samba).
+The Windows File Share module (`smb`) runs a pure Python SMB server using impacket and does not require Samba. It exposes a read-only share with guest access by default, and can be configured to require NTLM credentials before clients can authenticate and mount the share.
 
 ## Running OpenCanary
 

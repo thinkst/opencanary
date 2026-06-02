@@ -1,70 +1,41 @@
 Windows Server
 ================
 
-The Samba and RDP modules require an extra installation step. It's a
-good idea to consult the `README <https://github.com/thinkst/opencanary>`_ before trying this out.
+The Windows File Share module runs a pure Python SMB server using impacket. It does
+not require Samba to be installed. RDP still requires its usual extra setup.
 
 Inside ~/.opencanary.conf:
 
 .. code-block:: json
 
    {
-       "smb.auditfile": "/var/log/samba-audit.log",
-       "smb.enabled": true
+       "smb.enabled": true,
+       "smb.port": 445,
+       "smb.share_name": "myshare",
+       "smb.server_name": "SRV01",
+       "smb.auth_mode": "guest"
    }
 
-Below is an example of an `smb.conf` for a Samba installation,
+By default OpenCanary exposes a guest-accessible, read-only share backed by a
+small packaged sample directory. You can change the visible share name and server
+name with ``smb.share_name`` and ``smb.server_name``. To serve a different
+read-only directory, set ``smb.share_path`` to an existing directory.
 
-.. code-block:: dosini
+To require NTLM credentials before the share can be mounted, switch the auth mode
+and provide either a password or NTLM hashes:
 
-        [global]
-            workgroup = WORKGROUP
-            server string = NBDocs
-            netbios name = SRV01
-            dns proxy = no
-            log file = /var/log/samba/log.all
-            log level = 0
-            max log size = 100
-            panic action = /usr/share/samba/panic-action %d
-            server role = standalone
-            passdb backend = tdbsam
-            obey pam restrictions = yes
-            unix password sync = no
-            map to guest = bad user
-            usershare allow guests = yes
-            load printers = no
-            vfs object = full_audit
-            full_audit:prefix = %U|%I|%i|%m|%S|%L|%R|%a|%T|%D
-            full_audit:success = flistxattr
-            full_audit:failure = none
-            full_audit:facility = local7
-            full_audit:priority = notice
-        [myshare]
-            comment = All the stuff!
-            path = /samba
-            guest ok = yes
-            read only = yes
-            browseable = yes
+.. code-block:: json
 
-Please note that there are some details in the above config that you would want to change,
+   {
+       "smb.auth_mode": "ntlm",
+       "smb.ntlm_username": "filesvc",
+       "smb.ntlm_password": "ChangeMe123"
+   }
 
-* server string
-* NetBIOS name
-* [myshare] to the name of your share
-* path
+Instead of ``smb.ntlm_password`` you can provide ``smb.ntlm_hashes`` in
+``LMHASH:NTHASH`` format, or ``smb.ntlm_nthash`` with optional
+``smb.ntlm_lmhash``.
 
-Of course, you may change other settings as long as the `smbd_audit` logs to the file that your
-OpenCanary daemon is watching (above we set it as `/var/log/samba-audit.log`).
-
-In the above config, we are relying on Samba using Syslog (rsyslog in newer systems). For our Samba
-to use rsyslog, we will edit the `/etc/rsyslog.conf` file. Below are two lines we add to the bottom,
-
-.. code-block:: unixconfig
-
-    $FileCreateMode 0644
-    local7.*            /var/log/samba-audit.log
-
-This will redirect any message of facility local7 to your `/var/log/samba-audit.log` file, which will be
-watched by our OpenCanary daemon.
-
-Please note this is all written up in the GitHub Wiki.
+Binding to TCP port 445 normally requires root or equivalent privileges. For
+development or unprivileged deployments, set ``smb.port`` to a high port such as
+1445 and connect to that port explicitly.

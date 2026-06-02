@@ -48,6 +48,7 @@ dependencies = [
     "setuptools==78.1.1",
     "urllib3==2.7.0",
     "hpfeeds==3.0.0",
+    "impacket==0.13.1",
     "pyOpenSSL==25.3.0",
     "service-identity==21.1.0",
 ]
