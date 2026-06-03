@@ -21,16 +21,51 @@ AUTH_OVER = 5
 
 # if one of these is used in the VNC authentication attempt, alert that
 # a common password was tried
-COMMON_PASSWORDS = [
-    "111111",
-    "password",
-    "123456",
-    "111111",
-    "1234",
-    "administrator",
-    "root",
-    "passw0rd",
-]
+# code will look for a vncpassword.txt file and fall back to "original 6"
+# if no file is present.  Package comes with a vncpassword.txt containing 
+# 50 passwords and a vncpasswords-large.txt containing aroun 2800 passwords
+def load_password_list():
+    """
+    Load VNC common passwords from vncpasswords.txt (same directory as this module).
+    Lines beginning with '#' are treated as comments and skipped.
+    Non-ASCII entries are skipped with a warning.
+    Falls back to a built-in default list if the file is missing or unreadable,
+    and sets a flag so callers can detect the degraded state.
+    """
+    password_file = os.path.join(os.path.dirname(__file__), 'vncpasswords.txt')
+    fallback = [
+        "111111", "password", "123456",
+        "1234", "administrator", "root",
+        "passw0rd", "vizxv",
+    ]
+    seen = set()
+    passwords = []
+    try:
+        with open(password_file, 'r', encoding='ascii', errors='strict') as f:
+            for lineno, raw in enumerate(f, 1):
+                line = raw.strip()
+                if not line or line.startswith('#'):
+                    continue
+                if not line.isascii():
+                    print(f"WARNING: vnc passwords line {lineno}: skipping non-ASCII entry")
+                    continue
+                if line in seen:
+                    print(f"WARNING: vnc passwords line {lineno}: duplicate entry '{line}' skipped")
+                    continue
+                seen.add(line)
+                passwords.append(line)
+        if not passwords:
+            print("WARNING: vncpasswords.txt is empty — falling back to built-in defaults")
+            return fallback, True
+        print(f"Loaded {len(passwords)} VNC passwords from {password_file}")
+        return passwords, False
+    except FileNotFoundError:
+        print(f"WARNING: {password_file} not found — falling back to built-in defaults")
+    except Exception as e:
+        print(f"ERROR: Failed to load VNC passwords ({e}) — falling back to built-in defaults")
+    return fallback, True
+
+COMMON_PASSWORDS, _PASSWORDS_ARE_FALLBACK = load_password_list()
 
 
 class ProtocolError(Exception):
