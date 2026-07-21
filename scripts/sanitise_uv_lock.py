@@ -16,10 +16,7 @@ REPLACEMENTS = [
     ),
 ]
 
-REMOVALS = [
-    'exclude-newer = "0001-01-01T00:00:00Z" # This has no effect and is included for backwards compatibility when using relative exclude-newer values.',
-    'exclude-newer-span = "P7D"',
-]
+REMOVALS = []
 
 
 def main() -> int:

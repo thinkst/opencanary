@@ -32,7 +32,15 @@ repos:
         additional_dependencies: [flake8-typing-imports==1.12.0]
 -   repo: local
     hooks:
-      - id: sanitise-uv-lock
+    -   id: check-uv-lock-public-urls
+        name: Check uv.lock for internal package URLs
+        entry: python scripts/check_uv_lock_urls.py
+        language: system
+        stages:
+        -   pre-push
+        always_run: true
+        pass_filenames: false
+    -   id: sanitise-uv-lock
         name: Sanitise package-index URLs in uv.lock
         entry: python scripts/sanitise_uv_lock.py
         language: system
