@@ -49,6 +49,7 @@ dependencies = [
     "pyopenssl==26.3.0",
     "service-identity==21.1.0",
     "idna>=3.15",
+    "redis==7.4.0",
 ]
 
 [project.urls]
