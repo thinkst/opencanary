@@ -8,6 +8,7 @@ It implements the MongoDB wire protocol to respond realistically to connection a
 from opencanary.modules import CanaryService
 from twisted.internet.protocol import Protocol, Factory
 from twisted.application import internet
+from twisted.protocols.policies import TimeoutMixin
 import struct
 import re
 from datetime import datetime
@@ -26,7 +27,8 @@ OPCODE_OP_MSG = 2013
 # Wire protocol / message framing
 # ---------------------------------------------------------------------------
 MSG_HEADER_SIZE = 16  # 4 × int32 fields
-MSG_HEADER_FORMAT = "<iiii"
+MSG_HEADER_FORMAT = "<IIII"
+MSG_HEADER_LENGTH_FORMAT = "<I"
 MSG_FLAG_BITS_FORMAT = "<I"
 MSG_FLAG_BITS_NONE = 0
 MSG_SECTION_KIND_BODY = 0  # OP_MSG section kind 0: single document body
@@ -51,9 +53,9 @@ BSON_MIN_DOC_SIZE = 5  # 4-byte length + 1-byte EOD
 # ---------------------------------------------------------------------------
 # BSON string encoding
 # ---------------------------------------------------------------------------
-BSON_STRING_FORMAT = "<i"
-BSON_DOC_LEN_FORMAT = "<i"
-BSON_BIN_LEN_FORMAT = "<i"
+BSON_STRING_FORMAT = "<I"
+BSON_DOC_LEN_FORMAT = "<I"
+BSON_BIN_LEN_FORMAT = "<I"
 
 # ---------------------------------------------------------------------------
 # MongoDB server capability constants (advertised in isMaster response)
@@ -116,7 +118,7 @@ CMD_COLLECTION_SUFFIX = "$cmd"
 CMD_QUERY_PREFIX = "query:"
 
 
-class MongoDBProtocol(Protocol):
+class MongoDBProtocol(Protocol, TimeoutMixin):
     """
     Implements MongoDB wire protocol to handle incoming connections.
     Supports OP_QUERY, OP_MSG (MongoDB 3.6+), and logs all authentication attempts.
@@ -132,6 +134,7 @@ class MongoDBProtocol(Protocol):
         """Log new connection attempts"""
         self.transport_log_data = self.get_transport_log_data()
         self.factory.log_connection(self.transport)
+        self.setTimeout(MONGO_LOGICAL_SESSION_TIMEOUT_MIN * 60)  # Set a timeout for idle connections
 
     def get_transport_log_data(self):
         us = self.transport.getHost()
@@ -148,14 +151,26 @@ class MongoDBProtocol(Protocol):
         Process incoming MongoDB wire protocol messages.
         Handles OP_QUERY (legacy) and OP_MSG (modern) opcodes.
         """
+        if len(self.buffer) + len(data) > MONGO_MAX_MESSAGE_SIZE_BYTES:
+            self.factory.log_error(self.transport, "Buffer overflow attempt")
+            self.transport.loseConnection()
+            return
+
+        if len(data) > 0:
+            self.resetTimeout()
+
         self.buffer += data
 
         # MongoDB message format: length (4 bytes), requestID (4), responseTo (4), opCode (4), payload
         while len(self.buffer) >= MSG_HEADER_SIZE:
-            if len(self.buffer) < 4:
-                break
+            msg_length = struct.unpack(MSG_HEADER_LENGTH_FORMAT, self.buffer[0:4])[0]
 
-            msg_length = struct.unpack("<i", self.buffer[0:4])[0]
+            if msg_length < MSG_HEADER_SIZE or msg_length > MONGO_MAX_MESSAGE_SIZE_BYTES:
+                self.factory.log_error(
+                    self.transport, f"Invalid message length: {msg_length}"
+                )
+                self.transport.loseConnection()
+                return
 
             if len(self.buffer) < msg_length:
                 break  # Wait for complete message
