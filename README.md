@@ -183,6 +183,9 @@ $ opencanaryd --copyconfig
 
 This creates the path and file `/etc/opencanaryd/opencanary.conf`. You must now edit the config file to determine which services and logging options you want to enable.
 
+> [!WARNING]
+> The config file includes complex data, include Python objects for the logging configuration. The configuration is read while the process is running with root privileges. We recommend making the file root-owned and only writable by root. If regular users can write the file, it is possible to escalate privileges to root.
+
 ### Enabling protocol modules and alerting
 
 Configuration is performed via the JSON config file. Edit the file, and when happy save and exit.
@@ -270,11 +273,11 @@ We welcome PRs to this project. Please read our [Code of Conduct](https://github
 At a minimum you should run `pre-commit` before submitting the PR. Install and run it in the same Python environment that OpenCanary is installed into:
 ```
 $ pip install pre-commit
+$ pre-commit install
 # Do work
 $ git add file
-$ pre-commit
-$ git add file # only run this if pre-commit auto-fixed the file
 $ git commit
+# If pre-commit generated errors, then run "git add ... && git commit" again
 ```
 
 ### Security Vulnerability Reports
