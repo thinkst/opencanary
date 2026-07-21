@@ -134,7 +134,9 @@ class MongoDBProtocol(Protocol, TimeoutMixin):
         """Log new connection attempts"""
         self.transport_log_data = self.get_transport_log_data()
         self.factory.log_connection(self.transport)
-        self.setTimeout(MONGO_LOGICAL_SESSION_TIMEOUT_MIN * 60)  # Set a timeout for idle connections
+        self.setTimeout(
+            MONGO_LOGICAL_SESSION_TIMEOUT_MIN * 60
+        )  # Set a timeout for idle connections
 
     def get_transport_log_data(self):
         us = self.transport.getHost()
@@ -165,7 +167,10 @@ class MongoDBProtocol(Protocol, TimeoutMixin):
         while len(self.buffer) >= MSG_HEADER_SIZE:
             msg_length = struct.unpack(MSG_HEADER_LENGTH_FORMAT, self.buffer[0:4])[0]
 
-            if msg_length < MSG_HEADER_SIZE or msg_length > MONGO_MAX_MESSAGE_SIZE_BYTES:
+            if (
+                msg_length < MSG_HEADER_SIZE
+                or msg_length > MONGO_MAX_MESSAGE_SIZE_BYTES
+            ):
                 self.factory.log_error(
                     self.transport, f"Invalid message length: {msg_length}"
                 )
