@@ -39,8 +39,6 @@ dependencies = [
     "simplejson==3.16.0",
     "requests==2.33.0",
     "zope.interface==7.2",
-    "PyPDF2==1.27.9",
-    "fpdf==1.7.2",
     "passlib==1.7.1",
     "Jinja2==3.1.6",
     "ntlmlib==0.72",
@@ -73,6 +71,9 @@ version = { attr = "opencanary.__version__" }
 
 [tool.setuptools.packages.find]
 exclude = ["docs", "docs*", "opencanary.test", "opencanary.test*"]
+
+[tool.uv]
+exclude-newer = "7 days"
 
 [dependency-groups]
 dev = [
