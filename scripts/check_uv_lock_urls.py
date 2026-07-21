@@ -69,7 +69,7 @@ def main() -> int:
         return 0
 
     print(
-        "uv.lock in the commit being pushed contains internal " "package-index URLs:",
+        "uv.lock in the commit being pushed contains internal package-index URLs:",
         file=sys.stderr,
     )
 
