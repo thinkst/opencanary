@@ -7,10 +7,7 @@ import sys
 
 LOCK_FILE = Path("uv.lock")
 
-FORBIDDEN_URLS = (
-    "https://thinkst.packageproxy.dev/pypi/",
-    "https://thinkst.packageproxy.dev/pypi",
-)
+FORBIDDEN_URLS = ("https://thinkst.packageproxy.dev/pypi",)
 
 
 def read_file_from_commit(commit: str, path: Path) -> str | None:
