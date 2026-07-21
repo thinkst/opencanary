@@ -16,11 +16,6 @@ REPLACEMENTS = [
     ),
 ]
 
-REMOVALS = [
-    'exclude-newer = "0001-01-01T00:00:00Z" # This has no effect and is included for backwards compatibility when using relative exclude-newer values.',
-    'exclude-newer-span = "P7D"',
-]
-
 
 def main() -> int:
     if not LOCK_FILE.exists():
@@ -33,9 +28,6 @@ def main() -> int:
     # Apply the more specific replacement first.
     for old, new in REPLACEMENTS:
         updated = updated.replace(old, new)
-
-    for removal in REMOVALS:
-        updated = updated.replace(removal, "")
 
     if updated != original:
         LOCK_FILE.write_text(updated, encoding="utf-8")

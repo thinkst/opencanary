@@ -72,6 +72,9 @@ version = { attr = "opencanary.__version__" }
 [tool.setuptools.packages.find]
 exclude = ["docs", "docs*", "opencanary.test", "opencanary.test*"]
 
+[tool.uv]
+exclude-newer = "7 days"
+
 [dependency-groups]
 dev = [
     "gitpython>=3.1.50",
