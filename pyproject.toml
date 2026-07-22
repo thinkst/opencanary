@@ -33,9 +33,9 @@ classifiers = [
 ]
 requires-python = ">= 3.10"
 dependencies = [
-    "Twisted==24.11.0",
-    "pyasn1==0.6.3",
-    "cryptography==46.0.7",
+    "twisted==26.4.0",
+    "pyasn1==0.6.4",
+    "cryptography==49.0.0",
     "simplejson==3.16.0",
     "requests==2.33.0",
     "zope.interface==7.2",
@@ -46,8 +46,11 @@ dependencies = [
     "setuptools==78.1.1",
     "urllib3==2.7.0",
     "hpfeeds==3.0.0",
-    "pyOpenSSL==25.3.0",
+    "pyopenssl==26.3.0",
     "service-identity==21.1.0",
+    "idna>=3.15",
+    "redis==7.4.0",
+    "gitpython>=3.1.51",
 ]
 
 [project.urls]
