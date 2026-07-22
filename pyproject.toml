@@ -34,7 +34,7 @@ classifiers = [
 requires-python = ">= 3.10"
 dependencies = [
     "twisted==26.4.0",
-    "pyasn1==0.6.3",
+    "pyasn1==0.6.4",
     "cryptography==49.0.0",
     "simplejson==3.16.0",
     "requests==2.33.0",
@@ -43,7 +43,7 @@ dependencies = [
     "Jinja2==3.1.6",
     "ntlmlib==0.72",
     "bcrypt==3.2.0",
-    "setuptools==78.1.1",
+    "setuptools==83.0.0",
     "urllib3==2.7.0",
     "hpfeeds==3.0.0",
     "pyopenssl==26.3.0",
