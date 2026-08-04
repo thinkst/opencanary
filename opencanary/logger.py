@@ -5,7 +5,7 @@ import socket
 import hpfeeds
 import sys
 
-from datetime import datetime
+from datetime import datetime, timezone
 from logging.handlers import SocketHandler
 from twisted.internet import reactor
 import requests
@@ -98,6 +98,7 @@ class LoggerBase(object):
     LOG_TCP_BANNER_DATA_RECEIVED = 18005
     LOG_LLMNR_QUERY_RESPONSE = 19001
     LOG_MONGODB_LOGIN_ATTEMPT = 20001
+    LOG_STATUS_UPDATE = 21001
     LOG_USER_0 = 99000
     LOG_USER_1 = 99001
     LOG_USER_2 = 99002
@@ -111,9 +112,10 @@ class LoggerBase(object):
 
     def sanitizeLog(self, logdata):
         logdata["node_id"] = self.node_id
-        logdata["local_time"] = datetime.utcnow().strftime("%Y-%m-%d %H:%M:%S.%f")
-        logdata["utc_time"] = datetime.utcnow().strftime("%Y-%m-%d %H:%M:%S.%f")
-        logdata["local_time_adjusted"] = datetime.now().strftime("%Y-%m-%d %H:%M:%S.%f")
+        logdata["utc_time"] = datetime.now(timezone.utc).strftime(
+            "%Y-%m-%d %H:%M:%S.%f"
+        )
+        logdata["local_time"] = datetime.now().strftime("%Y-%m-%d %H:%M:%S.%f")
         if "src_host" not in logdata:
             logdata["src_host"] = ""
         if "src_port" not in logdata:
@@ -166,11 +168,14 @@ class PyLogger(LoggerBase):
 
         self.logger = logging.getLogger(self.node_id)
 
+        self.tally = 0
+
     def error(self, data):
         data["local_time"] = datetime.utcnow().strftime("%Y-%m-%d %H:%M:%S.%f")
         msg = "[ERR] %r" % json.dumps(data, sort_keys=True)
         print(msg, file=sys.stderr)
         self.logger.warn(msg)
+        self.tally += 1
 
     def log(self, logdata, retry=True):
         logdata = self.sanitizeLog(logdata)
@@ -187,6 +192,7 @@ class PyLogger(LoggerBase):
 
         if notify is True:
             self.logger.warn(json.dumps(logdata, sort_keys=True))
+            self.tally += 1
 
 
 class SocketJSONHandler(SocketHandler):
