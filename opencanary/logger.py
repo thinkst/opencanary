@@ -261,9 +261,9 @@ class SlackHandler(logging.Handler):
         logging.Handler.__init__(self)
         self.webhook_url = webhook_url
 
-    def generate_msg(self, alert):
+    def generate_msg(self, alert, title="OpenCanary Alert"):
         msg = {}
-        msg["pretext"] = "OpenCanary Alert"
+        msg["pretext"] = title
         data = json.loads(alert.msg)
         msg["fields"] = []
         for k, v in data.items():
@@ -273,7 +273,11 @@ class SlackHandler(logging.Handler):
         return {"attachments": [msg]}
 
     def emit(self, record):
-        data = self.generate_msg(record)
+        data = json.loads(record.msg)
+        title = "OpenCanary Alert"
+        if "logtype" in data and data["logtype"] == LoggerBase.LOG_STATUS_UPDATE:
+            title = "OpenCanary Status"
+        data = self.generate_msg(record, title)
         response = requests.post(self.webhook_url, json=data)
         if response.status_code != 200:
             print(
@@ -287,7 +291,7 @@ class TeamsHandler(logging.Handler):
         logging.Handler.__init__(self)
         self.webhook_url = webhook_url
 
-    def message(self, data):
+    def message(self, data, title="OpenCanary Alert"):
         return {
             "attachments": [
                 {
@@ -322,7 +326,7 @@ class TeamsHandler(logging.Handler):
                                             },
                                             {
                                                 "type": "TextBlock",
-                                                "text": "OpenCanary Alert",
+                                                "text": title,
                                                 "weight": "Bolder",
                                                 "size": "ExtraLarge",
                                             },
@@ -350,7 +354,10 @@ class TeamsHandler(logging.Handler):
 
     def emit(self, record):
         data = json.loads(record.msg)
-        payload = self.message(data)
+        title = "OpenCanary Alert"
+        if "logtype" in data and data["logtype"] == LoggerBase.LOG_STATUS_UPDATE:
+            title = "OpenCanary Status"
+        payload = self.message(data, title)
         headers = {"Content-Type": "application/json"}
         response = requests.post(self.webhook_url, headers=headers, json=payload)
         if response.status_code != 202:
