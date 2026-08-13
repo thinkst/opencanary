@@ -169,9 +169,9 @@ OpenCanary Docker images are hosted on Docker Hub. These are only useful on Linu
 
 When OpenCanary starts it looks for config files in the following locations and will stop when the first configuration is found:
 
-1. `./opencanary.conf` (i.e. the directory where OpenCanary is installed)
+1. `/etc/opencanaryd/opencanary.conf`
 2. `~/.opencanary.conf` (i.e. the home directory of the user, usually this will be `root` so `/root/.opencanary.conf`)
-3. `/etc/opencanaryd/opencanary.conf`
+3. `./opencanary.conf` (i.e. the directory where OpenCanary is installed)
 
 To create an initial configuration, run as `root` (you may be prompted for a `sudo` password):
 ```
