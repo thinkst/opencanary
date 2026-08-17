@@ -74,12 +74,10 @@ class AlertProxyRequest(Request):
             except:  # noqa: E722
                 pass
         elif atype == "NTLM":
-            # b64decode returns bytes not str in python2
-            print(b64decode(token).decode("utf-8").split(":"))
-            exit(1)
-            print("something NTLM")
-            # Shouldn't this return something?
-            return
+            # An NTLM Proxy-Authorization header carries an NTLMSSP message, not a
+            # user:pass pair, so record the raw token and let the attempt be logged
+            # like the Basic branch above.
+            username, password = token, ""
 
         logdata = {"USERNAME": username, "PASSWORD": password}
         factory.log(logdata, transport=self.transport)
