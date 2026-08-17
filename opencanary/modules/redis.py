@@ -9,14 +9,16 @@ import shlex
 
 class ProtocolError(Exception):
     def __init__(self, reason):
-        self.message = b"-ERR Protocol error: {reason}\r\n".format(reason=reason)
+        self.message = "-ERR Protocol error: {reason}\r\n".format(reason=reason).encode(
+            "utf-8"
+        )
 
 
 class ArgumentCountError(Exception):
     def __init__(self, cmd):
-        self.message = b"-ERR wrong number of arguments for '{cmd}' command\r\n".format(
+        self.message = "-ERR wrong number of arguments for '{cmd}' command\r\n".format(
             cmd=cmd.lower()
-        )
+        ).encode("utf-8")
 
 
 class AuthenticationRequiredError(Exception):
