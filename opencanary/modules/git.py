@@ -43,11 +43,11 @@ class GitProtocol(TimeoutMixin, Protocol):
         self.transport.loseConnection()
 
     def _checkDataLength(self, data):
-        if len(data) < 4:
+        actual_length = len(data)
+        if actual_length < 4:
             raise GitCommandLengthMismatch()
 
         try:
-            actual_length = len(data)
             indata_length = int(data[0:4], base=16)
             if indata_length > MAX_PACKET_SIZE:
                 raise ProtocolError()
@@ -114,7 +114,6 @@ class CanaryGit(LimitTotalConnectionsFactory, CanaryService):
             config.getVal("git.max_connections", default=DEFAULT_MAX_CONNECTIONS)
         )
         self.timeout = float(config.getVal("git.timeout", default=DEFAULT_TIMEOUT))
-        self.connectionCount = 0
         self.reactor = reactor
         self.listen_addr = config.getVal("device.listen_addr", default="")
         self.logtype = logger.LOG_GIT_CLONE_REQUEST

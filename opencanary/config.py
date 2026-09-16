@@ -141,7 +141,7 @@ class Config:
                 )
 
         if key == "git.max_connections":
-            if isinstance(val, bool) or not isinstance(val, int) or val < 1:
+            if type(val) is not int or val < 1:
                 raise ConfigException(
                     key, "git.max_connections must be a positive integer."
                 )

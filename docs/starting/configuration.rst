@@ -309,11 +309,11 @@ These configuration options are also available.
    * - device.listen_addr
      - ""
      - Controls which IP interface the Git, RDP, Redis, and VNC modules bind to.
-   * - git.timeout
-     - 10
-     - Seconds a Git connection may remain inactive before it is closed.
    * - git.max_connections
      - 32
      - Maximum number of concurrent connections accepted by the Git module.
+   * - git.timeout
+     - 10
+     - Seconds a Git connection may remain inactive before it is closed.
 
 Should you have any other questions regarding configuration or setup, please do not hesitate to contact us on `GitHub <https://github.com/thinkst/opencanary>`_.
