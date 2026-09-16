@@ -4,6 +4,9 @@ exclude: >
       .devcontainer/devcontainer.json
   )
 fail_fast: true
+default_install_hook_types:
+  - pre-commit
+  - pre-push
 repos:
 -   repo: https://github.com/pre-commit/pre-commit-hooks
     rev: v6.0.0
@@ -27,3 +30,21 @@ repos:
     hooks:
     -   id: flake8
         additional_dependencies: [flake8-typing-imports==1.12.0]
+-   repo: local
+    hooks:
+    -   id: check-uv-lock-public-urls
+        name: Check uv.lock for internal package URLs
+        entry: python scripts/check_uv_lock_urls.py
+        language: system
+        stages:
+        -   pre-push
+        always_run: true
+        pass_filenames: false
+    -   id: sanitise-uv-lock
+        name: Sanitise package-index URLs in uv.lock
+        entry: python scripts/sanitise_uv_lock.py
+        language: system
+        files: ^uv\.lock$
+        pass_filenames: false
+        stages:
+        -   pre-commit
