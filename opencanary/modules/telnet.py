@@ -2,15 +2,22 @@ from opencanary.modules import CanaryService
 
 from zope.interface import implementer
 from twisted.application import internet
+from twisted.internet import reactor
 from twisted.internet.error import ConnectionDone, ConnectionLost
-from twisted.internet import protocol
 from twisted.cred import portal
 from twisted.cred import credentials
 from twisted.conch.telnet import AuthenticatingTelnetProtocol
 from twisted.conch.telnet import ITelnetProtocol
 from twisted.conch.telnet import TelnetTransport
 from twisted.conch.telnet import ECHO
+from twisted.protocols.policies import LimitTotalConnectionsFactory, TimeoutMixin
+from twisted.python.compat import iterbytes
 from twisted.spread.pb import Avatar
+
+DEFAULT_MAX_CONNECTIONS = 64
+DEFAULT_TIMEOUT = 120
+MAX_SUBNEGOTIATION_BYTES = 256
+SUBNEGOTIATION_LIMIT_ERROR = "Telnet subnegotiation buffer limit reached"
 
 
 class MyTelnet(Avatar):
@@ -28,15 +35,43 @@ class Realm:
         raise NotImplementedError("Not supported by this realm")
 
 
-class CanaryTelnetTransport(TelnetTransport):
+class CanaryTelnetTransport(TimeoutMixin, TelnetTransport):
+    def connectionMade(self):
+        TelnetTransport.connectionMade(self)
+        self.setTimeout(self.factory.timeout)
+
+    def callLater(self, period, func):
+        return getattr(self.factory, "reactor", reactor).callLater(period, func)
+
     def dataReceived(self, data):
+        self.resetTimeout()
+
         try:
-            TelnetTransport.dataReceived(self, data)
+            for byte in iterbytes(data):
+                TelnetTransport.dataReceived(self, byte)
+                if (
+                    self.state.startswith("subnegotiation")
+                    and len(self.commands) >= MAX_SUBNEGOTIATION_BYTES
+                ):
+                    self.factory.canaryservice.log(
+                        {"ERROR": SUBNEGOTIATION_LIMIT_ERROR},
+                        transport=self.transport,
+                    )
+                    self.commands = []
+                    self.setTimeout(None)
+                    self.loseConnection()
+                    return
         except ValueError:
             print("Telnet client spoke weirdly, abandoning connection")
+            self.setTimeout(None)
             self.loseConnection()
 
+    def timeoutConnection(self):
+        self.setTimeout(None)
+        self.loseConnection()
+
     def connectionLost(self, reason):
+        self.setTimeout(None)
         # Avoids pointless logs on disconnect
         if reason.check(ConnectionDone) or reason.check(ConnectionLost):
             return
@@ -87,6 +122,11 @@ class Telnet(CanaryService):
         CanaryService.__init__(self, config=config, logger=logger)
         self.port = int(config.getVal("telnet.port", default=8023))
         self.banner = config.getVal("telnet.banner", "").encode("utf8")
+        self.max_connections = int(
+            config.getVal("telnet.max_connections", default=DEFAULT_MAX_CONNECTIONS)
+        )
+        self.timeout = float(config.getVal("telnet.timeout", default=DEFAULT_TIMEOUT))
+        self.reactor = reactor
         self.logtype = logger.LOG_TELNET_LOGIN_ATTEMPT
         self.listen_addr = config.getVal("device.listen_addr", default="")
 
@@ -96,7 +136,11 @@ class Telnet(CanaryService):
     def getService(self):
         r = Realm()
         p = portal.Portal(r)
-        f = protocol.ServerFactory()
+        f = LimitTotalConnectionsFactory()
+        f.connectionLimit = self.max_connections
+        f.connectionCount = 0
+        f.timeout = self.timeout
+        f.reactor = self.reactor
         f.canaryservice = self
         f.logger = self.logger
         f.banner = self.banner

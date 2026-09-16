@@ -94,6 +94,8 @@
     "telnet.enabled": false,
     "telnet.port": 23,
     "telnet.banner": "",
+    "telnet.max_connections": 64,
+    "telnet.timeout": 120,
     "telnet.honeycreds": [
         {
             "username": "admin",
