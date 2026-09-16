@@ -47,6 +47,8 @@ def test_httpproxy_auth_attempt_is_logged():
     assert log["logtype"] == LoggerBase.LOG_HTTPPROXY_LOGIN_ATTEMPT
     assert "USERNAME" in log["logdata"]
     assert "PASSWORD" in log["logdata"]
+    assert log["logdata"]["USERNAME"] == "test_user"
+    assert log["logdata"]["PASSWORD"] == "test_pass"
 
 
 def test_httpproxy_ntlm_auth_attempt_is_logged():

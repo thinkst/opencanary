@@ -70,7 +70,7 @@ class AlertProxyRequest(Request):
         atype, token = auth_arr
         if atype == "Basic":
             try:
-                username, password = b64decode(token).split(":")
+                username, password = b64decode(token).decode("utf-8").split(":", 1)
             except:  # noqa: E722
                 pass
         elif atype == "NTLM":
