@@ -47,3 +47,31 @@ def test_httpproxy_auth_attempt_is_logged():
     assert log["logtype"] == LoggerBase.LOG_HTTPPROXY_LOGIN_ATTEMPT
     assert "USERNAME" in log["logdata"]
     assert "PASSWORD" in log["logdata"]
+
+
+def test_httpproxy_ntlm_auth_attempt_is_logged():
+    """
+    Send a proxy request with an NTLM Proxy-Authorization header and verify the
+    attempt is logged. Regression test: the NTLM branch previously called
+    exit(1) before reaching factory.log, so NTLM probes were never alerted on.
+    """
+    log_start = get_log_count()
+    token = base64.b64encode(b"TlRMTVNTUAABAAAA").decode("ascii")
+
+    session = requests.Session()
+    session.trust_env = False
+    response = session.get(
+        "http://example.com/",
+        proxies={"http": f"http://localhost:{HTTPPROXY_PORT}"},
+        headers={"Proxy-Authorization": f"NTLM {token}"},
+        timeout=2,
+    )
+
+    assert response.status_code == 407
+
+    log = get_httpproxy_log(log_start)
+    assert log is not None
+    assert log["dst_port"] == HTTPPROXY_PORT
+    assert log["logtype"] == LoggerBase.LOG_HTTPPROXY_LOGIN_ATTEMPT
+    assert "USERNAME" in log["logdata"]
+    assert "PASSWORD" in log["logdata"]
