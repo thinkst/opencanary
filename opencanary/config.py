@@ -139,6 +139,16 @@ class Config:
                 raise ConfigException(
                     key, "Invalid port number (%s). Must be between 1 and 65535." % val
                 )
+
+        if key == "telnet.max_connections":
+            if isinstance(val, bool) or not isinstance(val, int) or val < 1:
+                raise ConfigException(
+                    key, "telnet.max_connections must be a positive integer."
+                )
+
+        if key == "telnet.timeout":
+            if isinstance(val, bool) or not isinstance(val, (int, float)) or val <= 0:
+                raise ConfigException(key, "telnet.timeout must be a positive number.")
         # Max length of SSH version string is 255 chars including trailing CR and LF
         # https://tools.ietf.org/html/rfc4253
         if key == "ssh.version" and len(val) > 253:

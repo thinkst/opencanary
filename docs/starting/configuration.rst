@@ -276,6 +276,8 @@ you will receive a json formatted config file at `/etc/opencanary/opencanary.con
         "telnet.enabled": false,
         "telnet.port": "23",
         "telnet.banner": "",
+        "telnet.max_connections": 64,
+        "telnet.timeout": 120,
         "telnet.honeycreds": [
             {
                 "username": "admin",
@@ -296,12 +298,22 @@ you will receive a json formatted config file at `/etc/opencanary/opencanary.con
 Other Configuration Options
 ---------------------------
 
-These configuration options aren't present in the default config file but may be added.
+These configuration options are also available.
 
-+------------------------+-----------+---------------------------------------------------------------------------+
-| Option Key             | Default   |  Description                                                              |
-+========================+===========+===========================================================================+
-| device.listen_addr     | ""        | Controls which IP interface the Git, RDP, Redis, and VNC modules bind to. |
-+------------------------+-----------+---------------------------------------------------------------------------+
+.. list-table::
+   :header-rows: 1
+
+   * - Option Key
+     - Default
+     - Description
+   * - device.listen_addr
+     - ""
+     - Controls which IP interface the Git, RDP, Redis, and VNC modules bind to.
+   * - telnet.max_connections
+     - 64
+     - Maximum number of concurrent connections accepted by the Telnet module. The default matches systemd socket units using ``Accept=yes``.
+   * - telnet.timeout
+     - 120
+     - Seconds a Telnet connection may remain inactive before it is closed.
 
 Should you have any other questions regarding configuration or setup, please do not hesitate to contact us on `GitHub <https://github.com/thinkst/opencanary>`_.
