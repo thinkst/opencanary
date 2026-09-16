@@ -180,6 +180,8 @@ you will receive a json formatted config file at `/etc/opencanary/opencanary.con
         "ip.ignorelist": [ ],
         "git.enabled": false,
         "git.port" : 9418,
+        "git.max_connections": 32,
+        "git.timeout": 10,
         "ftp.enabled": true,
         "ftp.port": 21,
         "ftp.banner": "FTP server ready",
@@ -296,12 +298,16 @@ you will receive a json formatted config file at `/etc/opencanary/opencanary.con
 Other Configuration Options
 ---------------------------
 
-These configuration options aren't present in the default config file but may be added.
+These configuration options are also available.
 
 +------------------------+-----------+---------------------------------------------------------------------------+
 | Option Key             | Default   |  Description                                                              |
 +========================+===========+===========================================================================+
 | device.listen_addr     | ""        | Controls which IP interface the Git, RDP, Redis, and VNC modules bind to. |
++------------------------+-----------+---------------------------------------------------------------------------+
+| git.max_connections    | 32        | Maximum number of concurrent connections accepted by the Git module.      |
++------------------------+-----------+---------------------------------------------------------------------------+
+| git.timeout            | 10        | Seconds a Git connection may remain inactive before it is closed.         |
 +------------------------+-----------+---------------------------------------------------------------------------+
 
 Should you have any other questions regarding configuration or setup, please do not hesitate to contact us on `GitHub <https://github.com/thinkst/opencanary>`_.
