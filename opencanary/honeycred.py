@@ -25,11 +25,18 @@ def testCred(cred, username=None, password=None):
 
     user_match = True
     if cred_username is not None:
-        user_match = cred_username.encode() == username
+        if isinstance(username, str):
+            username = username.encode("utf-8")
+        user_match = cred_username.encode("utf-8") == username
 
     password_match = True
     if cred_password is not None:
-        password_match = cryptcontext.verify(password, cred_password)
+        if password is None:
+            return False
+        try:
+            password_match = cryptcontext.verify(password, cred_password)
+        except UnicodeDecodeError:
+            return False
 
     return user_match and password_match
 
