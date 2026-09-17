@@ -62,6 +62,10 @@ BSON_BIN_LEN_FORMAT = "<I"
 # ---------------------------------------------------------------------------
 MONGO_MAX_BSON_OBJECT_SIZE = 16_777_216
 MONGO_MAX_MESSAGE_SIZE_BYTES = 48_000_000
+# A SCRAM username field is a few dozen bytes and always sits at the start of the
+# client-first payload. Scanning the whole message (up to MONGO_MAX_MESSAGE_SIZE_BYTES)
+# is inefficient and unnecessary.
+MONGO_SASL_PAYLOAD_SCAN_LIMIT = 1024
 MONGO_MAX_WRITE_BATCH_SIZE = 100_000
 MONGO_LOGICAL_SESSION_TIMEOUT_MIN = 30
 MONGO_CONNECTION_ID = 1
@@ -85,7 +89,9 @@ MONGO_ERR_AUTH_REQUIRED_MSG = "Authentication required"
 # ---------------------------------------------------------------------------
 # SASL / authentication
 # ---------------------------------------------------------------------------
-SASL_SCRAM_USERNAME_PATTERN = r"n=(.+?),"  # SCRAM client-first-message username field
+SASL_SCRAM_USERNAME_PATTERN = (
+    r"n=([^,]{1,256}),"  # SCRAM client-first-message username field
+)
 AUTH_UNKNOWN_USER = "unknown"
 AUTH_DEFAULT_MECHANISM = "SCRAM-SHA-1"
 
@@ -271,7 +277,10 @@ class MongoDBProtocol(Protocol, TimeoutMixin):
             payload = auth_doc["payload"]
             if isinstance(payload, bytes):
                 payload_str = payload.decode("utf-8", errors="ignore")
-                match = re.search(SASL_SCRAM_USERNAME_PATTERN, payload_str)
+                match = re.search(
+                    SASL_SCRAM_USERNAME_PATTERN,
+                    payload_str[:MONGO_SASL_PAYLOAD_SCAN_LIMIT],
+                )
                 if match:
                     username = match.group(1)
 
