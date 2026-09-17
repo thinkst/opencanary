@@ -180,6 +180,8 @@ you will receive a json formatted config file at `/etc/opencanary/opencanary.con
         "ip.ignorelist": [ ],
         "git.enabled": false,
         "git.port" : 9418,
+        "git.max_connections": 32,
+        "git.timeout": 10,
         "ftp.enabled": true,
         "ftp.port": 21,
         "ftp.banner": "FTP server ready",
@@ -309,6 +311,12 @@ These configuration options are also available.
    * - device.listen_addr
      - ""
      - Controls which IP interface the Git, RDP, Redis, and VNC modules bind to.
+   * - git.max_connections
+     - 32
+     - Maximum number of concurrent connections accepted by the Git module.
+   * - git.timeout
+     - 10
+     - Seconds a Git connection may remain inactive before it is closed.
    * - telnet.max_connections
      - 64
      - Maximum number of concurrent connections accepted by the Telnet module. The default matches systemd socket units using ``Accept=yes``.
