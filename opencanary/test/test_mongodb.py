@@ -59,11 +59,22 @@ def reactor_is_answering(timeout: float = 1.0) -> bool:
 
 def scram_sasl_message(payload: bytes) -> bytes:
     """One OP_MSG carrying {saslStart: 1, payload: <bytes>}."""
-    body = (b"\x10saslStart\x00" + struct.pack("<i", 1)
-            + b"\x05payload\x00" + struct.pack("<I", len(payload)) + b"\x00" + payload + b"\x00")
+    body = (
+        b"\x10saslStart\x00"
+        + struct.pack("<i", 1)
+        + b"\x05payload\x00"
+        + struct.pack("<I", len(payload))
+        + b"\x00"
+        + payload
+        + b"\x00"
+    )
     doc = struct.pack("<I", len(body) + 4) + body
-    return (struct.pack("<IIII", 16 + 5 + len(doc), 1, 0, 2013)
-            + struct.pack("<I", 0) + b"\x00" + doc)
+    return (
+        struct.pack("<IIII", 16 + 5 + len(doc), 1, 0, 2013)
+        + struct.pack("<I", 0)
+        + b"\x00"
+        + doc
+    )
 
 
 @pytest.fixture
@@ -153,17 +164,20 @@ def test_mongodb_scram_username_is_extracted_from_both_shapes(log_start):
     bare `n=user,r=...` both yield the username. Anchoring the pattern on a leading comma
     instead would have logged `unknown` for the bare shape.
     """
-    for payload, expected in ((b"n,,n=alice,r=nonce123456789", "alice"),
-                              (b"n=alice,r=nonce123456789", "alice"),
-                              (b"n,,n=user=2Cname,r=nonce123456789", "user=2Cname")):
+    for payload, expected in (
+        (b"n,,n=alice,r=nonce123456789", "alice"),
+        (b"n=alice,r=nonce123456789", "alice"),
+        (b"n,,n=user=2Cname,r=nonce123456789", "user=2Cname"),
+    ):
         s = socket.create_connection(("localhost", MONGODB_PORT), timeout=5)
         s.settimeout(5)
         s.sendall(scram_sasl_message(payload))
         s.recv(4096)
         s.close()
 
-        last_log = get_mongodb_log("mongodb.auth_attempt", log_start,
-                                   {"username": expected})
+        last_log = get_mongodb_log(
+            "mongodb.auth_attempt", log_start, {"username": expected}
+        )
         assert last_log is not None, f"{payload!r} must log {expected!r}"
 
 
@@ -175,7 +189,9 @@ def test_mongodb_scram_payload_does_not_freeze_the_reactor(log_start):
     """
     # Prove the other decoy is up *first*: a module the test config does not enable would
     # otherwise read as "the reactor is frozen" instead of "this test cannot run".
-    assert reactor_is_answering(), "the vnc decoy is not up: is the test daemon running?"
+    assert (
+        reactor_is_answering()
+    ), "the vnc decoy is not up: is the test daemon running?"
 
     s = socket.create_connection(("localhost", MONGODB_PORT), timeout=5)
     s.settimeout(5)

@@ -89,7 +89,9 @@ MONGO_ERR_AUTH_REQUIRED_MSG = "Authentication required"
 # ---------------------------------------------------------------------------
 # SASL / authentication
 # ---------------------------------------------------------------------------
-SASL_SCRAM_USERNAME_PATTERN = r"n=([^,]{1,256}),"  # SCRAM client-first-message username field
+SASL_SCRAM_USERNAME_PATTERN = (
+    r"n=([^,]{1,256}),"  # SCRAM client-first-message username field
+)
 AUTH_UNKNOWN_USER = "unknown"
 AUTH_DEFAULT_MECHANISM = "SCRAM-SHA-1"
 
