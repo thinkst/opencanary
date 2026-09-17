@@ -35,7 +35,7 @@ requires-python = ">= 3.10"
 dependencies = [
     "twisted==26.4.0",
     "pyasn1==0.6.4",
-    "cryptography==49.0.0",
+    "cryptography>=50.0.0",
     "simplejson==3.16.0",
     "requests==2.33.0",
     "zope.interface==7.2",
@@ -46,7 +46,7 @@ dependencies = [
     "setuptools==83.0.0",
     "urllib3==2.7.0",
     "hpfeeds==3.0.0",
-    "pyopenssl==26.3.0",
+    "pyopenssl>=26.4.0",
     "service-identity==21.1.0",
     "idna>=3.15",
     "redis==7.4.0",
@@ -81,7 +81,7 @@ exclude-newer = "7 days"
 [dependency-groups]
 dev = [
     "gitpython>=3.1.50",
-    "paramiko==3.4.1",
+    "paramiko>4.0.0",
     "pymongo>=4.17.0",
     "pymysql>=1.1.2",
     "pytest>=9.0.3",
