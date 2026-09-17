@@ -1,4 +1,8 @@
 import pytest
+import socket
+import struct
+import time
+
 from pymongo import MongoClient
 from pymongo.errors import OperationFailure
 
@@ -112,3 +116,51 @@ def test_mongodb_command_attempt(mongodb_client, log_start):
     assert last_log["logdata"]["action"] == "mongodb.command"
     assert last_log["logdata"]["command"] == "listDatabases"
     assert "listDatabases" in last_log["logdata"]["query"]
+
+def scram_sasl_message(payload: bytes) -> bytes:
+    """One OP_MSG carrying {saslStart: 1, payload: <bytes>}."""
+    body = (b"\x10saslStart\x00" + struct.pack("<i", 1)
+            + b"\x05payload\x00" + struct.pack("<I", len(payload)) + b"\x00" + payload + b"\x00")
+    doc = struct.pack("<I", len(body) + 4) + body
+    return (struct.pack("<IIII", 16 + 5 + len(doc), 1, 0, 2013)
+            + struct.pack("<I", 0) + b"\x00" + doc)
+
+
+def test_mongodb_scram_payload_does_not_freeze_the_reactor(log_start):
+    """A payload shaped to make `n=(.+?),` backtrack must not stall the shared reactor.
+
+    120KB of `n=` with no comma took 26s and froze every other module before the pattern was
+    bounded; the daemon must answer a *different* service while this is in flight.
+    """
+    s = socket.create_connection(("localhost", MONGODB_PORT), timeout=5)
+    s.sendall(scram_sasl_message(b"n=" * 60_000))
+    started = time.monotonic()
+    try:
+        s.recv(4096)
+    except socket.timeout:
+        pytest.fail("mongodb stopped answering: the reactor is busy in the regex")
+    assert time.monotonic() - started < 2, "the match must not scale with the payload"
+    s.close()
+
+    # A different module on the same reactor still answers, promptly.
+    probe = socket.create_connection(("localhost", 1433), timeout=1)
+    probe.settimeout(1)
+    probe.sendall(bytes.fromhex("1201000000000000"))
+    assert probe.recv(64), "another honeypot service was starved by the regex"
+    probe.close()
+
+    log = get_mongodb_log("mongodb.auth_attempt", log_start)
+    assert log is not None
+
+
+def test_mongodb_scram_username_is_extracted_from_both_shapes(log_start):
+    """The username is read whether or not the payload carries a gs2-header."""
+    for payload, expected in ((b"n,,n=alice,r=nonce123", "alice"),
+                              (b"n=alice,r=nonce123", "alice"),
+                              (b"n,,n=user=2Cname,r=nonce123", "user=2Cname")):
+        s = socket.create_connection(("localhost", MONGODB_PORT), timeout=5)
+        s.sendall(scram_sasl_message(payload))
+        s.recv(4096)
+        s.close()
+        log = get_mongodb_log("mongodb.auth_attempt", log_start, {"username": expected})
+        assert log is not None, f"{payload!r} must log {expected!r}"
