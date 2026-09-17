@@ -4,6 +4,7 @@ import datetime
 from opencanary.modules import CanaryService
 
 from base64 import b64decode
+from urllib.parse import urlsplit
 
 from twisted.application import internet
 from twisted.web.http import Request, HTTPChannel
@@ -87,11 +88,22 @@ class AlertProxyRequest(Request):
 
         factory = AlertProxyRequest.FACTORY
         profile = PROFILES[factory.skin]
+        url = self.uri.decode()
+        try:
+            parsed_url = urlsplit(url)
+            link_url = (
+                url
+                if parsed_url.scheme in ("http", "https") and parsed_url.netloc
+                else None
+            )
+        except ValueError:
+            link_url = None
         content = factory.auth_template.render(
-            url=self.uri.decode(),
+            url=url,
+            link_url=link_url,
             date=datetime.datetime.utcnow().strftime("%a, %d %b %Y %H:%M:%S %ZGMT"),
             clientip=self.transport.getPeer().host,
-        )
+        ).encode("utf-8")
         if factory.banner:
             prompt = factory.banner
         else:
@@ -112,7 +124,7 @@ class AlertProxyRequest(Request):
         )
         self.responseHeaders.addRawHeader("Content-Length", "{}".format(len(content)))
 
-        self.write(content.encode("utf-8"))
+        self.write(content)
         self.finish()
 
 
@@ -140,9 +152,9 @@ class HTTPProxy(CanaryService):
         authfilename = os.path.join(self.skindir, "auth.html")
         try:
             with open(authfilename, "r") as f:
-                self.auth_template = Template(f.read())
+                self.auth_template = Template(f.read(), autoescape=True)
         except:  # noqa: E722
-            self.auth_template = Template("")
+            self.auth_template = Template("", autoescape=True)
 
     def getService(self):
         AlertProxyRequest.FACTORY = self

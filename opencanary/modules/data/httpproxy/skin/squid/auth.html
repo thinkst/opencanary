@@ -114,7 +114,7 @@ body
 <hr>
 
 <div id="content">
-<p>The following error was encountered while trying to retrieve the URL: <a href="{{ url }}">{{ url }}</a></p>
+<p>The following error was encountered while trying to retrieve the URL: {% if link_url %}<a href="{{ link_url }}">{{ url }}</a>{% else %}{{ url }}{% endif %}</p>
 
 <blockquote id="error">
 <p><b>Cache Access Denied.</b></p>
