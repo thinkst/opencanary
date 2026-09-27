@@ -5,7 +5,7 @@ import socket
 import hpfeeds
 import sys
 
-from datetime import datetime
+from datetime import datetime, timezone
 from logging.handlers import SocketHandler
 from twisted.internet import reactor
 import requests
@@ -98,6 +98,7 @@ class LoggerBase(object):
     LOG_TCP_BANNER_DATA_RECEIVED = 18005
     LOG_LLMNR_QUERY_RESPONSE = 19001
     LOG_MONGODB_LOGIN_ATTEMPT = 20001
+    LOG_STATUS_UPDATE = 21001
     LOG_USER_0 = 99000
     LOG_USER_1 = 99001
     LOG_USER_2 = 99002
@@ -111,9 +112,10 @@ class LoggerBase(object):
 
     def sanitizeLog(self, logdata):
         logdata["node_id"] = self.node_id
-        logdata["local_time"] = datetime.utcnow().strftime("%Y-%m-%d %H:%M:%S.%f")
-        logdata["utc_time"] = datetime.utcnow().strftime("%Y-%m-%d %H:%M:%S.%f")
-        logdata["local_time_adjusted"] = datetime.now().strftime("%Y-%m-%d %H:%M:%S.%f")
+        logdata["utc_time"] = datetime.now(timezone.utc).strftime(
+            "%Y-%m-%d %H:%M:%S.%f"
+        )
+        logdata["local_time"] = datetime.now().strftime("%Y-%m-%d %H:%M:%S.%f")
         if "src_host" not in logdata:
             logdata["src_host"] = ""
         if "src_port" not in logdata:
@@ -166,11 +168,14 @@ class PyLogger(LoggerBase):
 
         self.logger = logging.getLogger(self.node_id)
 
+        self.tally = 0
+
     def error(self, data):
         data["local_time"] = datetime.utcnow().strftime("%Y-%m-%d %H:%M:%S.%f")
         msg = "[ERR] %r" % json.dumps(data, sort_keys=True)
         print(msg, file=sys.stderr)
         self.logger.warn(msg)
+        self.tally += 1
 
     def log(self, logdata, retry=True):
         logdata = self.sanitizeLog(logdata)
@@ -187,6 +192,7 @@ class PyLogger(LoggerBase):
 
         if notify is True:
             self.logger.warn(json.dumps(logdata, sort_keys=True))
+            self.tally += 1
 
 
 class SocketJSONHandler(SocketHandler):
@@ -255,9 +261,9 @@ class SlackHandler(logging.Handler):
         logging.Handler.__init__(self)
         self.webhook_url = webhook_url
 
-    def generate_msg(self, alert):
+    def generate_msg(self, alert, title="OpenCanary Alert"):
         msg = {}
-        msg["pretext"] = "OpenCanary Alert"
+        msg["pretext"] = title
         data = json.loads(alert.msg)
         msg["fields"] = []
         for k, v in data.items():
@@ -267,7 +273,11 @@ class SlackHandler(logging.Handler):
         return {"attachments": [msg]}
 
     def emit(self, record):
-        data = self.generate_msg(record)
+        data = json.loads(record.msg)
+        title = "OpenCanary Alert"
+        if "logtype" in data and data["logtype"] == LoggerBase.LOG_STATUS_UPDATE:
+            title = "OpenCanary Status"
+        data = self.generate_msg(record, title)
         response = requests.post(self.webhook_url, json=data)
         if response.status_code != 200:
             print(
@@ -281,7 +291,7 @@ class TeamsHandler(logging.Handler):
         logging.Handler.__init__(self)
         self.webhook_url = webhook_url
 
-    def message(self, data):
+    def message(self, data, title="OpenCanary Alert"):
         return {
             "attachments": [
                 {
@@ -316,7 +326,7 @@ class TeamsHandler(logging.Handler):
                                             },
                                             {
                                                 "type": "TextBlock",
-                                                "text": "OpenCanary Alert",
+                                                "text": title,
                                                 "weight": "Bolder",
                                                 "size": "ExtraLarge",
                                             },
@@ -344,7 +354,10 @@ class TeamsHandler(logging.Handler):
 
     def emit(self, record):
         data = json.loads(record.msg)
-        payload = self.message(data)
+        title = "OpenCanary Alert"
+        if "logtype" in data and data["logtype"] == LoggerBase.LOG_STATUS_UPDATE:
+            title = "OpenCanary Status"
+        payload = self.message(data, title)
         headers = {"Content-Type": "application/json"}
         response = requests.post(self.webhook_url, headers=headers, json=payload)
         if response.status_code != 202:
