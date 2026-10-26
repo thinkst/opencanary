@@ -537,7 +537,10 @@ class RedisProtocol(Protocol, TimeoutMixin):
             line = line[:-1]
 
         try:
-            tokens = [ t.encode("utf-8") for t in shlex.split(line.decode("utf-8", errors="replace")) ]
+            tokens = [
+                t.encode("utf-8")
+                for t in shlex.split(line.decode("utf-8", errors="replace"))
+            ]
         except ValueError:
             raise ProtocolError("unbalanced quotes in request")
 
