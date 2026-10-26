@@ -19,6 +19,7 @@ class StringTransportWithDisconnect(StringTransport):
     def loseWriteConnection(self):
         self.loseConnection()
 
+
 def get_redis_client(**kwargs):
     client = redis.Redis(
         host=REDIS_HOST,
@@ -26,7 +27,7 @@ def get_redis_client(**kwargs):
         socket_connect_timeout=REDIS_TIMEOUT,
         socket_timeout=REDIS_TIMEOUT,
         decode_responses=True,
-        driver_info=redis.driver_info.DriverInfo(name="",lib_version=""),
+        driver_info=redis.driver_info.DriverInfo(name="", lib_version=""),
         **kwargs,
     )
     return client
@@ -340,7 +341,9 @@ def test_redis_connection_limit_can_be_disabled(redis_factory):
         pytest.param(3, "PIN", "\u00e9\ufffd", id="truncated-utf8-argument"),
     ],
 )
-def test_redis_log_limit_counts_bytes(redis_factory, length, expected_command, expected_args):
+def test_redis_log_limit_counts_bytes(
+    redis_factory, length, expected_command, expected_args
+):
     factory, connect = redis_factory(**{"redis.max_arg_length": length})
     protocol = connect()
     protocol.dataReceived(b"*2\r\n$4\r\nPING\r\n$4\r\n\xc3\xa9\xc3\xa9\r\n")
@@ -536,17 +539,20 @@ def test_unknown_command_handles_non_utf8_input(
     assert protocol.transport.disconnecting is False
 
 
-def test_inline_command_handles_non_utf8_input(
-    redis_factory
-):
+def test_inline_command_handles_non_utf8_input(redis_factory):
     _, connect = redis_factory()
     protocol = connect()
-    protocol.dataReceived(b"\xff\r\n") 
+    protocol.dataReceived(b"\xff\r\n")
 
     event = protocol.factory.logger.log.call_args.args[0]
     assert event["logdata"]["CMD"] == "\ufffd"
     assert event["logdata"]["ARGS"] == ""
-    assert protocol.transport.value() == "-ERR unknown command '\ufffd', with args beginning with: \r\n".encode('utf-8')
+    assert (
+        protocol.transport.value()
+        == "-ERR unknown command '\ufffd', with args beginning with: \r\n".encode(
+            "utf-8"
+        )
+    )
     assert not protocol.transport.disconnecting
 
 
@@ -560,5 +566,8 @@ def test_invalid_resp_element_handles_non_utf8_input(
     event = protocol.factory.logger.log.call_args.args[0]
     assert event["logdata"]["CMD"] == ""
     assert event["logdata"]["ARGS"] == ""
-    assert protocol.transport.value() == "-ERR Protocol error: expected '$', got '\ufffd'\r\n".encode('utf-8')
+    assert (
+        protocol.transport.value()
+        == "-ERR Protocol error: expected '$', got '\ufffd'\r\n".encode("utf-8")
+    )
     assert protocol.transport.disconnecting
