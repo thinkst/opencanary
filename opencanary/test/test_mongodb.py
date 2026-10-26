@@ -10,6 +10,7 @@ from helpers import get_log_count, get_matching_log
 
 MONGODB_PORT = 27017
 MONGODB_VERSION = "4.4.6"
+MONGODB_MAX_WIRE_VERSION = 9
 MONGODB_AUTH_FAILED_CODE = 18
 MONGODB_UNAUTHORIZED_CODE = 13
 MONGODB_CLIENT_OPTIONS = {
@@ -97,6 +98,7 @@ def test_mongodb_hello(mongodb_client, log_start):
 
     assert response["ok"] == 1.0
     assert response["ismaster"] is True
+    assert response["maxWireVersion"] == MONGODB_MAX_WIRE_VERSION
     assert response["version"] == MONGODB_VERSION
 
     last_log = get_mongodb_log("mongodb.connection", log_start)
