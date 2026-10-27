@@ -52,7 +52,7 @@ dependencies = [
     "redis==7.4.0",
     "gitpython==3.2.1",
     "pymongo>=4.18.3",
-    "certifi==2026.10.19",
+    "certifi==2026.10.18",
 ]
 
 [project.urls]
