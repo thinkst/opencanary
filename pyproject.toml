@@ -43,7 +43,7 @@ dependencies = [
     "Jinja2==3.1.6",
     "ntlmlib==0.72",
     "bcrypt==3.2.0",
-    "setuptools==83.0.0",
+    "setuptools==84.1.0",
     "urllib3==2.8.0",
     "hpfeeds==3.0.0",
     "pyopenssl>=26.4.0",
