@@ -2,6 +2,11 @@ version: "3.4"
 
 x-common: &common
   restart: unless-stopped
+  # Resource limits so a fault in the container cannot exhaust host memory,
+  # CPU or process slots. Tune these to your environment if needed.
+  mem_limit: 512m
+  pids_limit: 200
+  cpus: 1.0
   tmpfs:
     - /run
   volumes:
