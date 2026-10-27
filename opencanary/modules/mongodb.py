@@ -70,7 +70,7 @@ MONGO_MAX_WRITE_BATCH_SIZE = 100_000
 MONGO_LOGICAL_SESSION_TIMEOUT_MIN = 30
 MONGO_CONNECTION_ID = 1
 MONGO_MIN_WIRE_VERSION = 0
-MONGO_MAX_WIRE_VERSION = 8
+MONGO_MAX_WIRE_VERSION = 9
 
 # ---------------------------------------------------------------------------
 # MongoDB error / result codes

@@ -156,13 +156,9 @@ class Config:
 
             min_value, max_value = INTEGER_RANGES[key]
             if min_value is not None and val < min_value:
-                raise ConfigException(
-                    key, "%s must be at least %s." % (key, min_value)
-                )
+                raise ConfigException(key, "%s must be at least %s." % (key, min_value))
             if max_value is not None and val > max_value:
-                raise ConfigException(
-                    key, "%s must be at most %s." % (key, max_value)
-                )
+                raise ConfigException(key, "%s must be at most %s." % (key, max_value))
 
         if key in NUMBER_RANGES:
             if isinstance(val, bool) or not isinstance(val, (int, float)):
@@ -170,13 +166,9 @@ class Config:
 
             min_value, max_value = NUMBER_RANGES[key]
             if min_value is not None and val < min_value:
-                raise ConfigException(
-                    key, "%s must be at least %s." % (key, min_value)
-                )
+                raise ConfigException(key, "%s must be at least %s." % (key, min_value))
             if max_value is not None and val > max_value:
-                raise ConfigException(
-                    key, "%s must be at most %s." % (key, max_value)
-                )
+                raise ConfigException(key, "%s must be at most %s." % (key, max_value))
 
         if key == "git.max_connections":
             if type(val) is not int or val < 1:

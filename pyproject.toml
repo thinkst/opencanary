@@ -44,13 +44,15 @@ dependencies = [
     "ntlmlib==0.72",
     "bcrypt==3.2.0",
     "setuptools==83.0.0",
-    "urllib3==2.7.0",
+    "urllib3==2.8.0",
     "hpfeeds==3.0.0",
     "pyopenssl>=26.4.0",
     "service-identity==21.1.0",
     "idna>=3.15",
     "redis==7.4.0",
-    "gitpython>=3.1.62",
+    "gitpython==3.2.1",
+    "pymongo>=4.18.3",
+    "certifi==2026.10.19",
 ]
 
 [project.urls]
