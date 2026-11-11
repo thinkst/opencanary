@@ -9,8 +9,8 @@ import time
 
 import pytest
 
-HERE = Path(__file__).resolve().parent
-ROOT = HERE.parents[2]
+CURRENT_DIR = Path(__file__).resolve().parent
+ROOT_DIR = CURRENT_DIR.parents[2]
 
 
 class Canary:
@@ -92,7 +92,7 @@ def canary(tmp_path, request, monkeypatch):
         names = (name, *additional_names)
         directory = tmp_path / f"canary-{len(list(tmp_path.iterdir()))}"
         directory.mkdir()
-        settings = json.loads((HERE / "opencanary.conf").read_text())
+        settings = json.loads((CURRENT_DIR / "opencanary.conf").read_text())
         # Port zero lets the listener itself allocate a free port, with no
         # bind-close-rebind race. Do not run production fixed-port validation.
         for key in settings:
@@ -112,12 +112,12 @@ def canary(tmp_path, request, monkeypatch):
         config_path = directory / "opencanary.conf"
         config_path.write_text(json.dumps(settings))
         (directory / "events.jsonl").touch()
-        environment = dict(os.environ, PYTHONPATH=str(ROOT), HOME=str(directory))
+        environment = dict(os.environ, PYTHONPATH=str(ROOT_DIR), HOME=str(directory))
         with (directory / "process.log").open("w") as output:
             process = subprocess.Popen(
                 [
                     sys.executable,
-                    str(HERE / "runner.py"),
+                    str(CURRENT_DIR / "opencanary_runner.py"),
                     str(config_path),
                     str(directory / "ready.json"),
                     *names,
