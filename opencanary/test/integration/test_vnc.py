@@ -1,17 +1,15 @@
 import socket
 
-from helpers import get_log_count, get_matching_log
 from opencanary.logger import LoggerBase
 
-VNC_PORT = 5000
 VNC_VERSION = b"RFB 003.008\n"
 
 
-def get_vnc_log(start_line):
+def get_vnc_log(server, start_line):
     def is_matching_log(log):
         if log.get("logtype") != LoggerBase.LOG_VNC:
             return False
-        if log.get("dst_port") != VNC_PORT:
+        if log.get("dst_port") != server.port:
             return False
         if "VNC Server Challenge" not in log.get("logdata", {}):
             return False
@@ -19,17 +17,18 @@ def get_vnc_log(start_line):
             return False
         return True
 
-    return get_matching_log(start_line, is_matching_log)
+    return server.get_matching_log(start_line, is_matching_log)
 
 
-def test_vnc_auth_attempt_is_logged():
+def test_vnc_auth_attempt_is_logged(canary):
     """
     Perform a minimal VNC handshake and send auth response.
     """
-    log_start = get_log_count()
+    server = canary("vnc")
+    log_start = server.get_log_count()
     with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as connection:
         connection.settimeout(2)
-        connection.connect(("localhost", VNC_PORT))
+        connection.connect((server.host, server.port))
 
         server_hello = connection.recv(12)
         assert server_hello == VNC_VERSION
@@ -44,9 +43,9 @@ def test_vnc_auth_attempt_is_logged():
 
         connection.sendall(b"\x00" * 16)
 
-    log = get_vnc_log(log_start)
+    log = get_vnc_log(server, log_start)
     assert log is not None
-    assert log["dst_port"] == VNC_PORT
+    assert log["dst_port"] == server.port
     assert log["logtype"] == LoggerBase.LOG_VNC
     assert len(log["logdata"]["VNC Server Challenge"]) == 32
     assert len(log["logdata"]["VNC Client Response"]) == 32

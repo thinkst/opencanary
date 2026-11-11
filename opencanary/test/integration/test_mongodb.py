@@ -6,9 +6,6 @@ import pytest
 from pymongo import MongoClient
 from pymongo.errors import OperationFailure
 
-from helpers import get_log_count, get_matching_log
-
-MONGODB_PORT = 27017
 MONGODB_VERSION = "4.4.6"
 MONGODB_MAX_WIRE_VERSION = 9
 MONGODB_AUTH_FAILED_CODE = 18
@@ -20,23 +17,15 @@ MONGODB_CLIENT_OPTIONS = {
     "directConnection": True,
 }
 
-# The liveness probe for "is the shared reactor still answering" - a different module, enabled
-# in opencanary/test/opencanary.conf, that replies on connect. Probing a module the test config
-# disables (mssql, :1433) raises ConnectionRefusedError and reads as a freeze that is really a
-# missing listener.
-VNC_PORT = 5000
+# Probe a different service running on the same child reactor.
 VNC_VERSION = b"RFB 003.008\n"
 
 
-def get_mongodb_client(uri="mongodb://localhost:27017"):
-    return MongoClient(uri, **MONGODB_CLIENT_OPTIONS)
-
-
-def get_mongodb_log(action, start_line, logdata=None):
+def get_mongodb_log(server, action, start_line, logdata=None):
     logdata = logdata or {}
 
     def is_matching_log(log):
-        if log["dst_port"] != MONGODB_PORT:
+        if log["dst_port"] != server.port:
             return False
         if log["logdata"].get("action") != action:
             return False
@@ -44,15 +33,15 @@ def get_mongodb_log(action, start_line, logdata=None):
             return False
         return True
 
-    return get_matching_log(start_line, is_matching_log)
+    return server.get_matching_log(start_line, is_matching_log)
 
 
-def reactor_is_answering(timeout: float = 1.0) -> bool:
+def reactor_is_answering(server, timeout: float = 1.0) -> bool:
     """Is a different module on the shared reactor still replying?"""
     try:
         with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as probe:
             probe.settimeout(timeout)
-            probe.connect(("localhost", VNC_PORT))
+            probe.connect((server.host, server.ports["vnc"]))
             return probe.recv(len(VNC_VERSION)) == VNC_VERSION
     except OSError:
         return False
@@ -79,18 +68,25 @@ def scram_sasl_message(payload: bytes) -> bytes:
 
 
 @pytest.fixture
-def log_start():
-    return get_log_count()
+def mongodb_server(canary):
+    return canary("mongodb")
 
 
 @pytest.fixture
-def mongodb_client():
-    client = get_mongodb_client()
+def log_start(mongodb_server):
+    return mongodb_server.get_log_count()
+
+
+@pytest.fixture
+def mongodb_client(mongodb_server, log_start):
+    client = MongoClient(
+        mongodb_server.host, mongodb_server.port, **MONGODB_CLIENT_OPTIONS
+    )
     yield client
     client.close()
 
 
-def test_mongodb_hello(mongodb_client, log_start):
+def test_mongodb_hello(mongodb_server, mongodb_client, log_start):
     """
     Connect to the MongoDB service and send a hello command.
     """
@@ -101,20 +97,21 @@ def test_mongodb_hello(mongodb_client, log_start):
     assert response["maxWireVersion"] == MONGODB_MAX_WIRE_VERSION
     assert response["version"] == MONGODB_VERSION
 
-    last_log = get_mongodb_log("mongodb.connection", log_start)
+    last_log = get_mongodb_log(mongodb_server, "mongodb.connection", log_start)
     assert last_log is not None
     assert last_log["logtype"] == 20001
-    assert last_log["dst_port"] == MONGODB_PORT
+    assert last_log["dst_port"] == mongodb_server.port
     assert last_log["logdata"]["action"] == "mongodb.connection"
 
 
-def test_mongodb_auth_attempt(log_start):
+def test_mongodb_auth_attempt(mongodb_server, log_start):
     """
     Try to authenticate to the MongoDB service.
     """
-    client = get_mongodb_client(
-        "mongodb://test_user:test_pass@localhost:27017/admin?"
-        "authMechanism=SCRAM-SHA-256"
+    client = MongoClient(
+        f"mongodb://test_user:test_pass@{mongodb_server.host}:{mongodb_server.port}/admin?"
+        "authMechanism=SCRAM-SHA-256",
+        **MONGODB_CLIENT_OPTIONS,
     )
 
     try:
@@ -123,13 +120,14 @@ def test_mongodb_auth_attempt(log_start):
 
         assert error.value.code == MONGODB_AUTH_FAILED_CODE
         last_log = get_mongodb_log(
+            mongodb_server,
             "mongodb.auth_attempt",
             log_start,
             {"username": "test_user", "mechanism": "SCRAM-SHA-256"},
         )
         assert last_log is not None
         assert last_log["logtype"] == 20001
-        assert last_log["dst_port"] == MONGODB_PORT
+        assert last_log["dst_port"] == mongodb_server.port
         assert last_log["logdata"]["action"] == "mongodb.auth_attempt"
         assert last_log["logdata"]["username"] == "test_user"
         assert last_log["logdata"]["mechanism"] == "SCRAM-SHA-256"
@@ -138,7 +136,7 @@ def test_mongodb_auth_attempt(log_start):
         client.close()
 
 
-def test_mongodb_command_attempt(mongodb_client, log_start):
+def test_mongodb_command_attempt(mongodb_server, mongodb_client, log_start):
     """
     Try to run an unauthenticated MongoDB command.
     """
@@ -148,17 +146,27 @@ def test_mongodb_command_attempt(mongodb_client, log_start):
     assert error.value.code == MONGODB_UNAUTHORIZED_CODE
 
     last_log = get_mongodb_log(
-        "mongodb.command", log_start, {"command": "listDatabases"}
+        mongodb_server, "mongodb.command", log_start, {"command": "listDatabases"}
     )
     assert last_log is not None
     assert last_log["logtype"] == 20001
-    assert last_log["dst_port"] == MONGODB_PORT
+    assert last_log["dst_port"] == mongodb_server.port
     assert last_log["logdata"]["action"] == "mongodb.command"
     assert last_log["logdata"]["command"] == "listDatabases"
     assert "listDatabases" in last_log["logdata"]["query"]
 
 
-def test_mongodb_scram_username_is_extracted_from_both_shapes(log_start):
+@pytest.mark.parametrize(
+    "payload,expected",
+    [
+        (b"n,,n=alice,r=nonce123456789", "alice"),
+        (b"n=alice,r=nonce123456789", "alice"),
+        (b"n,,n=user=2Cname,r=nonce123456789", "user=2Cname"),
+    ],
+)
+def test_mongodb_scram_username_is_extracted_from_both_shapes(
+    mongodb_server, log_start, payload, expected
+):
     """The username is read whether or not the payload carries a gs2-header.
 
     `n=([^,]{1,256}),` matches the legal SCRAM username field (RFC 5802: a comma can only
@@ -166,47 +174,42 @@ def test_mongodb_scram_username_is_extracted_from_both_shapes(log_start):
     bare `n=user,r=...` both yield the username. Anchoring the pattern on a leading comma
     instead would have logged `unknown` for the bare shape.
     """
-    for payload, expected in (
-        (b"n,,n=alice,r=nonce123456789", "alice"),
-        (b"n=alice,r=nonce123456789", "alice"),
-        (b"n,,n=user=2Cname,r=nonce123456789", "user=2Cname"),
-    ):
-        s = socket.create_connection(("localhost", MONGODB_PORT), timeout=5)
-        s.settimeout(5)
-        s.sendall(scram_sasl_message(payload))
-        s.recv(4096)
-        s.close()
+    with socket.create_connection(
+        (mongodb_server.host, mongodb_server.port), timeout=5
+    ) as connection:
+        connection.sendall(scram_sasl_message(payload))
+        connection.recv(4096)
 
-        last_log = get_mongodb_log(
-            "mongodb.auth_attempt", log_start, {"username": expected}
-        )
-        assert last_log is not None, f"{payload!r} must log {expected!r}"
+    last_log = get_mongodb_log(
+        mongodb_server, "mongodb.auth_attempt", log_start, {"username": expected}
+    )
+    assert last_log is not None, f"{payload!r} must log {expected!r}"
 
 
-def test_mongodb_scram_payload_does_not_freeze_the_reactor(log_start):
+def test_mongodb_scram_payload_does_not_freeze_the_reactor(canary):
     """A payload shaped to make `n=(.+?),` backtrack must not stall the shared reactor.
 
     120KB of `n=` with no comma took ~26s and froze every other module while the reactor sat
     in the regex; the daemon has to answer a *different* service while this is in flight.
     """
-    # Prove the other decoy is up *first*: a module the test config does not enable would
-    # otherwise read as "the reactor is frozen" instead of "this test cannot run".
-    assert (
-        reactor_is_answering()
-    ), "the vnc decoy is not up: is the test daemon running?"
+    server = canary("mongodb", "vnc")
+    log_start = server.get_log_count()
+    assert reactor_is_answering(server), "the vnc decoy is not answering"
 
-    s = socket.create_connection(("localhost", MONGODB_PORT), timeout=5)
-    s.settimeout(5)
-    s.sendall(scram_sasl_message(b"n=" * 60_000))
-    started = time.monotonic()
-    try:
-        s.recv(4096)
-    except socket.timeout:
-        pytest.fail("mongodb stopped answering: the reactor is busy in the regex")
-    assert time.monotonic() - started < 2, "the match must not scale with the payload"
-    s.close()
+    with socket.create_connection((server.host, server.port), timeout=5) as connection:
+        connection.sendall(scram_sasl_message(b"n=" * 60_000))
+        started = time.monotonic()
+        try:
+            connection.recv(4096)
+        except socket.timeout:
+            pytest.fail("mongodb stopped answering: the reactor is busy in the regex")
+        assert (
+            time.monotonic() - started < 2
+        ), "the match must not scale with the payload"
 
-    assert reactor_is_answering(), "another honeypot service was starved by the regex"
+    assert reactor_is_answering(
+        server
+    ), "another honeypot service was starved by the regex"
 
-    last_log = get_mongodb_log("mongodb.auth_attempt", log_start)
+    last_log = get_mongodb_log(server, "mongodb.auth_attempt", log_start)
     assert last_log is not None

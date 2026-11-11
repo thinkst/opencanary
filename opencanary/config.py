@@ -257,11 +257,3 @@ class ConfigException(Exception):
 
     def __repr__(self):
         return "<%s %s (%s)>" % (self.__class__.__name__, self.key, self.msg)
-
-
-config = Config()
-errors = config.checkValues()
-if errors:
-    for error in errors:
-        print(error)
-    sys.exit(1)

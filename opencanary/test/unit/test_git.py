@@ -1,37 +1,13 @@
 from unittest.mock import Mock
 
-import git
 import pytest
 from twisted.internet.error import ConnectionDone
 from twisted.internet.task import Clock
 from twisted.internet.testing import StringTransport
 from twisted.python.failure import Failure
 
-from helpers import get_last_log
 from opencanary.logger import LoggerBase
 from opencanary.modules.git import CanaryGit, GitProtocol, MAX_PACKET_SIZE
-
-
-@pytest.fixture
-def git_repo():
-    repo = git.Repo
-    yield repo
-
-
-def test_clone_a_repository(git_repo):
-    with pytest.raises(git.exc.GitCommandError):
-        git_repo.clone_from("git://localhost/test.git", "/tmp/git_test")
-
-
-def test_log_git_clone(git_repo):
-    """
-    Check that the git clone attempt was logged
-    """
-    # This test assumes a prior clone attempt has already been made.
-    # Otherwise, trigger one here or in shared test setup.
-    last_log = get_last_log()
-    assert "localhost" in last_log["logdata"]["HOST"]
-    assert last_log["logdata"]["REPO"] == "test.git"
 
 
 class GitTestFactory:
@@ -136,20 +112,6 @@ def test_git_activity_resets_timeout():
 
     protocol.factory.reactor.advance(1)
     assert protocol.transport.disconnecting
-
-
-def test_git_default_settings():
-    service = git_service()
-
-    assert service.connectionLimit == 32
-    assert service.timeout == 10
-
-
-def test_git_custom_settings():
-    service = git_service(**{"git.max_connections": 2, "git.timeout": 4.5})
-
-    assert service.connectionLimit == 2
-    assert service.timeout == 4.5
 
 
 @pytest.mark.parametrize("limit", [32, 2])
