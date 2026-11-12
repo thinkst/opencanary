@@ -43,13 +43,6 @@ For this configuration, you will need to set up your own Windows File Share. Ple
 `portscan` - a log watcher that works with iptables to monitor when your Opencanary is being scanned.
 At this stage, the portscan module supports the detection of Nmap OS, Nmap FIN, Nmap OS, Nmap NULL, and normal port scans.
 
-The `smb` and `portscan` log watchers resume reading from the beginning when they
-detect that a watched file has shrunk, including after a ``copytruncate`` rotation.
-This detection is best-effort: if the file is truncated and regrows to the previous
-read offset or beyond before the watcher handles the notification, new records
-can still be missed. Prefer rename/create rotation and configure the log writer
-(for example, rsyslog for the Samba setup) to reopen its output file after rotation.
-
 Logger Configuration
 --------------------
 
