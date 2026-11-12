@@ -5,6 +5,7 @@ import os
 from pathlib import Path
 import subprocess
 import sys
+import tempfile
 import time
 
 import pytest
@@ -83,15 +84,11 @@ class Canary:
 
 
 @pytest.fixture
-def canary(tmp_path, request, monkeypatch):
-    # Loopback clients must not inherit the developer's outbound proxy settings.
-    monkeypatch.setenv("NO_PROXY", "127.0.0.1,localhost")
-    monkeypatch.setenv("no_proxy", "127.0.0.1,localhost")
+def canary(tmp_path, request):
 
     def start(name, *additional_names):
         names = (name, *additional_names)
-        directory = tmp_path / f"canary-{len(list(tmp_path.iterdir()))}"
-        directory.mkdir()
+        directory = Path(tempfile.mkdtemp(prefix="canary-", dir=tmp_path))
         settings = json.loads((CURRENT_DIR / "opencanary.conf").read_text())
         # Port zero lets the listener itself allocate a free port, with no
         # bind-close-rebind race. Do not run production fixed-port validation.
@@ -113,6 +110,8 @@ def canary(tmp_path, request, monkeypatch):
         config_path.write_text(json.dumps(settings))
         (directory / "events.jsonl").touch()
         environment = dict(os.environ, PYTHONPATH=str(ROOT_DIR), HOME=str(directory))
+        # Keep the reactor independent of blocking clients and disposable per test.
+        # A subprocess also lets teardown kill a server whose reactor is blocked.
         with (directory / "process.log").open("w") as output:
             process = subprocess.Popen(
                 [
