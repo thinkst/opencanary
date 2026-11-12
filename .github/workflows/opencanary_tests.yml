@@ -39,6 +39,6 @@ jobs:
       - name: Install OpenCanary
         run: uv sync --locked --dev
       - name: Run unit tests
-        run: uv run pytest -q
+        run: uv run pytest
       - name: Run isolated integration tests
-        run: uv run pytest -q opencanary/test/integration
+        run: uv run pytest opencanary/test/integration
