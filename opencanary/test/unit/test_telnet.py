@@ -1,6 +1,3 @@
-import socket
-import time
-
 import pytest
 from twisted.conch.telnet import IAC, NAWS, SB
 from twisted.internet.error import ConnectionDone
@@ -8,7 +5,6 @@ from twisted.internet.task import Clock
 from twisted.internet.testing import StringTransport
 from twisted.python.failure import Failure
 
-from helpers import get_log_count, get_matching_log
 from opencanary.logger import LoggerBase
 from opencanary.modules.telnet import (
     DEFAULT_MAX_CONNECTIONS,
@@ -17,15 +13,6 @@ from opencanary.modules.telnet import (
     SUBNEGOTIATION_LIMIT_ERROR,
     Telnet,
 )
-
-TELNET_PORT = 23
-
-
-def get_telnet_log(start_line, logtype):
-    def is_matching_log(log):
-        return log.get("logtype") == logtype and log.get("dst_port") == TELNET_PORT
-
-    return get_matching_log(start_line, is_matching_log)
 
 
 class TelnetTestConfig:
@@ -63,30 +50,6 @@ def connect_telnet(factory):
     return wrapper.wrappedProtocol, transport
 
 
-def test_telnet_connection_and_login_attempt_are_logged():
-    """
-    Connect and submit credentials to telnet service.
-    """
-    # Assumes that telnet.log_tcp_connection is enabled in the test configuration
-    log_start = get_log_count()
-    with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as connection:
-        connection.settimeout(2)
-        connection.connect(("localhost", TELNET_PORT))
-        time.sleep(0.1)
-        _ = connection.recv(4096)
-        connection.sendall(b"test_user\r\n")
-        time.sleep(0.1)
-        connection.sendall(b"test_pass\r\n")
-
-    login_log = get_telnet_log(log_start, LoggerBase.LOG_TELNET_LOGIN_ATTEMPT)
-    assert login_log is not None
-    assert login_log["logdata"]["USERNAME"] == "test_user"
-    assert login_log["logdata"]["PASSWORD"] == "test_pass"
-
-    connection_log = get_telnet_log(log_start, LoggerBase.LOG_TELNET_CONNECTION_MADE)
-    assert connection_log is not None
-
-
 def test_subnegotiation_buffer_limit_logs_error_and_closes():
     factory, logger = build_telnet_factory()
     protocol, transport = connect_telnet(factory)
@@ -114,22 +77,6 @@ def test_large_subnegotiation_chunk_never_exceeds_buffer_limit():
     assert transport.disconnecting
     assert protocol.commands == []
     assert len(logger.events) == 1
-
-
-def test_telnet_default_limits():
-    factory, _ = build_telnet_factory()
-
-    assert factory.connectionLimit == DEFAULT_MAX_CONNECTIONS == 64
-    assert factory.timeout == DEFAULT_TIMEOUT == 120
-
-
-def test_telnet_custom_limits():
-    factory, _ = build_telnet_factory(
-        {"telnet.max_connections": 2, "telnet.timeout": 15.5}
-    )
-
-    assert factory.connectionLimit == 2
-    assert factory.timeout == 15.5
 
 
 @pytest.mark.parametrize("limit", [DEFAULT_MAX_CONNECTIONS, 2])

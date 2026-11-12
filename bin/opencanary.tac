@@ -4,7 +4,7 @@ import sys
 from twisted.application import service
 from importlib.metadata import entry_points
 
-from opencanary.config import config, is_docker
+from opencanary.config import Config, is_docker
 from opencanary.logger import getLogger
 from opencanary.modules.http import CanaryHTTP
 from opencanary.modules.https import CanaryHTTPS
@@ -23,6 +23,13 @@ from opencanary.modules.redis import CanaryRedis
 from opencanary.modules.tcpbanner import CanaryTCPBanner
 from opencanary.modules.rdp import CanaryRDP
 from opencanary.modules.mongodb import CanaryMongoDB
+
+config = Config()
+errors = config.checkValues()
+if errors:
+    for error in errors:
+        print(error)
+    sys.exit(1)
 
 
 def warn(*args, **kwargs):

@@ -90,3 +90,8 @@ dev = [
     "redis>=6.4.0",
     "requests>=2.32.4",
 ]
+
+[tool.pytest.ini_options]
+testpaths = ["opencanary/test/unit"]
+addopts = "--import-mode=importlib"
+pythonpath = ["."]
