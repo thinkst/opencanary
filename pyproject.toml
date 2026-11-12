@@ -34,7 +34,7 @@ classifiers = [
 requires-python = ">= 3.10"
 dependencies = [
     "twisted==26.4.0",
-    "pyasn1==0.6.4",
+    "pyasn1==0.6.5",
     "cryptography>=50.0.0",
     "simplejson==3.16.0",
     "requests==2.33.0",
