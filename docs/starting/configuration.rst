@@ -344,9 +344,9 @@ These configuration options are also available.
 TCP Resource Limits
 ~~~~~~~~~~~~~~~~~~~
 
-The MSSQL, MySQL, RDP, VNC listeners limit concurrent connections and idle time. They also support optional limits on total connection lifetime.
+The MongoDB, MSSQL, MySQL, RDP, VNC listeners limit concurrent connections and idle time. They also support optional limits on total connection lifetime.
 
-Use the prefixes ``mssql``, ``mysql``, ``rdp``, ``vnc`` for the following options:
+Use the prefixes ``mongodb``, ``mssql``, ``mysql``, ``rdp``, ``vnc`` for the following options:
 
 .. list-table::
    :header-rows: 1
@@ -355,14 +355,17 @@ Use the prefixes ``mssql``, ``mysql``, ``rdp``, ``vnc`` for the following option
      - Default
      - Description
    * - <prefix>.max_connections
-     - 32
+     - 10 for MongoDB; 32 otherwise
      - Maximum concurrent accepted connections per listener. Excess connections are closed immediately.
    * - <prefix>.timeout
      - 10
      - Seconds without incoming data before the connection is aborted.
    * - <prefix>.max_duration
-     - 0 for MSSQL; 60 otherwise
+     - 0 for MongoDB, MSSQL; 60 otherwise
      - Maximum connection lifetime in seconds, even when the client keeps sending data. Set to 0 for no total lifetime limit.
+   * - mongodb.max_buffer_size
+     - 16777216 (16 MiB)
+     - Maximum receive buffer and declared message size in bytes, capped at the MongoDB wire protocol maximum of 48000000. Also advertised to clients as maxMessageSizeBytes.
 
 A ``max_duration`` of 0 disables limit on connection duration.
 

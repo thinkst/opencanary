@@ -12,6 +12,7 @@ from twisted.python.failure import Failure
 
 from opencanary.config import ConfigException
 from opencanary.logger import PyLogger
+from opencanary.modules.mongodb import CanaryMongoDB
 from opencanary.modules.mssql import MSSQL, MSSQLProtocol
 from opencanary.modules.mysql import CanaryMySQL
 from opencanary.modules.rdp import CanaryRDP
@@ -21,6 +22,7 @@ from opencanary.modules.vnc import CanaryVNC
 SERVICES = [
     ("rdp", CanaryRDP),
     ("vnc", CanaryVNC),
+    ("mongodb", CanaryMongoDB),
     ("mysql", CanaryMySQL),
     ("mssql", MSSQL),
 ]
@@ -49,7 +51,7 @@ def connect(factory):
 @pytest.mark.parametrize("prefix,service_class", SERVICES)
 @pytest.mark.parametrize("configured_limit", [None, 2])
 def test_connection_limit_and_release(prefix, service_class, configured_limit):
-    default_limit = 32
+    default_limit = 10 if service_class is CanaryMongoDB else 32
     limit = default_limit if configured_limit is None else configured_limit
     settings = {} if configured_limit is None else {prefix + ".max_connections": limit}
     factory = listener_factory(service_class, settings)
@@ -161,6 +163,22 @@ def test_mysql_rejects_oversized_declared_length_without_buffering_payload():
     assert protocol.wrappedProtocol._buffer == b""
 
 
+@pytest.mark.parametrize("limit", [16 * 1024 * 1024, 2048])
+def test_mongodb_rejects_large_messages_and_bounds_memory(limit):
+    settings = {} if limit == 16 * 1024 * 1024 else {"mongodb.max_buffer_size": limit}
+    factory = listener_factory(CanaryMongoDB, settings)
+    assert factory.wrappedFactory.max_buffer_size == limit
+    protocol = connect(factory)
+    protocol.dataReceived(struct.pack("<IIII", limit + 1, 1, 0, 2013))
+    assert protocol.transport.disconnected
+    assert protocol.wrappedProtocol.buffer == b""
+
+    protocol = connect(factory)
+    protocol.dataReceived(b"x" * (limit + 1))
+    assert protocol.transport.disconnected
+    assert protocol.wrappedProtocol.buffer == b""
+
+
 @pytest.mark.parametrize("option", ["max_connections", "timeout", "max_duration"])
 @pytest.mark.parametrize("value", [-1, None, True, float("inf"), float("nan"), "bad"])
 def test_invalid_limits_are_rejected(option, value):
@@ -232,13 +250,16 @@ def test_service_defaults_are_validated(defaults):
         BoundedConnectionFactory(Factory(), config, "test", **defaults)
 
 
-@pytest.mark.parametrize("service_class", [MSSQL])
+@pytest.mark.parametrize("service_class", [CanaryMongoDB, MSSQL])
 def test_persistent_services_have_no_default_lifetime_limit(service_class):
     factory = listener_factory(service_class)
     assert factory.max_duration == 0
     protocol = connect(factory)
     inner = protocol.wrappedProtocol
-    if service_class is MSSQL:
+    if service_class is CanaryMongoDB:
+        body = b"\x00\x00\x00\x00\x00" + inner.encode_bson({"hello": 1})
+        message = struct.pack("<IIII", 16 + len(body), 1, 0, 2013) + body
+    elif service_class is MSSQL:
         message = inner.build_packet(MSSQLProtocol.NMAP_PROBE_1)
     else:
         message = b"monitoring\n"
