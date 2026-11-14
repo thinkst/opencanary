@@ -341,4 +341,32 @@ These configuration options are also available.
      - 120
      - Seconds a Telnet connection may remain inactive before it is closed.
 
+TCP Resource Limits
+~~~~~~~~~~~~~~~~~~~
+
+The RDP listeners limit concurrent connections and idle time. They also support optional limits on total connection lifetime.
+
+Use the prefixes ``rdp`` for the following options:
+
+.. list-table::
+   :header-rows: 1
+
+   * - Option Key
+     - Default
+     - Description
+   * - <prefix>.max_connections
+     - 32
+     - Maximum concurrent accepted connections per listener. Excess connections are closed immediately.
+   * - <prefix>.timeout
+     - 10
+     - Seconds without incoming data before the connection is aborted.
+   * - <prefix>.max_duration
+     - 60
+     - Maximum connection lifetime in seconds, even when the client keeps sending data. Set to 0 for no total lifetime limit.
+
+A ``max_duration`` of 0 disables limit on connection duration.
+
+Contact
+-------
+
 Should you have any other questions regarding configuration or setup, please do not hesitate to contact us on `GitHub <https://github.com/thinkst/opencanary>`_.
