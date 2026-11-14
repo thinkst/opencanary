@@ -12,6 +12,7 @@ from twisted.python.failure import Failure
 
 from opencanary.config import ConfigException
 from opencanary.logger import PyLogger
+from opencanary.modules.mssql import MSSQL, MSSQLProtocol
 from opencanary.modules.mysql import CanaryMySQL
 from opencanary.modules.rdp import CanaryRDP
 from opencanary.modules.resource_limits import BoundedConnectionFactory
@@ -21,6 +22,7 @@ SERVICES = [
     ("rdp", CanaryRDP),
     ("vnc", CanaryVNC),
     ("mysql", CanaryMySQL),
+    ("mssql", MSSQL),
 ]
 
 
@@ -124,7 +126,7 @@ def test_default_deadline_cannot_be_extended(prefix, service_class):
     assert protocol.transport.disconnected
 
 
-@pytest.mark.parametrize("service_class", [CanaryMySQL])
+@pytest.mark.parametrize("service_class", [CanaryMySQL, MSSQL])
 def test_slow_sql_packets_obey_configured_deadline(service_class):
     prefix = "mysql" if service_class is CanaryMySQL else "mssql"
     factory = listener_factory(service_class, {prefix + ".max_duration": 60})
@@ -144,7 +146,7 @@ def test_slow_sql_packets_obey_configured_deadline(service_class):
     assert protocol.transport.disconnected
 
 
-@pytest.mark.parametrize("service_class,limit", [(CanaryMySQL, 65536)])
+@pytest.mark.parametrize("service_class,limit", [(CanaryMySQL, 65536), (MSSQL, 65535)])
 def test_sql_receive_buffer_is_bounded(service_class, limit):
     protocol = connect(listener_factory(service_class))
     protocol.dataReceived(b"x" * (limit + 1))
@@ -228,6 +230,30 @@ def test_service_defaults_are_validated(defaults):
     config.getVal.side_effect = lambda key, default=None: default
     with pytest.raises(ConfigException):
         BoundedConnectionFactory(Factory(), config, "test", **defaults)
+
+
+@pytest.mark.parametrize("service_class", [MSSQL])
+def test_persistent_services_have_no_default_lifetime_limit(service_class):
+    factory = listener_factory(service_class)
+    assert factory.max_duration == 0
+    protocol = connect(factory)
+    inner = protocol.wrappedProtocol
+    if service_class is MSSQL:
+        message = inner.build_packet(MSSQLProtocol.NMAP_PROBE_1)
+    else:
+        message = b"monitoring\n"
+    assert protocol._deadline_call is None
+    for _ in range(120):
+        factory.reactor.advance(9)
+        protocol.dataReceived(message)
+        assert not protocol.transport.disconnecting
+    assert factory.connectionCount == 1
+    # Removing the lifetime limit preserves idle expiry and slot cleanup.
+    factory.reactor.advance(10)
+    assert protocol.transport.disconnected
+    protocol.connectionLost(Failure(ConnectionDone()))
+    assert factory.connectionCount == 0
+    assert factory.reactor.getDelayedCalls() == []
 
 
 @pytest.mark.parametrize("prefix,service_class", SERVICES)

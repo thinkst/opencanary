@@ -1,7 +1,7 @@
 from opencanary.modules import CanaryService
+from opencanary.modules.resource_limits import BoundedConnectionFactory
 from opencanary.config import ConfigException
 
-from twisted.protocols.policies import TimeoutMixin
 from twisted.internet.protocol import Protocol
 from twisted.internet.protocol import Factory
 from twisted.application import internet
@@ -24,7 +24,7 @@ TDSPacket = collections.namedtuple(
 PreLoginOption = collections.namedtuple("PreLoginOption", "token data")
 
 
-class MSSQLProtocol(Protocol, TimeoutMixin):
+class MSSQLProtocol(Protocol):
     # overview https://msdn.microsoft.com/en-us/library/dd357422.aspx
 
     TDS_HEADER_LEN = 8
@@ -107,7 +107,6 @@ class MSSQLProtocol(Protocol, TimeoutMixin):
         self._busyReceiving = False
         self._buffer = b""
         self.factory = factory
-        self.setTimeout(10)
 
     @staticmethod
     def build_packet(tds):
@@ -421,8 +420,11 @@ class MSSQLProtocol(Protocol, TimeoutMixin):
             self.transport.abortConnection()
 
     def dataReceived(self, data):
+        if len(self._buffer) + len(data) > 65535:
+            self._buffer = b""
+            self.transport.abortConnection()
+            return
         self._buffer += data
-        self.resetTimeout()
 
         if self._busyReceiving:
             return
@@ -435,8 +437,8 @@ class MSSQLProtocol(Protocol, TimeoutMixin):
         finally:
             self._busyReceiving = False
 
-    def timeoutConnection(self):
-        self.transport.abortConnection()
+    def connectionLost(self, reason):
+        self._buffer = b""
 
 
 class SQLFactory(Factory):
@@ -461,4 +463,7 @@ class MSSQL(CanaryService):
     def getService(self):
         factory = SQLFactory()
         factory.canaryservice = self
+        factory = BoundedConnectionFactory(
+            factory, self.config, "mssql", default_max_duration=0
+        )
         return internet.TCPServer(self.port, factory, interface=self.listen_addr)
