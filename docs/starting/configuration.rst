@@ -344,9 +344,9 @@ These configuration options are also available.
 TCP Resource Limits
 ~~~~~~~~~~~~~~~~~~~
 
-The RDP, VNC listeners limit concurrent connections and idle time. They also support optional limits on total connection lifetime.
+The MySQL, RDP, VNC listeners limit concurrent connections and idle time. They also support optional limits on total connection lifetime.
 
-Use the prefixes ``rdp``, ``vnc`` for the following options:
+Use the prefixes ``mysql``, ``rdp``, ``vnc`` for the following options:
 
 .. list-table::
    :header-rows: 1

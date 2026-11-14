@@ -1,5 +1,6 @@
 """Exercise the production listener factories with deterministic time."""
 
+import struct
 from unittest.mock import Mock
 
 import pytest
@@ -11,6 +12,7 @@ from twisted.python.failure import Failure
 
 from opencanary.config import ConfigException
 from opencanary.logger import PyLogger
+from opencanary.modules.mysql import CanaryMySQL
 from opencanary.modules.rdp import CanaryRDP
 from opencanary.modules.resource_limits import BoundedConnectionFactory
 from opencanary.modules.vnc import CanaryVNC
@@ -18,6 +20,7 @@ from opencanary.modules.vnc import CanaryVNC
 SERVICES = [
     ("rdp", CanaryRDP),
     ("vnc", CanaryVNC),
+    ("mysql", CanaryMySQL),
 ]
 
 
@@ -104,7 +107,11 @@ def test_active_connections_still_have_absolute_deadline(prefix, service_class):
 
 @pytest.mark.parametrize(
     "prefix,service_class",
-    [(prefix, cls) for prefix, cls in SERVICES if cls in (CanaryRDP, CanaryVNC)],
+    [
+        (prefix, cls)
+        for prefix, cls in SERVICES
+        if cls in (CanaryRDP, CanaryVNC, CanaryMySQL)
+    ],
 )
 def test_default_deadline_cannot_be_extended(prefix, service_class):
     factory = listener_factory(service_class)
@@ -115,6 +122,41 @@ def test_default_deadline_cannot_be_extended(prefix, service_class):
         protocol.dataReceived(b"x")
     factory.reactor.advance(4)
     assert protocol.transport.disconnected
+
+
+@pytest.mark.parametrize("service_class", [CanaryMySQL])
+def test_slow_sql_packets_obey_configured_deadline(service_class):
+    prefix = "mysql" if service_class is CanaryMySQL else "mssql"
+    factory = listener_factory(service_class, {prefix + ".max_duration": 60})
+    protocol = connect(factory)
+    # Valid headers for incomplete MySQL auth / TDS prelogin messages.
+    header = (
+        b"\xfc\xff\x00\x01"
+        if service_class is CanaryMySQL
+        else struct.pack(">BBHHBB", 18, 1, 65535, 0, 1, 0)
+    )
+    protocol.dataReceived(header)
+    for _ in range(6):
+        factory.reactor.advance(9)
+        protocol.dataReceived(b"\x00")
+        assert not protocol.transport.disconnecting
+    factory.reactor.advance(6)
+    assert protocol.transport.disconnected
+
+
+@pytest.mark.parametrize("service_class,limit", [(CanaryMySQL, 65536)])
+def test_sql_receive_buffer_is_bounded(service_class, limit):
+    protocol = connect(listener_factory(service_class))
+    protocol.dataReceived(b"x" * (limit + 1))
+    assert protocol.transport.disconnected
+    assert protocol.wrappedProtocol._buffer == b""
+
+
+def test_mysql_rejects_oversized_declared_length_without_buffering_payload():
+    protocol = connect(listener_factory(CanaryMySQL))
+    protocol.dataReceived(b"\xff\xff\xff\x01")
+    assert protocol.transport.disconnected
+    assert protocol.wrappedProtocol._buffer == b""
 
 
 @pytest.mark.parametrize("option", ["max_connections", "timeout", "max_duration"])
