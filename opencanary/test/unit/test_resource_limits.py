@@ -17,6 +17,7 @@ from opencanary.modules.mssql import MSSQL, MSSQLProtocol
 from opencanary.modules.mysql import CanaryMySQL
 from opencanary.modules.rdp import CanaryRDP
 from opencanary.modules.resource_limits import BoundedConnectionFactory
+from opencanary.modules.tcpbanner import CanaryTCPBanner
 from opencanary.modules.vnc import CanaryVNC
 
 SERVICES = [
@@ -25,6 +26,7 @@ SERVICES = [
     ("mongodb", CanaryMongoDB),
     ("mysql", CanaryMySQL),
     ("mssql", MSSQL),
+    ("tcpbanner_1", CanaryTCPBanner),
 ]
 
 
@@ -250,7 +252,7 @@ def test_service_defaults_are_validated(defaults):
         BoundedConnectionFactory(Factory(), config, "test", **defaults)
 
 
-@pytest.mark.parametrize("service_class", [CanaryMongoDB, MSSQL])
+@pytest.mark.parametrize("service_class", [CanaryMongoDB, MSSQL, CanaryTCPBanner])
 def test_persistent_services_have_no_default_lifetime_limit(service_class):
     factory = listener_factory(service_class)
     assert factory.max_duration == 0
