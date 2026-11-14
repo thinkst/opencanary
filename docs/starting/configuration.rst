@@ -344,9 +344,9 @@ These configuration options are also available.
 TCP Resource Limits
 ~~~~~~~~~~~~~~~~~~~
 
-The RDP listeners limit concurrent connections and idle time. They also support optional limits on total connection lifetime.
+The RDP, VNC listeners limit concurrent connections and idle time. They also support optional limits on total connection lifetime.
 
-Use the prefixes ``rdp`` for the following options:
+Use the prefixes ``rdp``, ``vnc`` for the following options:
 
 .. list-table::
    :header-rows: 1

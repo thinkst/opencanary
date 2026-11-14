@@ -13,9 +13,11 @@ from opencanary.config import ConfigException
 from opencanary.logger import PyLogger
 from opencanary.modules.rdp import CanaryRDP
 from opencanary.modules.resource_limits import BoundedConnectionFactory
+from opencanary.modules.vnc import CanaryVNC
 
 SERVICES = [
     ("rdp", CanaryRDP),
+    ("vnc", CanaryVNC),
 ]
 
 
@@ -102,7 +104,7 @@ def test_active_connections_still_have_absolute_deadline(prefix, service_class):
 
 @pytest.mark.parametrize(
     "prefix,service_class",
-    [(prefix, cls) for prefix, cls in SERVICES if cls in (CanaryRDP,)],
+    [(prefix, cls) for prefix, cls in SERVICES if cls in (CanaryRDP, CanaryVNC)],
 )
 def test_default_deadline_cannot_be_extended(prefix, service_class):
     factory = listener_factory(service_class)
