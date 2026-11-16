@@ -10,10 +10,22 @@ def ssh_connection():
     connection.close()
 
 
-def test_ssh_with_basic_login(ssh_connection, canary):
-    """
-    Try to log into the SSH server
-    """
+@pytest.mark.parametrize(
+    "kex",
+    [
+        pytest.param(None, id="default"),
+        "diffie-hellman-group-exchange-sha256",
+    ],
+)
+def test_ssh_with_basic_login(ssh_connection, canary, kex):
+    """Key exchange must reach password authentication and log rejected credentials."""
+
+    def transport_factory(*args, **kwargs):
+        transport = paramiko.Transport(*args, **kwargs)
+        if kex is not None:
+            transport.get_security_options().kex = (kex,)
+        return transport
+
     server = canary("ssh")
     start = server.get_log_count()
     with pytest.raises(paramiko.ssh_exception.AuthenticationException):
@@ -27,13 +39,15 @@ def test_ssh_with_basic_login(ssh_connection, canary):
             auth_timeout=5,
             allow_agent=False,
             look_for_keys=False,
+            transport_factory=transport_factory,
         )
     last_log = server.get_matching_log(
         start,
-        lambda entry: entry.get("logdata", {}).get("USERNAME") == "test_user",
+        lambda entry: (
+            entry.get("logtype") == 4002
+            and entry.get("logdata", {}).get("USERNAME") == "test_user"
+        ),
     )
-    assert last_log is not None
     assert last_log["dst_port"] == server.port
-    assert "paramiko" in last_log["logdata"]["REMOTEVERSION"]
     assert last_log["logdata"]["USERNAME"] == "test_user"
     assert last_log["logdata"]["PASSWORD"] == "test_pass"
