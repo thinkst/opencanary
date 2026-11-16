@@ -196,6 +196,7 @@ class HoneyPotTransport(transport.SSHServerTransport):
         self.dhGexRequest = packet
         min, ideal, max = struct.unpack(">3L", packet)
         self.g, self.p = self.factory.getDHPrime(min)
+        self._startEphemeralDH()
         self.sendPacket(MSG_KEX_DH_GEX_GROUP, MP(self.p) + MP(self.g))
 
     # this seems to be the only reliable place of catching lost connection
