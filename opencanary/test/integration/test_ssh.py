@@ -18,7 +18,9 @@ def ssh_connection():
     ],
 )
 def test_ssh_with_basic_login(ssh_connection, canary, kex):
-    """Key exchange must reach password authentication and log rejected credentials."""
+    """
+    Try to log into the SSH server
+    """
 
     def transport_factory(*args, **kwargs):
         transport = paramiko.Transport(*args, **kwargs)
@@ -49,5 +51,9 @@ def test_ssh_with_basic_login(ssh_connection, canary, kex):
         ),
     )
     assert last_log["dst_port"] == server.port
+    assert (
+        last_log["logdata"]["REMOTEVERSION"]
+        == ssh_connection.get_transport().local_version
+    )
     assert last_log["logdata"]["USERNAME"] == "test_user"
     assert last_log["logdata"]["PASSWORD"] == "test_pass"
