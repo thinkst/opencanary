@@ -161,6 +161,10 @@ if sys.platform.startswith("linux"):  # noqa: C901
             if not self.f:
                 return
 
+            # copytruncate keeps the inode but can leave our offset past EOF.
+            if os.fstat(self.f.fileno()).st_size < self.f.tell():
+                self.f.seek(0)
+
             lines = self.f.read().strip().split("\n")
 
             self.handleLines(lines=lines)
