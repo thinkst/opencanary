@@ -86,10 +86,12 @@ class Canary:
 @pytest.fixture
 def canary(tmp_path, request):
 
-    def start(name, *additional_names):
+    def start(name, *additional_names, overrides=None):
         names = (name, *additional_names)
         directory = Path(tempfile.mkdtemp(prefix="canary-", dir=tmp_path))
         settings = json.loads((CURRENT_DIR / "opencanary.conf").read_text())
+        if overrides:
+            settings.update(overrides)
         # Port zero lets the listener itself allocate a free port, with no
         # bind-close-rebind race. Do not run production fixed-port validation.
         for key in settings:
