@@ -5,6 +5,8 @@ The HTTP server should look like a NAS and present a login box, any
 interaction with the server (GET, POST) should be logged.
 """
 
+import re
+
 import requests
 import pytest
 
@@ -167,3 +169,27 @@ def test_redirect(http_server):
     assert last_log is not None
     assert request.status_code == 302
     assert last_log["logtype"] == 3003
+
+
+def test_redirect_fallback_link_reaches_login_page(http_server):
+    """
+    The fallback link in the redirect body must lead to the login page
+    rather than a 404, so visitors who click it are logged (issue #533).
+    """
+    start = http_server.get_log_count()
+    redirect = requests.get(http_server.url, allow_redirects=False, timeout=5)
+    assert redirect.status_code == 302
+    match = re.search(r'href="([^"]+)"', redirect.text)
+    assert match is not None
+    target = match.group(1)
+    assert redirect.headers["Location"] == target
+    page = requests.get(f"{http_server.url}{target}", timeout=5)
+    assert page.status_code == 200
+    last_log = http_server.get_matching_log(
+        start,
+        lambda entry: (
+            entry.get("logtype") == 3000
+            and entry.get("logdata", {}).get("PATH") == target
+        ),
+    )
+    assert last_log is not None
