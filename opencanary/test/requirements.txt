@@ -1,5 +1,5 @@
 requests
-paramiko==3.4.0
+paramiko==5.0.0
 PyMySQL
 gitpython
 pymongo
