@@ -4,7 +4,7 @@ from twisted.application import internet
 from twisted.web.server import Site, GzipEncoderFactory, Request
 from twisted.web.resource import Resource, EncodingResourceWrapper
 from twisted.web.http import HTTPChannel, HTTPFactory
-from twisted.web.util import Redirect
+from twisted.web.util import Redirect, redirectTo
 from twisted.web import static
 
 import os
@@ -262,6 +262,8 @@ class RedirectCustomHeaders(Redirect):
         request.redirect(self.url)
 
         content = self._get_redirect_file_content()
+        if content is None:
+            return redirectTo(self.url, request)
         return content
 
     def _get_redirect_file_content(self):
@@ -271,7 +273,11 @@ class RedirectCustomHeaders(Redirect):
                 % (self.factory.skindir, self.skin)
             )
 
-        with open(os.path.join(self.skindir, "redirect.html")) as f:
+        redirect_path = os.path.join(self.skindir, "redirect.html")
+        if not os.path.isfile(redirect_path):
+            return None
+
+        with open(redirect_path) as f:
             text = f.read()
 
         return bytes(text, "utf-8")
