@@ -4,6 +4,7 @@ import sys
 from twisted.application import service
 from importlib.metadata import entry_points
 
+from opencanary import __version__
 from opencanary.config import Config, is_docker
 from opencanary.logger import getLogger
 from opencanary.modules.http import CanaryHTTP
@@ -187,5 +188,5 @@ start_modules.extend(filter(lambda m: config.moduleEnabled(m.NAME), MODULES))
 for klass in start_modules:
     start_mod(application, klass)
 
-msg = "Canary running!!!"
+msg = "Canary running!!! (OpenCanary version %s)" % __version__
 logMsg({"logdata": msg})
