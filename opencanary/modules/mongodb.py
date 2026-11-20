@@ -6,9 +6,12 @@ It implements the MongoDB wire protocol to respond realistically to connection a
 """
 
 from opencanary.modules import CanaryService
+from opencanary.modules.resource_limits import (
+    BoundedConnectionFactory,
+    positive_setting,
+)
 from twisted.internet.protocol import Protocol, Factory
 from twisted.application import internet
-from twisted.protocols.policies import TimeoutMixin
 import struct
 import re
 from datetime import datetime
@@ -124,7 +127,7 @@ CMD_COLLECTION_SUFFIX = "$cmd"
 CMD_QUERY_PREFIX = "query:"
 
 
-class MongoDBProtocol(Protocol, TimeoutMixin):
+class MongoDBProtocol(Protocol):
     """
     Implements MongoDB wire protocol to handle incoming connections.
     Supports OP_QUERY, OP_MSG (MongoDB 3.6+), and logs all authentication attempts.
@@ -140,9 +143,6 @@ class MongoDBProtocol(Protocol, TimeoutMixin):
         """Log new connection attempts"""
         self.transport_log_data = self.get_transport_log_data()
         self.factory.log_connection(self.transport)
-        self.setTimeout(
-            MONGO_LOGICAL_SESSION_TIMEOUT_MIN * 60
-        )  # Set a timeout for idle connections
 
     def get_transport_log_data(self):
         us = self.transport.getHost()
@@ -159,13 +159,11 @@ class MongoDBProtocol(Protocol, TimeoutMixin):
         Process incoming MongoDB wire protocol messages.
         Handles OP_QUERY (legacy) and OP_MSG (modern) opcodes.
         """
-        if len(self.buffer) + len(data) > MONGO_MAX_MESSAGE_SIZE_BYTES:
+        if len(self.buffer) + len(data) > self.factory.max_buffer_size:
             self.factory.log_error(self.transport, "Buffer overflow attempt")
-            self.transport.loseConnection()
+            self.buffer = b""
+            self.transport.abortConnection()
             return
-
-        if len(data) > 0:
-            self.resetTimeout()
 
         self.buffer += data
 
@@ -175,12 +173,13 @@ class MongoDBProtocol(Protocol, TimeoutMixin):
 
             if (
                 msg_length < MSG_HEADER_SIZE
-                or msg_length > MONGO_MAX_MESSAGE_SIZE_BYTES
+                or msg_length > self.factory.max_buffer_size
             ):
                 self.factory.log_error(
                     self.transport, f"Invalid message length: {msg_length}"
                 )
-                self.transport.loseConnection()
+                self.buffer = b""
+                self.transport.abortConnection()
                 return
 
             if len(self.buffer) < msg_length:
@@ -302,7 +301,7 @@ class MongoDBProtocol(Protocol, TimeoutMixin):
         response_doc = {
             "ismaster": True,
             "maxBsonObjectSize": MONGO_MAX_BSON_OBJECT_SIZE,
-            "maxMessageSizeBytes": MONGO_MAX_MESSAGE_SIZE_BYTES,
+            "maxMessageSizeBytes": self.factory.max_buffer_size,
             "maxWriteBatchSize": MONGO_MAX_WRITE_BATCH_SIZE,
             "localTime": datetime.utcnow().isoformat(),
             "logicalSessionTimeoutMinutes": MONGO_LOGICAL_SESSION_TIMEOUT_MIN,
@@ -471,6 +470,7 @@ class MongoDBProtocol(Protocol, TimeoutMixin):
 
     def connectionLost(self, reason):
         """Log connection closure"""
+        self.buffer = b""
         self.factory.log_disconnect(**self.transport_log_data)
 
 
@@ -494,6 +494,12 @@ class CanaryMongoDB(Factory, CanaryService):
             CONFIG_KEY_LISTEN_ADDR, default=CONFIG_DEFAULT_LISTEN_ADDR
         )
         self.logtype = LOG_TYPE_MONGODB
+        self.max_buffer_size = min(
+            MONGO_MAX_MESSAGE_SIZE_BYTES,
+            positive_setting(
+                config, "mongodb.max_buffer_size", 16 * 1024 * 1024, integer=True
+            ),
+        )
 
     def buildProtocol(self, addr):
         """Factory method to build protocol instances"""
@@ -535,7 +541,14 @@ class CanaryMongoDB(Factory, CanaryService):
         self.log({"action": LOG_ACTION_DISCONNECT}, **kwargs)
 
     def getService(self):
-        return internet.TCPServer(self.port, self, interface=self.listen_addr)
+        factory = BoundedConnectionFactory(
+            self,
+            self.config,
+            "mongodb",
+            default_max_connections=10,
+            default_max_duration=0,
+        )
+        return internet.TCPServer(self.port, factory, interface=self.listen_addr)
 
 
 CanaryServiceFactory = CanaryMongoDB

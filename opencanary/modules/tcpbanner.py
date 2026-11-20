@@ -1,4 +1,5 @@
 from opencanary.modules import CanaryService
+from opencanary.modules.resource_limits import BoundedConnectionFactory
 import socket
 
 from twisted.internet.protocol import Protocol
@@ -232,6 +233,9 @@ class CanaryTCPBanner(CanaryService):
                 factory.canaryservice = self
                 port = self.config.getVal(
                     "tcpbanner_" + str(i) + ".port", default=8000 + i
+                )
+                factory = BoundedConnectionFactory(
+                    factory, self.config, "tcpbanner_" + str(i), default_max_duration=0
                 )
                 services.append(internet.TCPServer(port, factory))
         return services
