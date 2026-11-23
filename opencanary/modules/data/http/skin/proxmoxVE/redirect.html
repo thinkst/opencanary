@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Proxmox Virtual Environment</title>
+    <style>
+      html,
+      body {
+        margin: 0;
+        height: 100%;
+      }
+      body {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: #cfcfcf;
+        color: #000000;
+        font-family: helvetica, arial, verdana, sans-serif;
+        font-size: 13px;
+        font-weight: 300;
+      }
+      .box {
+        text-align: center;
+      }
+      .box img {
+        width: 200px;
+        height: 33px;
+        margin-bottom: 18px;
+      }
+      a {
+        color: #157fcc;
+        text-decoration: none;
+      }
+      a:hover {
+        text-decoration: underline;
+      }
+      @media (prefers-color-scheme: dark) {
+        body {
+          background: #1a1a1a;
+          color: #f2f2f2;
+        }
+        .box img {
+          filter: invert(1) hue-rotate(180deg);
+        }
+        a {
+          color: #4db5ff;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="box">
+      <img src="/pwt/images/proxmox_logo.svg" alt="Proxmox" />
+      <p><a href="/index.html">Click here to log in</a></p>
+    </div>
+  </body>
+</html>
