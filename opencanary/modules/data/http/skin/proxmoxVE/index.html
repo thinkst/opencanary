@@ -1,0 +1,356 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no"
+    />
+    <title>pve - Proxmox Virtual Environment</title>
+    <link rel="icon" sizes="128x128" href="/pve2/images/logo-128.png" />
+    <link rel="apple-touch-icon" sizes="128x128" href="/pve2/images/logo-128.png" />
+    <link rel="stylesheet" href="/css/login.css" />
+  </head>
+  <body class="<!--STARTERR-->login-failed<!--ENDERR-->">
+    <!-- The workspace shell is rendered behind the modal login window, as it
+         is in the real Proxmox VE web interface.  It is inert and dimmed by
+         the modal mask. -->
+    <div class="app" aria-hidden="true">
+      <header class="topbar">
+        <a class="brand" href="/index.html" tabindex="-1" aria-hidden="true">
+          <img src="/pwt/images/proxmox_logo.svg" alt="Proxmox" />
+        </a>
+        <div class="brand-sub">Virtual Environment</div>
+        <div class="search">
+          <input type="text" placeholder="Search" aria-label="Search" tabindex="-1" />
+        </div>
+        <div class="top-actions">
+          <button type="button" class="btn btn-default" tabindex="-1">
+            <svg class="icon" viewBox="0 0 16 16" aria-hidden="true" focusable="false">
+              <path
+                d="M8 3.4C6.7 2.5 4.9 2.2 3 2.2v9.9c1.9 0 3.7.3 5 1.2 1.3-.9 3.1-1.2 5-1.2V2.2c-1.9 0-3.7.3-5 1.2z"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="1.1"
+                stroke-linejoin="round"
+              />
+              <path d="M8 3.4v9.9" fill="none" stroke="currentColor" stroke-width="1.1" />
+            </svg>
+            Documentation
+          </button>
+          <button type="button" class="btn btn-primary btn-vm" tabindex="-1">
+            <svg class="icon" viewBox="0 0 16 16" aria-hidden="true" focusable="false">
+              <rect
+                x="2.2"
+                y="2.6"
+                width="11.6"
+                height="7.8"
+                rx="0.8"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="1.1"
+              />
+              <path
+                d="M5.6 13.4h4.8M8 10.4v3"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="1.1"
+              />
+            </svg>
+            Create VM
+          </button>
+          <button type="button" class="btn btn-primary btn-ct" tabindex="-1">
+            <svg class="icon" viewBox="0 0 16 16" aria-hidden="true" focusable="false">
+              <path
+                d="M8 1.8 14 5v6l-6 3.2L2 11V5l6-3.2z"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="1.1"
+                stroke-linejoin="round"
+              />
+              <path
+                d="M2 5l6 3.2L14 5M8 8.2v6"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="1.1"
+              />
+            </svg>
+            Create CT
+          </button>
+          <button type="button" class="btn btn-user" tabindex="-1" aria-label="User menu">
+            <svg class="icon" viewBox="0 0 16 16" aria-hidden="true" focusable="false">
+              <circle
+                cx="8"
+                cy="5"
+                r="2.6"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="1.1"
+              />
+              <path
+                d="M2.9 13.4c0-2.4 2.3-3.9 5.1-3.9s5.1 1.5 5.1 3.9"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="1.1"
+              />
+            </svg>
+            <svg class="caret" viewBox="0 0 9 6" aria-hidden="true" focusable="false">
+              <path d="M1 1l3.5 3.5L8 1" fill="none" stroke="currentColor" stroke-width="1.1" />
+            </svg>
+          </button>
+        </div>
+      </header>
+
+      <div class="main">
+        <aside class="sidebar">
+          <div class="sidebar-toolbar">
+            <div class="server-view">
+              <span>Server View</span>
+              <svg class="caret" viewBox="0 0 9 6" aria-hidden="true" focusable="false">
+                <path d="M1 1l3.5 3.5L8 1" fill="none" stroke="currentColor" stroke-width="1.1" />
+              </svg>
+            </div>
+            <button type="button" class="gear" tabindex="-1" aria-label="Server view settings">
+              <svg class="icon" viewBox="0 0 16 16" aria-hidden="true" focusable="false">
+                <circle
+                  cx="8"
+                  cy="8"
+                  r="2.3"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="1.1"
+                />
+                <path
+                  d="M8 1.6v1.7M8 12.7v1.7M1.6 8h1.7M12.7 8h1.7M3.5 3.5l1.2 1.2M11.3 11.3l1.2 1.2M12.5 3.5l-1.2 1.2M4.7 11.3l-1.2 1.2"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="1.1"
+                />
+              </svg>
+            </button>
+          </div>
+          <div class="tree">
+            <div class="tree-row">
+              <span class="tree-arrow">
+                <svg class="icon" viewBox="0 0 6 10" aria-hidden="true" focusable="false">
+                  <path
+                    d="M1 1l4 4-4 4"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="1.1"
+                  />
+                </svg>
+              </span>
+              <span class="tree-icon">
+                <svg width="16" height="16" viewBox="0 0 16 16" aria-hidden="true" focusable="false">
+                  <rect
+                    x="2.6"
+                    y="2.4"
+                    width="10.8"
+                    height="3.1"
+                    rx="0.6"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="1"
+                  />
+                  <rect
+                    x="2.6"
+                    y="6.5"
+                    width="10.8"
+                    height="3.1"
+                    rx="0.6"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="1"
+                  />
+                  <rect
+                    x="2.6"
+                    y="10.6"
+                    width="10.8"
+                    height="3.1"
+                    rx="0.6"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="1"
+                  />
+                  <circle cx="4.4" cy="3.95" r="0.65" fill="currentColor" />
+                  <circle cx="4.4" cy="8.05" r="0.65" fill="currentColor" />
+                  <circle cx="4.4" cy="12.15" r="0.65" fill="currentColor" />
+                </svg>
+              </span>
+              <span class="tree-label">Datacenter</span>
+            </div>
+          </div>
+        </aside>
+        <div class="splitter-v"></div>
+        <main class="content"></main>
+      </div>
+
+      <div class="splitter-h"></div>
+
+      <section class="status">
+        <div class="tabbar">
+          <button type="button" class="tab is-active" tabindex="-1">Tasks</button>
+          <button type="button" class="tab" tabindex="-1">Cluster log</button>
+        </div>
+        <div class="grid">
+          <div class="grid-head">
+            <div class="cell col-1 is-sorted">
+              Start Time
+              <svg class="sort-arrow" viewBox="0 0 8 10" aria-hidden="true" focusable="false">
+                <path
+                  d="M4 1v8M1 6l3 3 3-3"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="1.1"
+                />
+              </svg>
+            </div>
+            <div class="cell col-2">End Time</div>
+            <div class="cell col-3">Node</div>
+            <div class="cell col-4">User name</div>
+            <div class="cell col-5">Description</div>
+            <div class="cell col-6">Status</div>
+            <div class="cell col-7"></div>
+          </div>
+          <div class="grid-body"></div>
+        </div>
+      </section>
+    </div>
+
+    <div class="mask"></div>
+
+    <div class="login-layer">
+      <div
+        class="login-window"
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="login-title"
+      >
+        <div class="login-titlebar" id="login-title">Proxmox VE Login</div>
+        <form
+          class="login-form"
+          id="login-form"
+          method="post"
+          action="/index.html"
+          autocomplete="on"
+        >
+          <div class="login-body">
+            <div class="field">
+              <label for="username">User name:</label>
+              <div class="control">
+                <input
+                  id="username"
+                  name="username"
+                  type="text"
+                  autocomplete="username"
+                  maxlength="256"
+                  spellcheck="false"
+                  autofocus
+                />
+              </div>
+            </div>
+            <div class="field">
+              <label for="password">Password:</label>
+              <div class="control">
+                <input
+                  id="password"
+                  name="password"
+                  type="password"
+                  autocomplete="current-password"
+                  maxlength="256"
+                />
+              </div>
+            </div>
+            <div class="field">
+              <label for="realm">Realm:</label>
+              <div class="control select">
+                <select id="realm" name="realm">
+                  <option value="pam" selected>Linux PAM standard authentication</option>
+                  <option value="pve">Proxmox VE authentication server</option>
+                </select>
+              </div>
+            </div>
+            <div class="field">
+              <label for="lang">Language:</label>
+              <div class="control select">
+                <select id="lang" name="lang">
+                  <option value="en" selected>English - English</option>
+                  <option value="ar">Arabic - العربية</option>
+                  <option value="ca">Catalan - Català</option>
+                  <option value="zh-cn">Chinese (Simplified) - 简体中文</option>
+                  <option value="zh-tw">Chinese (Traditional) - 繁體中文</option>
+                  <option value="cs">Czech - Čeština</option>
+                  <option value="da">Danish - Dansk</option>
+                  <option value="nl">Dutch - Nederlands</option>
+                  <option value="fr">French - Français</option>
+                  <option value="gl">Galician - Galego</option>
+                  <option value="de">German - Deutsch</option>
+                  <option value="el">Greek - Ελληνικά</option>
+                  <option value="he">Hebrew - עברית</option>
+                  <option value="hu">Hungarian - Magyar</option>
+                  <option value="id">Indonesian - Bahasa Indonesia</option>
+                  <option value="it">Italian - Italiano</option>
+                  <option value="ja">Japanese - 日本語</option>
+                  <option value="ko">Korean - 한국어</option>
+                  <option value="nb">Norwegian (Bokmal) - Norsk Bokmål</option>
+                  <option value="fa">Persian - فارسی</option>
+                  <option value="pl">Polish - Polski</option>
+                  <option value="pt-br">Portuguese (Brazil) - Português (Brasil)</option>
+                  <option value="pt">Portuguese - Português</option>
+                  <option value="ro">Romanian - Română</option>
+                  <option value="ru">Russian - Русский</option>
+                  <option value="sr">Serbian - Српски</option>
+                  <option value="sl">Slovenian - Slovenščina</option>
+                  <option value="es">Spanish - Español</option>
+                  <option value="sv">Swedish - Svenska</option>
+                  <option value="tr">Turkish - Türkçe</option>
+                  <option value="uk">Ukrainian - Українська</option>
+                </select>
+              </div>
+            </div>
+          </div>
+          <div class="login-footer">
+            <label class="save-username">
+              <span>Save User name:</span>
+              <input type="checkbox" id="saveusername" name="saveusername" value="1" />
+            </label>
+            <button class="login-button" type="submit" name="btnLogin" value="Login">
+              Login
+            </button>
+          </div>
+          <div class="window-mask" id="login-mask" hidden>
+            <span class="spinner"></span>Please wait...
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <!-- Ext.MessageBox "Error" alert, as shown by Proxmox VE after a failed
+         login.  It is revealed by body.login-failed (plain form POST) or by
+         body.is-error (the enhance JavaScript path). -->
+    <div class="error-layer" id="error-dialog">
+      <div
+        class="error-box"
+        role="alertdialog"
+        aria-modal="true"
+        aria-labelledby="error-title"
+        aria-describedby="error-message"
+      >
+        <div class="error-titlebar" id="error-title">Error</div>
+        <div class="error-body">
+          <div class="error-icon" aria-hidden="true">i</div>
+          <div class="error-message" id="error-message">
+            Login failed:<br />401 Unauthorized<br />Please try again
+          </div>
+        </div>
+        <div class="error-footer">
+          <button type="button" class="error-ok" id="error-ok">OK</button>
+        </div>
+      </div>
+    </div>
+
+    <script src="/js/login.js"></script>
+  </body>
+</html>
