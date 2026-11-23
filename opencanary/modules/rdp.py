@@ -1,6 +1,7 @@
 import re
 
 from opencanary.modules import CanaryService
+from opencanary.modules.resource_limits import BoundedConnectionFactory
 
 from twisted.internet.protocol import Protocol
 from twisted.internet.protocol import Factory
@@ -50,7 +51,8 @@ class CanaryRDP(Factory, CanaryService):
         self.logtype = logger.LOG_RDP
 
     def getService(self):
-        return internet.TCPServer(self.port, self, interface=self.listen_addr)
+        factory = BoundedConnectionFactory(self, self.config, "rdp")
+        return internet.TCPServer(self.port, factory, interface=self.listen_addr)
 
 
 CanaryServiceFactory = CanaryRDP

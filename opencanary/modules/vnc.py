@@ -1,4 +1,5 @@
 from opencanary.modules import CanaryService
+from opencanary.modules.resource_limits import BoundedConnectionFactory
 
 from twisted.internet.protocol import Protocol
 from twisted.internet.protocol import Factory
@@ -177,7 +178,8 @@ class CanaryVNC(Factory, CanaryService):
         self.logtype = logger.LOG_VNC
 
     def getService(self):
-        return internet.TCPServer(self.port, self, interface=self.listen_addr)
+        factory = BoundedConnectionFactory(self, self.config, "vnc")
+        return internet.TCPServer(self.port, factory, interface=self.listen_addr)
 
 
 CanaryServiceFactory = CanaryVNC

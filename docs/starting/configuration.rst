@@ -341,4 +341,35 @@ These configuration options are also available.
      - 120
      - Seconds a Telnet connection may remain inactive before it is closed.
 
+TCP Resource Limits
+~~~~~~~~~~~~~~~~~~~
+
+The MongoDB, MSSQL, MySQL, RDP, VNC and TCP banner listeners limit concurrent connections and idle time. They also support optional limits on total connection lifetime.
+
+Use the prefixes ``mongodb``, ``mssql``, ``mysql``, ``rdp``, ``vnc`` or a specific banner instance such as ``tcpbanner_1`` for the following options:
+
+.. list-table::
+   :header-rows: 1
+
+   * - Option Key
+     - Default
+     - Description
+   * - <prefix>.max_connections
+     - 10 for MongoDB; 32 otherwise
+     - Maximum concurrent accepted connections per listener. Excess connections are closed immediately.
+   * - <prefix>.timeout
+     - 10
+     - Seconds without incoming data before the connection is aborted.
+   * - <prefix>.max_duration
+     - 0 for MongoDB, MSSQL and TCP banner; 60 otherwise
+     - Maximum connection lifetime in seconds, even when the client keeps sending data. Set to 0 for no total lifetime limit.
+   * - mongodb.max_buffer_size
+     - 16777216 (16 MiB)
+     - Maximum receive buffer and declared message size in bytes, capped at the MongoDB wire protocol maximum of 48000000. Also advertised to clients as maxMessageSizeBytes.
+
+A ``max_duration`` of 0 disables limit on connection duration. TCP banner keepalive connections, including those which supplied the keepalive secret, are still subject to the idle timeout. TCP keepalive probes do not count as incoming application data.
+
+Contact
+-------
+
 Should you have any other questions regarding configuration or setup, please do not hesitate to contact us on `GitHub <https://github.com/thinkst/opencanary>`_.

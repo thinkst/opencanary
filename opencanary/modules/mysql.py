@@ -1,7 +1,7 @@
 from opencanary.modules import CanaryService
+from opencanary.modules.resource_limits import BoundedConnectionFactory
 from opencanary.config import ConfigException
 
-from twisted.protocols.policies import TimeoutMixin
 from twisted.internet.protocol import Protocol
 from twisted.internet.protocol import Factory
 from twisted.application import internet
@@ -13,9 +13,10 @@ import string
 import random
 
 UINT_MAX = 0xFFFFFFFF
+MAX_BUFFER_SIZE = 65536
 
 
-class MySQL(Protocol, TimeoutMixin):
+class MySQL(Protocol):
     HEADER_LEN = 4
     ERR_CODE_ACCESS_DENIED = 1045
     ERR_CODE_PKT_ORDER = 1156
@@ -28,7 +29,6 @@ class MySQL(Protocol, TimeoutMixin):
         self._buffer = b""
         self.factory = factory
         self.threadid = factory.next_threadid()
-        self.setTimeout(10)
 
     @staticmethod
     def build_packet(seq_id, data):
@@ -67,6 +67,10 @@ class MySQL(Protocol, TimeoutMixin):
             return None, None
         length = struct.unpack("<I", self._buffer[:3] + b"\x00")[0]
         seq_id = self._buffer[3]
+        if MySQL.HEADER_LEN + length > MAX_BUFFER_SIZE:
+            self._buffer = b""
+            self.transport.abortConnection()
+            return None, None
 
         # enough buffer data to consume packet?
         if len(self._buffer) < MySQL.HEADER_LEN + length:
@@ -133,8 +137,11 @@ class MySQL(Protocol, TimeoutMixin):
         self.transport.write(self.server_greeting())
 
     def dataReceived(self, data):
+        if len(self._buffer) + len(data) > MAX_BUFFER_SIZE:
+            self._buffer = b""
+            self.transport.abortConnection()
+            return
         self._buffer += data
-        self.resetTimeout()
 
         if self._busyReceiving:
             return
@@ -161,8 +168,8 @@ class MySQL(Protocol, TimeoutMixin):
         finally:
             self._busyReceiving = False
 
-    def timeoutConnection(self):
-        self.transport.abortConnection()
+    def connectionLost(self, reason):
+        self._buffer = b""
 
 
 class SQLFactory(Factory):
@@ -197,4 +204,5 @@ class CanaryMySQL(CanaryService):
     def getService(self):
         factory = SQLFactory()
         factory.canaryservice = self
+        factory = BoundedConnectionFactory(factory, self.config, "mysql")
         return internet.TCPServer(self.port, factory, interface=self.listen_addr)
